@@ -16,8 +16,8 @@
     --popover: 45 40% 98%;
     --popover-foreground: 30 15% 15%;
 
-    /* Deep Forest Green */
-    --primary: 152 45% 22%;
+    /* Deep Red */
+    --primary: 0 88% 35%;
     --primary-foreground: 45 30% 97%;
 
     /* Warm Gold */
@@ -37,16 +37,16 @@
 
     --border: 30 20% 85%;
     --input: 30 20% 85%;
-    --ring: 152 45% 22%;
+    --ring: 0 88% 35%;
 
     --radius: 0.5rem;
 
     /* Custom Design Tokens */
     --cream: 45 40% 96%;
     --cream-dark: 38 30% 90%;
-    --emerald: 152 45% 22%;
-    --emerald-light: 152 35% 35%;
-    --emerald-dark: 152 50% 15%;
+    --emerald: 0 88% 35%;
+    --emerald-light: 0 75% 45%;
+    --emerald-dark: 0 89% 28%;
     --gold: 38 85% 55%;
     --gold-light: 38 75% 70%;
     --gold-dark: 38 90% 40%;
@@ -54,7 +54,7 @@
     --earth-light: 30 20% 55%;
 
     /* Gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(152 45% 22% / 0.95), hsl(152 50% 15% / 0.98));
+    --gradient-hero: linear-gradient(135deg, hsla(0, 88%, 38%, 0.95), hsla(0, 89%, 31%, 0.98));
     --gradient-gold: linear-gradient(135deg, hsl(38 85% 55%), hsl(38 90% 40%));
     --gradient-cream: linear-gradient(180deg, hsl(45 40% 98%), hsl(45 30% 94%));
 
@@ -70,12 +70,12 @@
     /* Sidebar defaults */
     --sidebar-background: 45 40% 98%;
     --sidebar-foreground: 30 15% 15%;
-    --sidebar-primary: 152 45% 22%;
+    --sidebar-primary: 0 88% 35%;
     --sidebar-primary-foreground: 45 30% 97%;
     --sidebar-accent: 38 85% 55%;
     --sidebar-accent-foreground: 30 15% 15%;
     --sidebar-border: 30 20% 85%;
-    --sidebar-ring: 152 45% 22%;
+    --sidebar-ring: 0 88% 35%;
   }
 
   .dark {
@@ -88,7 +88,7 @@
     --popover: 30 15% 12%;
     --popover-foreground: 45 30% 95%;
 
-    --primary: 152 40% 45%;
+    --primary: 0 75% 55%;
     --primary-foreground: 30 15% 10%;
 
     --secondary: 38 70% 50%;
@@ -105,16 +105,16 @@
 
     --border: 30 10% 25%;
     --input: 30 10% 25%;
-    --ring: 152 40% 45%;
+    --ring: 0 75% 55%;
 
     --sidebar-background: 30 15% 12%;
     --sidebar-foreground: 45 30% 95%;
-    --sidebar-primary: 152 40% 45%;
+    --sidebar-primary: 0 75% 55%;
     --sidebar-primary-foreground: 30 15% 10%;
     --sidebar-accent: 38 85% 55%;
     --sidebar-accent-foreground: 30 15% 10%;
     --sidebar-border: 30 10% 25%;
-    --sidebar-ring: 152 40% 45%;
+    --sidebar-ring: 0 75% 55%;
   }
 }
 
@@ -131,7 +131,12 @@
     @apply bg-background text-foreground font-body antialiased;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-display;
   }
 }
@@ -190,6 +195,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -200,6 +206,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -210,6 +217,7 @@
     opacity: 0;
     transform: scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -221,6 +229,7 @@
     opacity: 0;
     transform: translateX(100%);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -228,9 +237,12 @@
 }
 
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-10px);
   }
