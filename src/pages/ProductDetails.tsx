@@ -1,20 +1,58 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Star, Plus, Minus, ShoppingBag, Leaf, Thermometer, Clock, Scale, MapPin, Check } from 'lucide-react';
+import { ArrowLeft, Star, Plus, Minus, ShoppingBag, Leaf, Thermometer, Clock, Scale, MapPin, Check, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { getProductById, products } from '@/data/products';
+import { useProduct, useProducts } from '@/hooks/useProducts';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
 
 const ProductDetails = () => {
   const { id } = useParams<{ id: string }>();
-  const product = getProductById(id || '');
+  const { data: product, isLoading, error } = useProduct(id || '');
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
   const { addToCart } = useCart();
   const { toast } = useToast();
 
-  if (!product) {
+  // Fetch related products from same category
+  const { data: relatedProducts = [] } = useProducts({
+    filters: { category: product?.category },
+    limit: 5,
+  });
+
+  const filteredRelated = relatedProducts.filter(p => p.id !== product?.id).slice(0, 4);
+
+  const formatPrice = (price: number) => {
+    // Prices are stored in paise, convert to rupees
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      minimumFractionDigits: 0,
+    }).format(price / 100);
+  };
+
+  const getProductImage = (p: typeof product) => {
+    if (!p) return '';
+    const primaryImage = p.images?.find(img => img.is_primary);
+    return primaryImage?.url || p.images?.[0]?.url || 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=800&q=80';
+  };
+
+  const getProductImages = () => {
+    if (!product?.images?.length) return [getProductImage(product)];
+    return product.images
+      .sort((a, b) => a.sort_order - b.sort_order)
+      .map(img => img.url);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!product || error) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
@@ -29,22 +67,16 @@ const ProductDetails = () => {
     );
   }
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      minimumFractionDigits: 0,
-    }).format(price);
-  };
+  const images = getProductImages();
 
   const handleAddToCart = () => {
     for (let i = 0; i < quantity; i++) {
       addToCart({
         id: product.id,
         name: product.name,
-        price: product.price,
-        image: product.image,
-        weight: product.weight,
+        price: product.price / 100, // Convert from paise
+        image: getProductImage(product),
+        weight: product.weight || undefined,
       });
     }
     toast({
@@ -52,10 +84,6 @@ const ProductDetails = () => {
       description: `${quantity} × ${product.name} added to your cart`,
     });
   };
-
-  const relatedProducts = products
-    .filter((p) => p.category === product.category && p.id !== product.id)
-    .slice(0, 4);
 
   return (
     <div className="min-h-screen bg-background">
@@ -89,9 +117,8 @@ const ProductDetails = () => {
                   <button
                     key={idx}
                     onClick={() => setSelectedImage(idx)}
-                    className={`w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${
-                      selectedImage === idx ? 'border-primary' : 'border-transparent'
-                    }`}
+                    className={`w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${selectedImage === idx ? 'border-primary' : 'border-transparent'
+                      }`}
                   >
                     <img src={img} alt="" className="w-full h-full object-cover" />
                   </button>
@@ -131,11 +158,10 @@ const ProductDetails = () => {
                 {[...Array(5)].map((_, i) => (
                   <Star
                     key={i}
-                    className={`h-5 w-5 ${
-                      i < Math.floor(product.rating)
+                    className={`h-5 w-5 ${i < Math.floor(product.rating)
                         ? 'fill-accent text-accent'
                         : 'text-muted'
-                    }`}
+                      }`}
                   />
                 ))}
               </div>
