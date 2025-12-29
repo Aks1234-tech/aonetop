@@ -1,30 +1,21 @@
 import { useState } from 'react';
-import { Lock, Package, ShoppingBag, Users, Plus, Edit, Trash2, Eye, LogOut } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Package, ShoppingBag, Users, Plus, Edit, Trash2, Eye, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { products } from '@/data/products';
+import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
 const Admin = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
+  const { signOut, profile } = useAuth();
   const [activeTab, setActiveTab] = useState('products');
   const { toast } = useToast();
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Simple mock authentication
-    if (password === 'admin123') {
-      setIsAuthenticated(true);
-      toast({ title: 'Welcome back!' });
-    } else {
-      toast({
-        title: 'Invalid password',
-        description: 'Please try again.',
-        variant: 'destructive',
-      });
-    }
+  const handleLogout = async () => {
+    await signOut();
+    toast({ title: 'Logged out successfully' });
+    navigate('/');
   };
 
   const formatPrice = (price: number) => {
@@ -35,7 +26,7 @@ const Admin = () => {
     }).format(price);
   };
 
-  // Mock data for orders and inquiries
+  // Mock data for orders and inquiries (will be replaced with Supabase queries in Phase 5)
   const mockOrders = [
     { id: 'ORD001', customer: 'Rahul Sharma', total: 4998, status: 'Pending', date: '2024-01-15' },
     { id: 'ORD002', customer: 'Priya Patel', total: 2499, status: 'Shipped', date: '2024-01-14' },
@@ -47,49 +38,9 @@ const Admin = () => {
     { id: 'INQ002', company: 'Cafe Coffee Day', contact: 'Neha Gupta', volume: '100kg+', date: '2024-01-14' },
   ];
 
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center py-20">
-        <div className="w-full max-w-md">
-          <div className="bg-card rounded-2xl p-8 shadow-elevated">
-            <div className="text-center mb-8">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                <Lock className="h-8 w-8 text-primary" />
-              </div>
-              <h1 className="font-display text-2xl font-semibold text-foreground">
-                Admin Login
-              </h1>
-              <p className="text-muted-foreground mt-2">
-                Enter your password to access the dashboard
-              </p>
-            </div>
-
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div>
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter admin password"
-                />
-              </div>
-              <Button type="submit" variant="gold" className="w-full">
-                Login
-              </Button>
-            </form>
-
-            <p className="text-xs text-muted-foreground text-center mt-6">
-              Demo password: admin123
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
+  // ProtectedRoute handles authentication, so we go straight to dashboard
   return (
+
     <div className="min-h-screen bg-muted/30">
       {/* Header */}
       <div className="bg-card border-b border-border">
@@ -100,7 +51,7 @@ const Admin = () => {
             </h1>
             <Button
               variant="ghost"
-              onClick={() => setIsAuthenticated(false)}
+              onClick={handleLogout}
             >
               <LogOut className="mr-2 h-4 w-4" />
               Logout
@@ -226,11 +177,10 @@ const Admin = () => {
                           <td className="py-3 px-4 text-muted-foreground">{product.category}</td>
                           <td className="py-3 px-4 text-foreground">{formatPrice(product.price)}</td>
                           <td className="py-3 px-4">
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              product.inStock
-                                ? 'bg-primary/10 text-primary'
-                                : 'bg-destructive/10 text-destructive'
-                            }`}>
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${product.inStock
+                              ? 'bg-primary/10 text-primary'
+                              : 'bg-destructive/10 text-destructive'
+                              }`}>
                               {product.inStock ? 'In Stock' : 'Out of Stock'}
                             </span>
                           </td>
@@ -280,13 +230,12 @@ const Admin = () => {
                           <td className="py-3 px-4 text-muted-foreground">{order.customer}</td>
                           <td className="py-3 px-4 text-foreground">{formatPrice(order.total)}</td>
                           <td className="py-3 px-4">
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              order.status === 'Delivered'
-                                ? 'bg-primary/10 text-primary'
-                                : order.status === 'Shipped'
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${order.status === 'Delivered'
+                              ? 'bg-primary/10 text-primary'
+                              : order.status === 'Shipped'
                                 ? 'bg-accent/10 text-accent'
                                 : 'bg-muted text-muted-foreground'
-                            }`}>
+                              }`}>
                               {order.status}
                             </span>
                           </td>
