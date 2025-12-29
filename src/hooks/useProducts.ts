@@ -28,74 +28,86 @@ export function useProducts(options: ProductsQueryOptions = {}) {
         queryKey: ['products', JSON.stringify(filters), sortBy, limit],
         queryFn: async () => {
             console.log('[useProducts] Query starting with filters:', filters, 'sortBy:', sortBy);
-            let query = supabase
-                .from('products')
-                .select(`
+            try {
+                let query = supabase
+                    .from('products')
+                    .select(`
           *,
           images:product_images(*)
         `);
 
-            // Apply filters
-            if (filters.category) {
-                query = query.ilike('category', `%${filters.category.replace(/-/g, ' ')}%`);
+                console.log('[useProducts] Query builder created');
+
+                // Apply filters
+                if (filters.category) {
+                    query = query.ilike('category', `%${filters.category.replace(/-/g, ' ')}%`);
+                }
+
+                if (filters.search) {
+                    query = query.or(
+                        `name.ilike.%${filters.search}%,description.ilike.%${filters.search}%`
+                    );
+                }
+
+                if (filters.inStock !== undefined) {
+                    query = query.eq('in_stock', filters.inStock);
+                }
+
+                if (filters.isFeatured) {
+                    query = query.eq('is_featured', true);
+                }
+
+                if (filters.isBestseller) {
+                    query = query.eq('is_bestseller', true);
+                }
+
+                if (filters.isNew) {
+                    query = query.eq('is_new', true);
+                }
+
+                console.log('[useProducts] Filters applied');
+
+                // Apply sorting
+                switch (sortBy) {
+                    case 'price-asc':
+                        query = query.order('price', { ascending: true });
+                        break;
+                    case 'price-desc':
+                        query = query.order('price', { ascending: false });
+                        break;
+                    case 'name':
+                        query = query.order('name', { ascending: true });
+                        break;
+                    case 'rating':
+                        query = query.order('rating', { ascending: false });
+                        break;
+                    case 'featured':
+                    default:
+                        query = query.order('is_featured', { ascending: false })
+                            .order('is_bestseller', { ascending: false });
+                        break;
+                }
+
+                console.log('[useProducts] Sorting applied');
+
+                if (limit) {
+                    query = query.limit(limit);
+                }
+
+                console.log('[useProducts] About to execute query...');
+                const { data, error } = await query;
+                console.log('[useProducts] Query executed');
+
+                if (error) {
+                    console.error('[useProducts] Query error:', error);
+                    throw error;
+                }
+                console.log('[useProducts] Query success, returned', (data as Product[])?.length || 0, 'products');
+                return data as Product[];
+            } catch (err) {
+                console.error('[useProducts] Catch block:', err);
+                throw err;
             }
-
-            if (filters.search) {
-                query = query.or(
-                    `name.ilike.%${filters.search}%,description.ilike.%${filters.search}%`
-                );
-            }
-
-            if (filters.inStock !== undefined) {
-                query = query.eq('in_stock', filters.inStock);
-            }
-
-            if (filters.isFeatured) {
-                query = query.eq('is_featured', true);
-            }
-
-            if (filters.isBestseller) {
-                query = query.eq('is_bestseller', true);
-            }
-
-            if (filters.isNew) {
-                query = query.eq('is_new', true);
-            }
-
-            // Apply sorting
-            switch (sortBy) {
-                case 'price-asc':
-                    query = query.order('price', { ascending: true });
-                    break;
-                case 'price-desc':
-                    query = query.order('price', { ascending: false });
-                    break;
-                case 'name':
-                    query = query.order('name', { ascending: true });
-                    break;
-                case 'rating':
-                    query = query.order('rating', { ascending: false });
-                    break;
-                case 'featured':
-                default:
-                    query = query.order('is_featured', { ascending: false })
-                        .order('is_bestseller', { ascending: false });
-                    break;
-            }
-
-            if (limit) {
-                query = query.limit(limit);
-            }
-
-            const { data, error } = await query;
-
-            if (error) {
-                console.error('[useProducts] Query error:', error);
-                throw error;
-            }
-
-            console.log('[useProducts] Query success, returned', (data as Product[])?.length || 0, 'products');
-            return data as Product[];
         },
         retry: false,
         staleTime: 60 * 1000,

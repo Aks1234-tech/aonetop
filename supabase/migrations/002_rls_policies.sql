@@ -31,24 +31,42 @@ CREATE POLICY "Admins can view all profiles"
 -- ============================================
 ALTER TABLE products ENABLE ROW LEVEL SECURITY;
 
--- Anyone can view products
+-- Anyone can view products (no admin check to prevent recursion)
 CREATE POLICY "Products are publicly readable"
   ON products FOR SELECT
   TO anon, authenticated
   USING (true);
 
 -- Only admins can insert/update/delete products
-CREATE POLICY "Admins can manage products"
-  ON products FOR ALL
+CREATE POLICY "Admins can insert products"
+  ON products FOR INSERT
+  TO authenticated
+  WITH CHECK (
+    auth.uid() IN (
+      SELECT id FROM profiles WHERE role = 'admin'
+    )
+  );
+
+CREATE POLICY "Admins can update products"
+  ON products FOR UPDATE
+  TO authenticated
   USING (
-    EXISTS (
-      SELECT 1 FROM profiles
-      WHERE id = auth.uid() AND role = 'admin'
+    auth.uid() IN (
+      SELECT id FROM profiles WHERE role = 'admin'
+    )
+  );
+
+CREATE POLICY "Admins can delete products"
+  ON products FOR DELETE
+  TO authenticated
+  USING (
+    auth.uid() IN (
+      SELECT id FROM profiles WHERE role = 'admin'
     )
   );
 
 -- ============================================
--- PRODUCT IMAGES (Same as products)
+-- PRODUCT IMAGES (Public read, Admin write)
 -- ============================================
 ALTER TABLE product_images ENABLE ROW LEVEL SECURITY;
 
@@ -57,12 +75,30 @@ CREATE POLICY "Product images are publicly readable"
   TO anon, authenticated
   USING (true);
 
-CREATE POLICY "Admins can manage product images"
-  ON product_images FOR ALL
+CREATE POLICY "Admins can insert product images"
+  ON product_images FOR INSERT
+  TO authenticated
+  WITH CHECK (
+    auth.uid() IN (
+      SELECT id FROM profiles WHERE role = 'admin'
+    )
+  );
+
+CREATE POLICY "Admins can update product images"
+  ON product_images FOR UPDATE
+  TO authenticated
   USING (
-    EXISTS (
-      SELECT 1 FROM profiles
-      WHERE id = auth.uid() AND role = 'admin'
+    auth.uid() IN (
+      SELECT id FROM profiles WHERE role = 'admin'
+    )
+  );
+
+CREATE POLICY "Admins can delete product images"
+  ON product_images FOR DELETE
+  TO authenticated
+  USING (
+    auth.uid() IN (
+      SELECT id FROM profiles WHERE role = 'admin'
     )
   );
 
@@ -76,12 +112,30 @@ CREATE POLICY "Categories are publicly readable"
   TO anon, authenticated
   USING (true);
 
-CREATE POLICY "Admins can manage categories"
-  ON categories FOR ALL
+CREATE POLICY "Admins can insert categories"
+  ON categories FOR INSERT
+  TO authenticated
+  WITH CHECK (
+    auth.uid() IN (
+      SELECT id FROM profiles WHERE role = 'admin'
+    )
+  );
+
+CREATE POLICY "Admins can update categories"
+  ON categories FOR UPDATE
+  TO authenticated
   USING (
-    EXISTS (
-      SELECT 1 FROM profiles
-      WHERE id = auth.uid() AND role = 'admin'
+    auth.uid() IN (
+      SELECT id FROM profiles WHERE role = 'admin'
+    )
+  );
+
+CREATE POLICY "Admins can delete categories"
+  ON categories FOR DELETE
+  TO authenticated
+  USING (
+    auth.uid() IN (
+      SELECT id FROM profiles WHERE role = 'admin'
     )
   );
 
@@ -123,21 +177,30 @@ CREATE POLICY "Active offers are publicly readable"
     AND (ends_at IS NULL OR ends_at >= NOW())
   );
 
-CREATE POLICY "Admins can view all offers"
-  ON offers FOR SELECT
-  USING (
-    EXISTS (
-      SELECT 1 FROM profiles
-      WHERE id = auth.uid() AND role = 'admin'
+CREATE POLICY "Admins can insert offers"
+  ON offers FOR INSERT
+  TO authenticated
+  WITH CHECK (
+    auth.uid() IN (
+      SELECT id FROM profiles WHERE role = 'admin'
     )
   );
 
-CREATE POLICY "Admins can manage offers"
-  ON offers FOR ALL
+CREATE POLICY "Admins can update offers"
+  ON offers FOR UPDATE
+  TO authenticated
   USING (
-    EXISTS (
-      SELECT 1 FROM profiles
-      WHERE id = auth.uid() AND role = 'admin'
+    auth.uid() IN (
+      SELECT id FROM profiles WHERE role = 'admin'
+    )
+  );
+
+CREATE POLICY "Admins can delete offers"
+  ON offers FOR DELETE
+  TO authenticated
+  USING (
+    auth.uid() IN (
+      SELECT id FROM profiles WHERE role = 'admin'
     )
   );
 
@@ -151,12 +214,30 @@ CREATE POLICY "Offer products publicly readable"
   TO anon, authenticated
   USING (true);
 
-CREATE POLICY "Admins can manage offer products"
-  ON offer_products FOR ALL
+CREATE POLICY "Admins can insert offer products"
+  ON offer_products FOR INSERT
+  TO authenticated
+  WITH CHECK (
+    auth.uid() IN (
+      SELECT id FROM profiles WHERE role = 'admin'
+    )
+  );
+
+CREATE POLICY "Admins can update offer products"
+  ON offer_products FOR UPDATE
+  TO authenticated
   USING (
-    EXISTS (
-      SELECT 1 FROM profiles
-      WHERE id = auth.uid() AND role = 'admin'
+    auth.uid() IN (
+      SELECT id FROM profiles WHERE role = 'admin'
+    )
+  );
+
+CREATE POLICY "Admins can delete offer products"
+  ON offer_products FOR DELETE
+  TO authenticated
+  USING (
+    auth.uid() IN (
+      SELECT id FROM profiles WHERE role = 'admin'
     )
   );
 
@@ -175,23 +256,43 @@ CREATE POLICY "Users can create orders"
   ON orders FOR INSERT
   WITH CHECK (auth.uid() = user_id OR user_id IS NULL);
 
--- Admins can view all orders
-CREATE POLICY "Admins can view all orders"
-  ON orders FOR SELECT
-  USING (
-    EXISTS (
-      SELECT 1 FROM profiles
-      WHERE id = auth.uid() AND role = 'admin'
+-- Admins can insert orders
+CREATE POLICY "Admins can insert orders"
+  ON orders FOR INSERT
+  TO authenticated
+  WITH CHECK (
+    auth.uid() IN (
+      SELECT id FROM profiles WHERE role = 'admin'
     )
   );
 
 -- Admins can update orders
 CREATE POLICY "Admins can update orders"
   ON orders FOR UPDATE
+  TO authenticated
   USING (
-    EXISTS (
-      SELECT 1 FROM profiles
-      WHERE id = auth.uid() AND role = 'admin'
+    auth.uid() IN (
+      SELECT id FROM profiles WHERE role = 'admin'
+    )
+  );
+
+-- Admins can delete orders
+CREATE POLICY "Admins can delete orders"
+  ON orders FOR DELETE
+  TO authenticated
+  USING (
+    auth.uid() IN (
+      SELECT id FROM profiles WHERE role = 'admin'
+    )
+  );
+
+-- Admins can view all orders
+CREATE POLICY "Admins can view all orders"
+  ON orders FOR SELECT
+  TO authenticated
+  USING (
+    auth.uid() IN (
+      SELECT id FROM profiles WHERE role = 'admin'
     )
   );
 
@@ -246,20 +347,20 @@ CREATE POLICY "Anyone can submit contact message"
 -- Only admins can view contact messages
 CREATE POLICY "Admins can view contact messages"
   ON contact_messages FOR SELECT
+  TO authenticated
   USING (
-    EXISTS (
-      SELECT 1 FROM profiles
-      WHERE id = auth.uid() AND role = 'admin'
+    auth.uid() IN (
+      SELECT id FROM profiles WHERE role = 'admin'
     )
   );
 
 -- Admins can update contact messages (mark as read)
 CREATE POLICY "Admins can update contact messages"
   ON contact_messages FOR UPDATE
+  TO authenticated
   USING (
-    EXISTS (
-      SELECT 1 FROM profiles
-      WHERE id = auth.uid() AND role = 'admin'
+    auth.uid() IN (
+      SELECT id FROM profiles WHERE role = 'admin'
     )
   );
 
@@ -277,19 +378,19 @@ CREATE POLICY "Anyone can submit bulk inquiry"
 -- Only admins can view bulk inquiries
 CREATE POLICY "Admins can view bulk inquiries"
   ON bulk_inquiries FOR SELECT
+  TO authenticated
   USING (
-    EXISTS (
-      SELECT 1 FROM profiles
-      WHERE id = auth.uid() AND role = 'admin'
+    auth.uid() IN (
+      SELECT id FROM profiles WHERE role = 'admin'
     )
   );
 
 -- Admins can update bulk inquiries
 CREATE POLICY "Admins can update bulk inquiries"
   ON bulk_inquiries FOR UPDATE
+  TO authenticated
   USING (
-    EXISTS (
-      SELECT 1 FROM profiles
-      WHERE id = auth.uid() AND role = 'admin'
+    auth.uid() IN (
+      SELECT id FROM profiles WHERE role = 'admin'
     )
   );
