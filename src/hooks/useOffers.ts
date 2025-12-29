@@ -18,7 +18,7 @@ export function useOffers() {
 
             // Client-side filter for dates since Supabase JS filters are limited for complex ORs
             const now = new Date();
-            return data.filter(offer =>
+            return (data ?? []).filter(offer =>
                 (!offer.starts_at || new Date(offer.starts_at) <= now) &&
                 (!offer.ends_at || new Date(offer.ends_at) >= now)
             ) as Tables<'offers'>[];
@@ -40,7 +40,7 @@ export function useAdminOffers() {
                 throw error;
             }
 
-            return data as Tables<'offers'>[];
+            return (data ?? []) as Tables<'offers'>[];
         },
     });
 }
@@ -58,6 +58,10 @@ export function useOfferByCode(code: string) {
                 .single();
 
             if (error) {
+                // Return null when no rows found; throw for other errors
+                if ((error as any).code === 'PGRST116' || (error as any).message?.toLowerCase()?.includes('no rows')) {
+                    return null;
+                }
                 throw error;
             }
 
@@ -106,7 +110,7 @@ export function useUpdateOffer() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async ({ id, ...updates }: UpdateTables<'offers'> & { id: string }) => {
+        mutationFn: async ({ id, updates }: { id: string; updates: UpdateTables<'offers'> }) => {
             const { data, error } = await supabase
                 .from('offers')
                 .update(updates as any)
