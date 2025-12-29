@@ -9,7 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useCreateOrder } from '@/hooks/useOrders';
 
 const Checkout = () => {
-  const { items, cartTotal, clearCart, cartCount } = useCart();
+  const { items, cartTotal, clearCart, cartCount, appliedOffer, discount, finalTotal, removeOffer } = useCart();
   const navigate = useNavigate();
   const { toast } = useToast();
   const createOrder = useCreateOrder();
@@ -38,8 +38,11 @@ const Checkout = () => {
     }).format(price);
   };
 
-  const shippingCost = cartTotal >= 999 ? 0 : 99;
-  const orderTotal = cartTotal + shippingCost;
+  // Determine shipping cost (check for free shipping offer or threshold)
+  const isFreeShipping = appliedOffer?.type === 'free_shipping' || cartTotal >= 999;
+  const shippingCost = isFreeShipping ? 0 : 99;
+
+  // orderTotal logic replaced by render-time calculation
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -100,11 +103,15 @@ const Checkout = () => {
         },
         paymentMethod: 'cod',
         notes: formData.notes || undefined,
+        offerId: appliedOffer?.id,
+        discountAmount: discount * 100, // Convert to paise for DB
+        shippingCost: shippingCost * 100, // Convert to paise
       });
 
       setOrderPlaced(true);
       setOrderNumber(order.order_number);
       clearCart();
+      removeOffer(); // Clear offer from state
 
       toast({
         title: 'Order placed successfully!',
@@ -351,7 +358,9 @@ const Checkout = () => {
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-foreground truncate">{item.name}</p>
                         <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
-                        <p className="font-medium text-primary">{formatPrice(item.price * item.quantity)}</p>
+                        <div className="flex justify-between items-center">
+                          <p className="font-medium text-primary">{formatPrice(item.price * item.quantity)}</p>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -362,6 +371,14 @@ const Checkout = () => {
                     <span>Subtotal</span>
                     <span>{formatPrice(cartTotal)}</span>
                   </div>
+
+                  {discount > 0 && (
+                    <div className="flex justify-between text-green-600 font-medium">
+                      <span>Discount {appliedOffer ? `(${appliedOffer.code})` : ''}</span>
+                      <span>-{formatPrice(discount)}</span>
+                    </div>
+                  )}
+
                   <div className="flex justify-between text-muted-foreground">
                     <span>Shipping</span>
                     <span>
@@ -372,13 +389,14 @@ const Checkout = () => {
                       )}
                     </span>
                   </div>
+
                   <div className="border-t border-border pt-3">
                     <div className="flex justify-between">
                       <span className="font-display text-lg font-semibold text-foreground">
                         Total
                       </span>
                       <span className="font-display text-2xl font-bold text-primary">
-                        {formatPrice(orderTotal)}
+                        {formatPrice(finalTotal + shippingCost)}
                       </span>
                     </div>
                   </div>

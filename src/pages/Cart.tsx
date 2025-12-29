@@ -1,10 +1,34 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Minus, Trash2, ShoppingBag, ArrowRight } from 'lucide-react';
+import { Plus, Minus, Trash2, ShoppingBag, ArrowRight, Tag, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { useCart } from '@/contexts/CartContext';
 
 const Cart = () => {
-  const { items, updateQuantity, removeFromCart, cartTotal, cartCount, clearCart } = useCart();
+  const {
+    items,
+    updateQuantity,
+    removeFromCart,
+    cartTotal,
+    cartCount,
+    clearCart,
+    applyOffer,
+    removeOffer,
+    appliedOffer,
+    discount,
+    finalTotal
+  } = useCart();
+
+  const [promoCode, setPromoCode] = useState('');
+
+  const handleApplyOffer = async () => {
+    if (!promoCode.trim()) return;
+    const success = await applyOffer(promoCode);
+    if (success) {
+      setPromoCode('');
+    }
+  };
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -15,7 +39,7 @@ const Cart = () => {
   };
 
   const shippingCost = cartTotal >= 999 ? 0 : 99;
-  const orderTotal = cartTotal + shippingCost;
+  // orderTotal logic moved to render using finalTotal + shippingCost
 
   if (items.length === 0) {
     return (
@@ -26,7 +50,7 @@ const Cart = () => {
             Your cart is empty
           </h1>
           <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-            Looks like you haven't added any teas to your cart yet. 
+            Looks like you haven't added any teas to your cart yet.
             Explore our collection and find your perfect cup!
           </p>
           <Button variant="gold" size="lg" asChild>
@@ -83,7 +107,7 @@ const Cart = () => {
                       <Trash2 className="h-5 w-5" />
                     </Button>
                   </div>
-                  
+
                   <div className="flex items-center justify-between mt-4">
                     <div className="flex items-center border border-border rounded-lg">
                       <Button
@@ -135,6 +159,48 @@ const Cart = () => {
                   <span>Subtotal</span>
                   <span>{formatPrice(cartTotal)}</span>
                 </div>
+
+                {/* Promo Code Input */}
+                {!appliedOffer ? (
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Enter promo code"
+                      value={promoCode}
+                      onChange={(e) => setPromoCode(e.target.value)}
+                      className="bg-background"
+                    />
+                    <Button
+                      variant="outline"
+                      onClick={handleApplyOffer}
+                      disabled={!promoCode.trim()}
+                    >
+                      Apply
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex justify-between items-center text-green-600 bg-green-50 p-2 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <Tag className="h-4 w-4" />
+                      <span className="text-sm font-medium">{appliedOffer.code} applied</span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 hover:text-destructive hover:bg-transparent"
+                      onClick={removeOffer}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+
+                {discount > 0 && (
+                  <div className="flex justify-between text-green-600 font-medium">
+                    <span>Discount</span>
+                    <span>-{formatPrice(discount)}</span>
+                  </div>
+                )}
+
                 <div className="flex justify-between text-muted-foreground">
                   <span>Shipping</span>
                   <span>
@@ -156,7 +222,7 @@ const Cart = () => {
                       Total
                     </span>
                     <span className="font-display text-2xl font-bold text-primary">
-                      {formatPrice(orderTotal)}
+                      {formatPrice(finalTotal + shippingCost)}
                     </span>
                   </div>
                 </div>

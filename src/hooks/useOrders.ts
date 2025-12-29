@@ -103,6 +103,7 @@ export interface CreateOrderInput {
     notes?: string;
     offerId?: string;
     discountAmount?: number;
+    shippingCost?: number;
 }
 
 // Create a new order
@@ -115,7 +116,7 @@ export function useCreateOrder() {
 
             // Calculate totals
             const subtotal = input.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-            const shippingCost = subtotal >= 99900 ? 0 : 4900; // Free shipping over ₹999
+            const shippingCost = input.shippingCost ?? (subtotal >= 99900 ? 0 : 9900); // Free shipping over ₹999
             const discount = input.discountAmount || 0;
             const total = subtotal + shippingCost - discount;
 
