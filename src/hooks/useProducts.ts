@@ -25,8 +25,9 @@ export function useProducts(options: ProductsQueryOptions = {}) {
     const { filters = {}, sortBy = 'featured', limit } = options;
 
     return useQuery<Product[]>({
-        queryKey: ['products', filters, sortBy, limit],
+        queryKey: ['products', JSON.stringify(filters), sortBy, limit],
         queryFn: async () => {
+            console.log('[useProducts] Query starting with filters:', filters, 'sortBy:', sortBy);
             let query = supabase
                 .from('products')
                 .select(`
@@ -89,9 +90,11 @@ export function useProducts(options: ProductsQueryOptions = {}) {
             const { data, error } = await query;
 
             if (error) {
+                console.error('[useProducts] Query error:', error);
                 throw error;
             }
 
+            console.log('[useProducts] Query success, returned', (data as Product[])?.length || 0, 'products');
             return data as Product[];
         },
         retry: false,
@@ -105,6 +108,7 @@ export function useProduct(identifier: string) {
     return useQuery<Product>({
         queryKey: ['product', identifier],
         queryFn: async () => {
+            console.log('[useProduct] Query starting for:', identifier);
             // Try to fetch by slug first, then by id
             let { data, error } = await supabase
                 .from('products')
@@ -131,9 +135,11 @@ export function useProduct(identifier: string) {
             }
 
             if (error) {
+                console.error('[useProduct] Query error for', identifier, error);
                 throw error;
             }
 
+            console.log('[useProduct] Query success for', identifier);
             return data as Product;
         },
         enabled: !!identifier,
@@ -171,15 +177,18 @@ export function useCategories() {
     return useQuery<Tables<'categories'>[]>({
         queryKey: ['categories'],
         queryFn: async () => {
+            console.log('[useCategories] Query starting');
             const { data, error } = await supabase
                 .from('categories')
                 .select('*')
                 .order('sort_order', { ascending: true });
 
             if (error) {
+                console.error('[useCategories] Query error:', error);
                 throw error;
             }
 
+            console.log('[useCategories] Query success, returned', (data as Tables<'categories'>[])?.length || 0, 'categories');
             return data as Tables<'categories'>[];
         },
         retry: false,
