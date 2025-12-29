@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { User, Package, MapPin, LogOut, Settings, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,12 +10,20 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useOrders } from '@/hooks/useOrders';
 
 const Profile = () => {
+  const navigate = useNavigate();
   const { user, profile, isAdmin, signOut, updateProfile, isLoading } = useAuth();
   const { data: orders = [], isLoading: ordersLoading } = useOrders();
   const [isEditing, setIsEditing] = useState(false);
   const [fullName, setFullName] = useState(profile?.full_name || '');
   const [phone, setPhone] = useState(profile?.phone || '');
   const [isSaving, setIsSaving] = useState(false);
+
+  // Redirect to home if user logs out
+  useEffect(() => {
+    if (!isLoading && !user) {
+      navigate('/');
+    }
+  }, [user, isLoading, navigate]);
 
   const formatPrice = (priceInPaise: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -42,6 +50,7 @@ const Profile = () => {
 
   const handleSignOut = async () => {
     await signOut();
+    navigate('/');
   };
 
   if (isLoading) {
@@ -80,10 +89,6 @@ const Profile = () => {
                 </Button>
               </Link>
             )}
-            <Button variant="outline" size="sm" onClick={handleSignOut}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Sign Out
-            </Button>
           </div>
         </div>
 
