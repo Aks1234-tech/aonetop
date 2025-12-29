@@ -1,18 +1,20 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, CreditCard, Truck, CheckCircle, AlertCircle } from 'lucide-react';
+import { ArrowLeft, CreditCard, Truck, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
+import { useCreateOrder } from '@/hooks/useOrders';
 
 const Checkout = () => {
   const { items, cartTotal, clearCart, cartCount } = useCart();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const createOrder = useCreateOrder();
   const [orderPlaced, setOrderPlaced] = useState(false);
+  const [orderNumber, setOrderNumber] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -78,20 +80,43 @@ const Checkout = () => {
       return;
     }
 
-    setIsSubmitting(true);
+    try {
+      const order = await createOrder.mutateAsync({
+        items: items.map((item) => ({
+          productId: item.id,
+          productName: item.name,
+          productImage: item.image,
+          quantity: item.quantity,
+          price: item.price * 100, // Convert to paise
+        })),
+        shippingInfo: {
+          name: `${formData.firstName} ${formData.lastName}`,
+          email: formData.email,
+          phone: formData.phone,
+          address: formData.address,
+          city: formData.city,
+          state: formData.state,
+          pincode: formData.pincode,
+        },
+        paymentMethod: 'cod',
+        notes: formData.notes || undefined,
+      });
 
-    // Simulate order processing
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+      setOrderPlaced(true);
+      setOrderNumber(order.order_number);
+      clearCart();
 
-    setOrderPlaced(true);
-    clearCart();
-
-    toast({
-      title: 'Order placed successfully!',
-      description: 'You will receive a confirmation email shortly.',
-    });
-
-    setIsSubmitting(false);
+      toast({
+        title: 'Order placed successfully!',
+        description: `Order ${order.order_number} - You will receive a confirmation email shortly.`,
+      });
+    } catch (error) {
+      toast({
+        title: 'Order failed',
+        description: 'There was an error processing your order. Please try again.',
+        variant: 'destructive',
+      });
+    }
   };
 
   if (items.length === 0 && !orderPlaced) {
