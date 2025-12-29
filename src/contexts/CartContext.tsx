@@ -166,22 +166,22 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Helper to get or create cart for user
   const getOrCreateCart = async (userId: string) => {
-    const { data: cart } = await supabase
-      .from('carts')
+    const { data: cart } = await (supabase
+      .from('carts') as any)
       .select('id')
       .eq('user_id', userId)
       .single();
 
     if (cart) return cart.id;
 
-    const { data: newCart, error } = await supabase
-      .from('carts')
+    const { data: newCart, error } = await (supabase
+      .from('carts') as any)
       .insert({ user_id: userId } as any)
       .select('id')
       .single();
 
     if (error) throw error;
-    return newCart.id;
+    return (newCart as any).id;
   };
 
   // Sync logic
@@ -357,17 +357,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
         // We don't have access to the *next* state here easily without wait.
         // So we'll fetch then upsert.
 
-        const { data: existing } = await supabase
-          .from('cart_items')
+        const { data: existing } = await (supabase
+          .from('cart_items') as any)
           .select('quantity')
           .eq('cart_id', cartId)
           .eq('product_id', item.id)
           .single();
 
-        const newQuantity = (existing?.quantity || 0) + quantityToAdd;
+        const existingQty = ((existing as any)?.quantity || 0) as number;
+        const newQuantity = existingQty + quantityToAdd;
 
-        await supabase
-          .from('cart_items')
+        await (supabase
+          .from('cart_items') as any)
           .upsert({
             cart_id: cartId,
             product_id: item.id,
@@ -405,15 +406,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
       try {
         const cartId = await getOrCreateCart(user.id);
         if (quantity > 0) {
-          await supabase
-            .from('cart_items')
+          await (supabase
+            .from('cart_items') as any)
             .update({ quantity } as any)
             .eq('cart_id', cartId)
             .eq('product_id', id);
         } else {
           // If quantity is 0, remove (though reducer handles this too)
-          await supabase
-            .from('cart_items')
+          await (supabase
+            .from('cart_items') as any)
             .delete()
             .eq('cart_id', cartId)
             .eq('product_id', id);
@@ -483,15 +484,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
         return false;
       }
 
-      // Validate minimum order
-      if (offer.min_order_value && cartTotal < offer.min_order_value) {
-        const needed = (offer.min_order_value - cartTotal) / 100;
+      // Validate minimum order: compare paise to paise
+      if (offer.min_order_value) {
+        const cartPaise = Math.round(cartTotal * 100);
+        if (cartPaise < offer.min_order_value) {
+          const needed = (offer.min_order_value - cartPaise) / 100;
         toast({
           title: 'Minimum order requirement not met',
           description: `Add ₹${needed.toFixed(2)} more to apply this offer.`,
           variant: 'destructive'
         });
         return false;
+        }
       }
 
       dispatch({ type: 'SET_OFFER', payload: offer });
