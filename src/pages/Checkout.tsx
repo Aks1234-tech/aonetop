@@ -389,10 +389,13 @@ const Checkout = () => {
                   variant="gold"
                   size="lg"
                   className="w-full"
-                  disabled={isSubmitting}
+                  disabled={createOrder.isPending}
                 >
-                  {isSubmitting ? (
-                    'Processing...'
+                  {createOrder.isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      Processing...
+                    </>
                   ) : (
                     <>
                       Place Order (COD)
