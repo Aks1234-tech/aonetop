@@ -332,3 +332,132 @@ export function useDeleteProduct() {
         },
     });
 }
+
+// ============== PRODUCT IMAGES ==============
+
+// Upload image to Supabase Storage and create product_images record
+export function useUploadProductImage() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({
+            productId,
+            file,
+            isPrimary = false
+        }: {
+            productId: string;
+            file: File;
+            isPrimary?: boolean;
+        }) => {
+            console.log('[useUploadProductImage] Uploading image for product:', productId);
+
+            // Generate unique filename
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${productId}/${Date.now()}.${fileExt}`;
+
+            // Upload to Supabase Storage
+            const { data: uploadData, error: uploadError } = await supabase.storage
+                .from('product-images')
+                .upload(fileName, file, {
+                    cacheControl: '3600',
+                    upsert: false,
+                });
+
+            if (uploadError) {
+                console.error('[useUploadProductImage] Storage upload error:', uploadError);
+                throw uploadError;
+            }
+
+            // Get public URL
+            const { data: { publicUrl } } = supabase.storage
+                .from('product-images')
+                .getPublicUrl(fileName);
+
+            console.log('[useUploadProductImage] Image uploaded, URL:', publicUrl);
+
+            // If this is primary, unset other primary images first
+            if (isPrimary) {
+                await (supabase.from('product_images') as any)
+                    .update({ is_primary: false })
+                    .eq('product_id', productId);
+            }
+
+            // Get current max sort_order
+            const { data: existingImages } = await supabase
+                .from('product_images')
+                .select('sort_order')
+                .eq('product_id', productId)
+                .order('sort_order', { ascending: false })
+                .limit(1);
+
+            const nextSortOrder = existingImages && existingImages.length > 0
+                ? ((existingImages as any)[0].sort_order + 1)
+                : 0;
+
+            // Create product_images record
+            const { data, error } = await (supabase.from('product_images') as any)
+                .insert({
+                    product_id: productId,
+                    url: publicUrl,
+                    is_primary: isPrimary,
+                    sort_order: nextSortOrder,
+                })
+                .select()
+                .single();
+
+            if (error) {
+                console.error('[useUploadProductImage] Insert error:', error);
+                throw error;
+            }
+
+            console.log('[useUploadProductImage] Image record created:', data);
+            return data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin-products'] });
+            queryClient.invalidateQueries({ queryKey: ['products'] });
+            queryClient.invalidateQueries({ queryKey: ['product'] });
+        },
+    });
+}
+
+// Delete a product image
+export function useDeleteProductImage() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ id, url }: { id: string; url: string }) => {
+            console.log('[useDeleteProductImage] Deleting image:', id);
+
+            // Extract file path from URL for storage deletion
+            try {
+                const urlObj = new URL(url);
+                const pathMatch = urlObj.pathname.match(/\/product-images\/(.+)$/);
+                if (pathMatch) {
+                    const filePath = pathMatch[1];
+                    await supabase.storage.from('product-images').remove([filePath]);
+                    console.log('[useDeleteProductImage] Removed from storage:', filePath);
+                }
+            } catch (err) {
+                console.warn('[useDeleteProductImage] Could not delete from storage:', err);
+            }
+
+            // Delete the database record
+            const { error } = await supabase
+                .from('product_images')
+                .delete()
+                .eq('id', id);
+
+            if (error) {
+                console.error('[useDeleteProductImage] Delete error:', error);
+                throw error;
+            }
+            console.log('[useDeleteProductImage] Deleted image record:', id);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin-products'] });
+            queryClient.invalidateQueries({ queryKey: ['products'] });
+            queryClient.invalidateQueries({ queryKey: ['product'] });
+        },
+    });
+}

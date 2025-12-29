@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Plus, Edit, Trash2, Loader2, Package } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Plus, Edit, Trash2, Loader2, Package, Upload, X, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -24,9 +24,12 @@ import {
     useCreateProduct,
     useUpdateProduct,
     useDeleteProduct,
+    useUploadProductImage,
+    useDeleteProductImage,
     useCategories,
     Product,
 } from '@/hooks/useProducts';
+import { Tables } from '@/lib/supabase';
 
 // Helper for currency
 const formatPrice = (price: number) => {
@@ -91,11 +94,15 @@ export function ProductsManager() {
     const createProduct = useCreateProduct();
     const updateProduct = useUpdateProduct();
     const deleteProduct = useDeleteProduct();
+    const uploadImage = useUploadProductImage();
+    const deleteImage = useDeleteProductImage();
     const { toast } = useToast();
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
     const [formData, setFormData] = useState<ProductFormData>(initialFormData);
+    const [isUploading, setIsUploading] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const resetForm = () => {
         setFormData(initialFormData);
@@ -181,6 +188,58 @@ export function ProductsManager() {
             } catch (error) {
                 toast({ title: 'Failed to delete product', variant: 'destructive' });
             }
+        }
+    };
+
+    // Handle image upload
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (!editingProduct || !e.target.files || e.target.files.length === 0) return;
+
+        const file = e.target.files[0];
+        if (!file.type.startsWith('image/')) {
+            toast({ title: 'Please select an image file', variant: 'destructive' });
+            return;
+        }
+
+        // Max 5MB
+        if (file.size > 5 * 1024 * 1024) {
+            toast({ title: 'Image must be less than 5MB', variant: 'destructive' });
+            return;
+        }
+
+        setIsUploading(true);
+        try {
+            const isPrimary = !editingProduct.images || editingProduct.images.length === 0;
+            await uploadImage.mutateAsync({
+                productId: editingProduct.id,
+                file,
+                isPrimary
+            });
+            toast({ title: 'Image uploaded successfully' });
+        } catch (error: any) {
+            console.error('Upload error:', error);
+            toast({
+                title: 'Failed to upload image',
+                description: error?.message || 'Check that the storage bucket exists',
+                variant: 'destructive'
+            });
+        } finally {
+            setIsUploading(false);
+            if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+            }
+        }
+    };
+
+    // Handle image delete
+    const handleImageDelete = async (image: Tables<'product_images'>) => {
+        if (!confirm('Delete this image?')) return;
+
+        try {
+            await deleteImage.mutateAsync({ id: image.id, url: image.url });
+            toast({ title: 'Image deleted' });
+        } catch (error) {
+            toast({ title: 'Failed to delete image', variant: 'destructive' });
         }
     };
 
@@ -480,6 +539,79 @@ export function ProductsManager() {
                             </label>
                         </div>
 
+                        {/* Product Images - Only show for existing products */}
+                        {editingProduct && (
+                            <div className="space-y-3 pt-4 border-t">
+                                <div className="flex items-center justify-between">
+                                    <Label>Product Images</Label>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => fileInputRef.current?.click()}
+                                        disabled={isUploading}
+                                    >
+                                        {isUploading ? (
+                                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                        ) : (
+                                            <Upload className="h-4 w-4 mr-2" />
+                                        )}
+                                        {isUploading ? 'Uploading...' : 'Upload Image'}
+                                    </Button>
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        onChange={handleImageUpload}
+                                        accept="image/*"
+                                        className="hidden"
+                                    />
+                                </div>
+
+                                {/* Display existing images */}
+                                <div className="grid grid-cols-3 gap-3">
+                                    {editingProduct.images?.map((image) => (
+                                        <div key={image.id} className="relative group">
+                                            <img
+                                                src={image.url}
+                                                alt="Product"
+                                                className="w-full h-24 object-cover rounded-lg border"
+                                            />
+                                            {image.is_primary && (
+                                                <span className="absolute top-1 left-1 px-1.5 py-0.5 bg-primary text-primary-foreground text-xs rounded">
+                                                    Primary
+                                                </span>
+                                            )}
+                                            <button
+                                                type="button"
+                                                onClick={() => handleImageDelete(image)}
+                                                className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                            >
+                                                <X className="h-3 w-3" />
+                                            </button>
+                                        </div>
+                                    ))}
+                                    {(!editingProduct.images || editingProduct.images.length === 0) && (
+                                        <div className="col-span-3 py-6 text-center text-muted-foreground border border-dashed rounded-lg">
+                                            <ImageIcon className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                                            <p className="text-sm">No images uploaded yet</p>
+                                        </div>
+                                    )}
+                                </div>
+                                <p className="text-xs text-muted-foreground">
+                                    First uploaded image will be set as primary. Max 5MB per image.
+                                </p>
+                            </div>
+                        )}
+
+                        {/* Note for new products */}
+                        {!editingProduct && (
+                            <div className="pt-4 border-t">
+                                <p className="text-sm text-muted-foreground flex items-center gap-2">
+                                    <ImageIcon className="h-4 w-4" />
+                                    You can add images after creating the product.
+                                </p>
+                            </div>
+                        )}
                         <DialogFooter>
                             <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
                             <Button type="submit" variant="gold" disabled={createProduct.isPending || updateProduct.isPending}>
