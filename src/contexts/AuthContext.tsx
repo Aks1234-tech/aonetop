@@ -120,7 +120,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Wrap in timeout to prevent hanging
         const signOutWithTimeout = async () => {
             const timeoutPromise = new Promise<{ error: Error }>((_, reject) =>
-                setTimeout(() => reject(new Error('Sign out timed out after 3 seconds')), 3000)
+                setTimeout(() => reject(new Error('Sign out timed out after 10 seconds')), 10000)
             );
 
             try {
