@@ -18,10 +18,11 @@ export function useOffers() {
 
             // Client-side filter for dates since Supabase JS filters are limited for complex ORs
             const now = new Date();
-            return (data ?? []).filter(offer =>
+            const rows = (data ?? []) as Tables<'offers'>[];
+            return rows.filter((offer) =>
                 (!offer.starts_at || new Date(offer.starts_at) <= now) &&
                 (!offer.ends_at || new Date(offer.ends_at) >= now)
-            ) as Tables<'offers'>[];
+            );
         },
     });
 }
@@ -65,15 +66,19 @@ export function useOfferByCode(code: string) {
                 throw error;
             }
 
+            if (!data) return null;
+
+            const row = data as Tables<'offers'>;
+
             // Check dates
             const now = new Date();
-            if (data.starts_at && new Date(data.starts_at) > now) return null;
-            if (data.ends_at && new Date(data.ends_at) < now) return null;
+            if (row.starts_at && new Date(row.starts_at) > now) return null;
+            if (row.ends_at && new Date(row.ends_at) < now) return null;
 
             // Check usage limits
-            if (data.usage_limit && (data.used_count || 0) >= data.usage_limit) return null;
+            if (row.usage_limit && (row.used_count || 0) >= row.usage_limit) return null;
 
-            return data as Tables<'offers'>;
+            return row;
         },
         enabled: !!code,
         retry: false,
@@ -86,9 +91,9 @@ export function useCreateOffer() {
 
     return useMutation({
         mutationFn: async (offer: InsertTables<'offers'>) => {
-            const { data, error } = await supabase
-                .from('offers')
-                .insert(offer as any)
+            const { data, error } = await (supabase
+                .from('offers') as any)
+                .insert(offer)
                 .select()
                 .single();
 
@@ -111,9 +116,9 @@ export function useUpdateOffer() {
 
     return useMutation({
         mutationFn: async ({ id, updates }: { id: string; updates: UpdateTables<'offers'> }) => {
-            const { data, error } = await supabase
-                .from('offers')
-                .update(updates as any)
+            const { data, error } = await (supabase
+                .from('offers') as any)
+                .update(updates)
                 .eq('id', id)
                 .select()
                 .single();
