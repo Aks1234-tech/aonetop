@@ -1,13 +1,13 @@
 import { jsPDF } from 'jspdf';
 import { Order } from '@/hooks/useOrders';
 
-// Helper for currency formatting
+// Helper for currency formatting - using Rs. for better PDF compatibility
 const formatPrice = (priceInPaise: number): string => {
-    return new Intl.NumberFormat('en-IN', {
-        style: 'currency',
-        currency: 'INR',
-        minimumFractionDigits: 0,
-    }).format(priceInPaise / 100);
+    const amount = (priceInPaise / 100).toLocaleString('en-IN', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    });
+    return `Rs. ${amount}`;
 };
 
 // Format date
@@ -19,6 +19,11 @@ const formatDate = (dateString: string): string => {
     });
 };
 
+// GST Rate (18% split into CGST 9% + SGST 9%)
+const GST_RATE = 0.18;
+const CGST_RATE = 0.09;
+const SGST_RATE = 0.09;
+
 export function generateInvoicePDF(order: Order): void {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -29,6 +34,13 @@ export function generateInvoicePDF(order: Order): void {
     const primaryColor: [number, number, number] = [185, 28, 28]; // Red theme
     const darkText: [number, number, number] = [31, 41, 55];
     const mutedText: [number, number, number] = [107, 114, 128];
+
+    // Calculate tax amounts (GST is included in subtotal, so we back-calculate)
+    const subtotalWithGST = order.subtotal;
+    const baseAmount = Math.round(subtotalWithGST / (1 + GST_RATE));
+    const cgstAmount = Math.round(baseAmount * CGST_RATE);
+    const sgstAmount = Math.round(baseAmount * SGST_RATE);
+    const totalGST = cgstAmount + sgstAmount;
 
     // ========== HEADER ==========
     doc.setFillColor(...primaryColor);
