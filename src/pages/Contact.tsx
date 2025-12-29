@@ -1,14 +1,15 @@
 import { useState } from 'react';
-import { Mail, Phone, MapPin, Clock, Send, MessageSquare } from 'lucide-react';
+import { Mail, Phone, MapPin, Clock, Send, MessageSquare, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { useSubmitContactForm } from '@/hooks/useForms';
 
 const Contact = () => {
   const { toast } = useToast();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const submitForm = useSubmitContactForm();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -33,18 +34,28 @@ const Contact = () => {
       return;
     }
 
-    setIsSubmitting(true);
+    try {
+      await submitForm.mutateAsync({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone || undefined,
+        subject: formData.subject || undefined,
+        message: formData.message,
+      });
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+      toast({
+        title: 'Message sent!',
+        description: 'We\'ll get back to you within 24 hours.',
+      });
 
-    toast({
-      title: 'Message sent!',
-      description: 'We\'ll get back to you within 24 hours.',
-    });
-
-    setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
-    setIsSubmitting(false);
+      setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
+    } catch (error) {
+      toast({
+        title: 'Error sending message',
+        description: 'Please try again later.',
+        variant: 'destructive',
+      });
+    }
   };
 
   return (
@@ -56,7 +67,7 @@ const Contact = () => {
             Get in Touch
           </h1>
           <p className="text-muted-foreground max-w-xl mx-auto">
-            Have questions about our teas or need help with your order? 
+            Have questions about our teas or need help with your order?
             We're here to help and would love to hear from you.
           </p>
         </div>
@@ -220,10 +231,13 @@ const Contact = () => {
                     type="submit"
                     variant="gold"
                     size="lg"
-                    disabled={isSubmitting}
+                    disabled={submitForm.isPending}
                   >
-                    {isSubmitting ? (
-                      'Sending...'
+                    {submitForm.isPending ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        Sending...
+                      </>
                     ) : (
                       <>
                         <Send className="mr-2 h-5 w-5" />
