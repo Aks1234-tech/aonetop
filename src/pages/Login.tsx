@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,13 +9,29 @@ import { useToast } from '@/hooks/use-toast';
 
 const Login = () => {
     const navigate = useNavigate();
-    const { signIn } = useAuth();
+    const { signIn, user, isAdmin, isLoading: authLoading } = useAuth();
     const { toast } = useToast();
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [loginSuccess, setLoginSuccess] = useState(false);
+
+    // Redirect after login based on user role
+    useEffect(() => {
+        if (loginSuccess && user && !authLoading) {
+            // Wait a tick for isAdmin to be computed from profile
+            const timer = setTimeout(() => {
+                if (isAdmin) {
+                    navigate('/admin');
+                } else {
+                    navigate('/');
+                }
+            }, 100);
+            return () => clearTimeout(timer);
+        }
+    }, [loginSuccess, user, isAdmin, authLoading, navigate]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -47,7 +63,8 @@ const Login = () => {
             description: 'You have been logged in successfully.',
         });
 
-        navigate('/');
+        // Mark login as successful, useEffect will handle redirect
+        setLoginSuccess(true);
     };
 
     return (

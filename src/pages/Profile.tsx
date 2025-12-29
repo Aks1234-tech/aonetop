@@ -99,14 +99,18 @@ const Profile = () => {
               <User className="h-4 w-4 mr-2" />
               Profile
             </TabsTrigger>
-            <TabsTrigger value="orders">
-              <Package className="h-4 w-4 mr-2" />
-              Orders
-            </TabsTrigger>
-            <TabsTrigger value="addresses">
-              <MapPin className="h-4 w-4 mr-2" />
-              Addresses
-            </TabsTrigger>
+            {!isAdmin && (
+              <>
+                <TabsTrigger value="orders">
+                  <Package className="h-4 w-4 mr-2" />
+                  Orders
+                </TabsTrigger>
+                <TabsTrigger value="addresses">
+                  <MapPin className="h-4 w-4 mr-2" />
+                  Addresses
+                </TabsTrigger>
+              </>
+            )}
           </TabsList>
 
           {/* Profile Tab */}
@@ -184,12 +188,12 @@ const Profile = () => {
                       <div>
                         <p className="text-sm text-muted-foreground">Member Since</p>
                         <p className="font-medium">
-                          {profile?.created_at 
+                          {profile?.created_at
                             ? new Date(profile.created_at).toLocaleDateString('en-IN', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric'
-                              })
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric'
+                            })
                             : 'N/A'}
                         </p>
                       </div>
@@ -200,8 +204,8 @@ const Profile = () => {
             </Card>
           </TabsContent>
 
-          {/* Orders Tab */}
-          <TabsContent value="orders">
+          {/* Orders Tab - only for non-admin users */}
+          {!isAdmin && <TabsContent value="orders">
             <Card>
               <CardHeader>
                 <CardTitle>Order History</CardTitle>
@@ -239,15 +243,14 @@ const Profile = () => {
                         <div className="text-right">
                           <p className="font-medium">{formatPrice(order.total)}</p>
                           <span
-                            className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                              order.status === 'delivered'
-                                ? 'bg-green-100 text-green-800'
-                                : order.status === 'shipped'
+                            className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${order.status === 'delivered'
+                              ? 'bg-green-100 text-green-800'
+                              : order.status === 'shipped'
                                 ? 'bg-blue-100 text-blue-800'
                                 : order.status === 'cancelled'
-                                ? 'bg-red-100 text-red-800'
-                                : 'bg-yellow-100 text-yellow-800'
-                            }`}
+                                  ? 'bg-red-100 text-red-800'
+                                  : 'bg-yellow-100 text-yellow-800'
+                              }`}
                           >
                             {order.status}
                           </span>
@@ -265,10 +268,10 @@ const Profile = () => {
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
+          </TabsContent>}
 
-          {/* Addresses Tab */}
-          <TabsContent value="addresses">
+          {/* Addresses Tab - only for non-admin users */}
+          {!isAdmin && <TabsContent value="addresses">
             <Card>
               <CardHeader>
                 <CardTitle>Saved Addresses</CardTitle>
@@ -284,7 +287,7 @@ const Profile = () => {
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
+          </TabsContent>}
         </Tabs>
       </div>
     </div>
