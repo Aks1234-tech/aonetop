@@ -1,5 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
-import { supabase, Tables } from '@/lib/supabase';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase, Tables, InsertTables, UpdateTables } from '@/lib/supabase';
 
 export type Product = Tables<'products'> & {
     images?: Tables<'product_images'>[];
@@ -208,3 +208,127 @@ export function useCategories() {
     });
 }
 
+// ============== ADMIN CRUD OPERATIONS ==============
+
+// Fetch all products for admin (no limit, includes all data)
+export function useAdminProducts() {
+    return useQuery<Product[]>({
+        queryKey: ['admin-products'],
+        queryFn: async () => {
+            console.log('[useAdminProducts] Fetching all products for admin');
+            const { data, error } = await supabase
+                .from('products')
+                .select(`
+                    *,
+                    images:product_images(*)
+                `)
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('[useAdminProducts] Query error:', error);
+                throw error;
+            }
+            console.log('[useAdminProducts] Fetched', data?.length || 0, 'products');
+            return data as Product[];
+        },
+        retry: false,
+        refetchOnWindowFocus: false,
+    });
+}
+
+// Helper to generate slug from name
+function generateSlug(name: string): string {
+    return name
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .trim();
+}
+
+// Create a new product
+export function useCreateProduct() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (product: Omit<InsertTables<'products'>, 'slug'> & { slug?: string }) => {
+            console.log('[useCreateProduct] Creating product:', product.name);
+
+            // Auto-generate slug if not provided
+            const slug = product.slug || generateSlug(product.name);
+
+            const { data, error } = await (supabase
+                .from('products') as any)
+                .insert({ ...product, slug })
+                .select()
+                .single();
+
+            if (error) {
+                console.error('[useCreateProduct] Error:', error);
+                throw error;
+            }
+            console.log('[useCreateProduct] Created product:', data);
+            return data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin-products'] });
+            queryClient.invalidateQueries({ queryKey: ['products'] });
+        },
+    });
+}
+
+// Update an existing product
+export function useUpdateProduct() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ id, updates }: { id: string; updates: UpdateTables<'products'> }) => {
+            console.log('[useUpdateProduct] Updating product:', id);
+
+            const { data, error } = await (supabase
+                .from('products') as any)
+                .update(updates)
+                .eq('id', id)
+                .select()
+                .single();
+
+            if (error) {
+                console.error('[useUpdateProduct] Error:', error);
+                throw error;
+            }
+            console.log('[useUpdateProduct] Updated product:', data);
+            return data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin-products'] });
+            queryClient.invalidateQueries({ queryKey: ['products'] });
+            queryClient.invalidateQueries({ queryKey: ['product'] });
+        },
+    });
+}
+
+// Delete a product
+export function useDeleteProduct() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (id: string) => {
+            console.log('[useDeleteProduct] Deleting product:', id);
+
+            const { error } = await supabase
+                .from('products')
+                .delete()
+                .eq('id', id);
+
+            if (error) {
+                console.error('[useDeleteProduct] Error:', error);
+                throw error;
+            }
+            console.log('[useDeleteProduct] Deleted product:', id);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin-products'] });
+            queryClient.invalidateQueries({ queryKey: ['products'] });
+        },
+    });
+}
