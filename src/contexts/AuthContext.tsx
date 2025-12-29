@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session, AuthError } from '@supabase/supabase-js';
-import { supabase, Tables } from '@/lib/supabase';
+import { supabase, Tables, UpdateTables } from '@/lib/supabase';
 
 interface AuthContextType {
     user: User | null;
@@ -11,7 +11,7 @@ interface AuthContextType {
     signUp: (email: string, password: string, fullName: string) => Promise<{ error: AuthError | null }>;
     signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
     signOut: () => Promise<void>;
-    updateProfile: (updates: Partial<Tables<'profiles'>>) => Promise<void>;
+    updateProfile: (updates: UpdateTables<'profiles'>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -101,12 +101,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setProfile(null);
     };
 
-    const updateProfile = async (updates: Partial<Tables<'profiles'>>) => {
+    const updateProfile = async (updates: UpdateTables<'profiles'>) => {
         if (!user) return;
 
-        const { error } = await supabase
-            .from('profiles')
-            .update(updates)
+        const { error } = await (supabase
+            .from('profiles') as any)
+            .update(updates as any)
             .eq('id', user.id);
 
         if (error) {
