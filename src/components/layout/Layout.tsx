@@ -1,10 +1,11 @@
 import { ReactNode } from 'react';
+import { Outlet } from 'react-router-dom';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { CartDrawer } from './CartDrawer';
 
 interface LayoutProps {
-  children: ReactNode;
+  children?: ReactNode;
 }
 
 export function Layout({ children }: LayoutProps) {
@@ -12,10 +13,11 @@ export function Layout({ children }: LayoutProps) {
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-1 pt-20">
-        {children}
+        {children || <Outlet />}
       </main>
       <Footer />
       <CartDrawer />
     </div>
   );
 }
+
