@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Building2, Package, Truck, HeartHandshake, Send, CheckCircle } from 'lucide-react';
+import { Building2, Package, Truck, HeartHandshake, Send, CheckCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { useSubmitBulkInquiry } from '@/hooks/useForms';
 
 const benefits = [
   {
@@ -31,7 +32,7 @@ const benefits = [
 
 const BulkOrders = () => {
   const { toast } = useToast();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const submitInquiry = useSubmitBulkInquiry();
   const [submitted, setSubmitted] = useState(false);
   const [formData, setFormData] = useState({
     companyName: '',
@@ -60,18 +61,30 @@ const BulkOrders = () => {
       return;
     }
 
-    setIsSubmitting(true);
+    try {
+      await submitInquiry.mutateAsync({
+        companyName: formData.companyName,
+        contactName: formData.contactName,
+        email: formData.email,
+        phone: formData.phone,
+        businessType: formData.businessType || undefined,
+        estimatedVolume: formData.estimatedVolume || undefined,
+        productsInterested: formData.productsInterested || undefined,
+        message: formData.message || undefined,
+      });
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    setSubmitted(true);
-    toast({
-      title: 'Inquiry submitted!',
-      description: 'Our team will contact you within 24 hours.',
-    });
-
-    setIsSubmitting(false);
+      setSubmitted(true);
+      toast({
+        title: 'Inquiry submitted!',
+        description: 'Our team will contact you within 24 hours.',
+      });
+    } catch (error) {
+      toast({
+        title: 'Error submitting inquiry',
+        description: 'Please try again later.',
+        variant: 'destructive',
+      });
+    }
   };
 
   if (submitted) {
@@ -85,7 +98,7 @@ const BulkOrders = () => {
             Thank You for Your Interest!
           </h1>
           <p className="text-muted-foreground mb-8">
-            We've received your bulk order inquiry. Our B2B team will review your 
+            We've received your bulk order inquiry. Our B2B team will review your
             requirements and get back to you within 24 hours with a customized quote.
           </p>
           <Button variant="gold" onClick={() => setSubmitted(false)}>
@@ -109,7 +122,7 @@ const BulkOrders = () => {
               Bulk Orders & Business Solutions
             </h1>
             <p className="text-xl text-primary-foreground/80">
-              Partner with us for premium tea supplies. Whether you're a hotel, 
+              Partner with us for premium tea supplies. Whether you're a hotel,
               restaurant, cafe, or retailer, we have tailored solutions for you.
             </p>
           </div>
@@ -146,7 +159,7 @@ const BulkOrders = () => {
                 Request a Quote
               </h2>
               <p className="text-muted-foreground">
-                Fill out the form below and our B2B team will get back to you 
+                Fill out the form below and our B2B team will get back to you
                 with a customized quote within 24 hours.
               </p>
             </div>
@@ -271,10 +284,13 @@ const BulkOrders = () => {
                   variant="gold"
                   size="lg"
                   className="w-full"
-                  disabled={isSubmitting}
+                  disabled={submitInquiry.isPending}
                 >
-                  {isSubmitting ? (
-                    'Submitting...'
+                  {submitInquiry.isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      Submitting...
+                    </>
                   ) : (
                     <>
                       <Send className="mr-2 h-5 w-5" />
@@ -296,7 +312,7 @@ const BulkOrders = () => {
               Prefer to Talk Directly?
             </h2>
             <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
-              Our B2B team is available Monday to Saturday, 9 AM to 6 PM IST. 
+              Our B2B team is available Monday to Saturday, 9 AM to 6 PM IST.
               Call us for immediate assistance with your bulk order requirements.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
