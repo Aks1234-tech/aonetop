@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom';
-import { Package, Clock, ChevronRight, Loader2 } from 'lucide-react';
+import { Package, Clock, ChevronRight, Loader2, FileDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useOrders } from '@/hooks/useOrders';
 import { useAuth } from '@/contexts/AuthContext';
+import { generateInvoicePDF } from '@/lib/generateInvoicePDF';
 
 const OrderHistory = () => {
     const { user, isLoading: authLoading } = useAuth();
@@ -170,10 +171,21 @@ const OrderHistory = () => {
                                     <div className="text-sm text-muted-foreground">
                                         Shipping to: {order.shipping_city}, {order.shipping_state}
                                     </div>
-                                    <Button variant="ghost" size="sm">
-                                        View Details
-                                        <ChevronRight className="ml-1 h-4 w-4" />
-                                    </Button>
+                                    <div className="flex gap-2">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => generateInvoicePDF(order)}
+                                            className="gap-1"
+                                        >
+                                            <FileDown className="h-4 w-4" />
+                                            Invoice
+                                        </Button>
+                                        <Button variant="ghost" size="sm">
+                                            View Details
+                                            <ChevronRight className="ml-1 h-4 w-4" />
+                                        </Button>
+                                    </div>
                                 </div>
                             </div>
                         ))}
