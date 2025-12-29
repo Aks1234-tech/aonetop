@@ -171,28 +171,53 @@ export function generateInvoicePDF(order: Order): void {
     yPos += 10;
 
     // ========== SUMMARY ==========
-    const summaryX = pageWidth - margin - 60;
+    const summaryX = pageWidth - margin - 70;
 
+    // Taxable Amount (Base before GST)
+    doc.setFontSize(9);
+    doc.setTextColor(...mutedText);
+    doc.text('Taxable Amount:', summaryX, yPos);
+    doc.setTextColor(...darkText);
+    doc.text(formatPrice(baseAmount), pageWidth - margin - 3, yPos, { align: 'right' });
+
+    // CGST
+    yPos += 6;
+    doc.setTextColor(...mutedText);
+    doc.text('CGST (9%):', summaryX, yPos);
+    doc.setTextColor(...darkText);
+    doc.text(formatPrice(cgstAmount), pageWidth - margin - 3, yPos, { align: 'right' });
+
+    // SGST
+    yPos += 6;
+    doc.setTextColor(...mutedText);
+    doc.text('SGST (9%):', summaryX, yPos);
+    doc.setTextColor(...darkText);
+    doc.text(formatPrice(sgstAmount), pageWidth - margin - 3, yPos, { align: 'right' });
+
+    // Subtotal (with GST)
+    yPos += 6;
     doc.setTextColor(...mutedText);
     doc.text('Subtotal:', summaryX, yPos);
     doc.setTextColor(...darkText);
     doc.text(formatPrice(order.subtotal), pageWidth - margin - 3, yPos, { align: 'right' });
 
-    yPos += 7;
+    // Shipping
+    yPos += 6;
     doc.setTextColor(...mutedText);
     doc.text('Shipping:', summaryX, yPos);
     doc.setTextColor(...darkText);
     const shippingText = order.shipping_cost === 0 ? 'FREE' : formatPrice(order.shipping_cost);
     doc.text(shippingText, pageWidth - margin - 3, yPos, { align: 'right' });
 
+    // Discount (if any)
     if (order.discount_amount > 0) {
-        yPos += 7;
+        yPos += 6;
         doc.setTextColor(22, 163, 74); // Green for discount
         doc.text('Discount:', summaryX, yPos);
         doc.text(`-${formatPrice(order.discount_amount)}`, pageWidth - margin - 3, yPos, { align: 'right' });
     }
 
-    yPos += 10;
+    yPos += 8;
     doc.setDrawColor(229, 231, 235);
     doc.line(summaryX, yPos, pageWidth - margin, yPos);
     yPos += 8;
@@ -201,7 +226,7 @@ export function generateInvoicePDF(order: Order): void {
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...primaryColor);
-    doc.text('TOTAL:', summaryX, yPos);
+    doc.text('GRAND TOTAL:', summaryX, yPos);
     doc.text(formatPrice(order.total), pageWidth - margin - 3, yPos, { align: 'right' });
 
     // ========== FOOTER ==========
