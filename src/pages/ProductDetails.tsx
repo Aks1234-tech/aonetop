@@ -106,14 +106,14 @@ const ProductDetails = () => {
           <div className="space-y-4">
             <div className="aspect-square rounded-2xl overflow-hidden bg-muted">
               <img
-                src={product.images[selectedImage] || product.image}
+                src={images[selectedImage] || getProductImage(product)}
                 alt={product.name}
                 className="w-full h-full object-cover"
               />
             </div>
-            {product.images.length > 1 && (
+            {images.length > 1 && (
               <div className="flex gap-3">
-                {product.images.map((img, idx) => (
+                {images.map((img, idx) => (
                   <button
                     key={idx}
                     onClick={() => setSelectedImage(idx)}
@@ -131,19 +131,19 @@ const ProductDetails = () => {
           <div>
             {/* Badges */}
             <div className="flex flex-wrap gap-2 mb-4">
-              {product.isBestseller && (
+              {product.is_bestseller && (
                 <span className="px-3 py-1 bg-accent text-accent-foreground text-sm font-medium rounded-full">
                   Bestseller
                 </span>
               )}
-              {product.isNew && (
+              {product.is_new && (
                 <span className="px-3 py-1 bg-primary text-primary-foreground text-sm font-medium rounded-full">
                   New Arrival
                 </span>
               )}
-              {product.originalPrice && (
+              {product.original_price && (
                 <span className="px-3 py-1 bg-destructive text-destructive-foreground text-sm font-medium rounded-full">
-                  {Math.round((1 - product.price / product.originalPrice) * 100)}% Off
+                  {Math.round((1 - product.price / product.original_price) * 100)}% Off
                 </span>
               )}
             </div>
@@ -159,14 +159,14 @@ const ProductDetails = () => {
                   <Star
                     key={i}
                     className={`h-5 w-5 ${i < Math.floor(product.rating)
-                        ? 'fill-accent text-accent'
-                        : 'text-muted'
+                      ? 'fill-accent text-accent'
+                      : 'text-muted'
                       }`}
                   />
                 ))}
               </div>
               <span className="font-medium text-foreground">{product.rating}</span>
-              <span className="text-muted-foreground">({product.reviews} reviews)</span>
+              <span className="text-muted-foreground">({product.reviews_count} reviews)</span>
             </div>
 
             {/* Price */}
@@ -174,16 +174,16 @@ const ProductDetails = () => {
               <span className="font-display text-3xl font-bold text-primary">
                 {formatPrice(product.price)}
               </span>
-              {product.originalPrice && (
+              {product.original_price && (
                 <span className="text-xl text-muted-foreground line-through">
-                  {formatPrice(product.originalPrice)}
+                  {formatPrice(product.original_price)}
                 </span>
               )}
               <span className="text-muted-foreground">/ {product.weight}</span>
             </div>
 
             <p className="text-muted-foreground leading-relaxed mb-8">
-              {product.longDescription}
+              {product.long_description || product.description}
             </p>
 
             {/* Info Grid */}
@@ -215,21 +215,21 @@ const ProductDetails = () => {
                     <Thermometer className="h-5 w-5 text-primary" />
                   </div>
                   <p className="text-sm text-muted-foreground">Temperature</p>
-                  <p className="font-medium text-foreground">{product.brewingInstructions.temperature}</p>
+                  <p className="font-medium text-foreground">{product.brewing_temp || 'N/A'}</p>
                 </div>
                 <div className="text-center">
                   <div className="w-12 h-12 rounded-full bg-background flex items-center justify-center mx-auto mb-2">
                     <Clock className="h-5 w-5 text-primary" />
                   </div>
                   <p className="text-sm text-muted-foreground">Steep Time</p>
-                  <p className="font-medium text-foreground">{product.brewingInstructions.steepTime}</p>
+                  <p className="font-medium text-foreground">{product.brewing_time || 'N/A'}</p>
                 </div>
                 <div className="text-center">
                   <div className="w-12 h-12 rounded-full bg-background flex items-center justify-center mx-auto mb-2">
                     <Scale className="h-5 w-5 text-primary" />
                   </div>
                   <p className="text-sm text-muted-foreground">Amount</p>
-                  <p className="font-medium text-foreground">{product.brewingInstructions.amount}</p>
+                  <p className="font-medium text-foreground">{product.brewing_amount || 'N/A'}</p>
                 </div>
               </div>
             </div>
@@ -259,16 +259,16 @@ const ProductDetails = () => {
                 size="lg"
                 className="flex-1"
                 onClick={handleAddToCart}
-                disabled={!product.inStock}
+                disabled={!product.in_stock}
               >
                 <ShoppingBag className="mr-2 h-5 w-5" />
-                {product.inStock ? 'Add to Cart' : 'Out of Stock'}
+                {product.in_stock ? 'Add to Cart' : 'Out of Stock'}
               </Button>
             </div>
 
             {/* Tags */}
             <div className="flex flex-wrap gap-2">
-              {product.tags.map((tag) => (
+              {product.tags?.map((tag) => (
                 <span
                   key={tag}
                   className="px-3 py-1 bg-muted text-muted-foreground text-sm rounded-full"
@@ -297,21 +297,21 @@ const ProductDetails = () => {
         </div>
 
         {/* Related Products */}
-        {relatedProducts.length > 0 && (
+        {filteredRelated.length > 0 && (
           <div className="mt-20">
             <h2 className="font-display text-2xl font-semibold text-foreground mb-8">
               You May Also Like
             </h2>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-              {relatedProducts.map((p) => (
+              {filteredRelated.map((p) => (
                 <Link
                   key={p.id}
-                  to={`/products/${p.id}`}
+                  to={`/products/${p.slug}`}
                   className="group bg-card rounded-2xl overflow-hidden shadow-soft hover:shadow-elevated transition-all duration-300"
                 >
                   <div className="aspect-square overflow-hidden">
                     <img
-                      src={p.image}
+                      src={p.images?.[0]?.url || getProductImage(p)}
                       alt={p.name}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
