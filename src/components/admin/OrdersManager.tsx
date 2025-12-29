@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Eye, Loader2, Package, Truck, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { Eye, Loader2, Package, Truck, CheckCircle, XCircle, Clock, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { generateInvoicePDF } from '@/lib/generateInvoicePDF';
 import {
     Dialog,
     DialogContent,
@@ -291,29 +292,40 @@ export function OrdersManager() {
                             )}
 
                             {/* Update Status */}
-                            <div className="flex items-center gap-4 pt-4 border-t">
-                                <Label>Update Status:</Label>
-                                <Select
-                                    value={selectedOrder.status}
-                                    onValueChange={(value) => {
-                                        handleStatusChange(selectedOrder.id, value);
-                                        setSelectedOrder({ ...selectedOrder, status: value });
-                                    }}
+                            <div className="flex items-center justify-between gap-4 pt-4 border-t">
+                                <div className="flex items-center gap-4">
+                                    <Label>Update Status:</Label>
+                                    <Select
+                                        value={selectedOrder.status}
+                                        onValueChange={(value) => {
+                                            handleStatusChange(selectedOrder.id, value);
+                                            setSelectedOrder({ ...selectedOrder, status: value });
+                                        }}
+                                    >
+                                        <SelectTrigger className="w-40">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {ORDER_STATUSES.map((status) => (
+                                                <SelectItem key={status.value} value={status.value}>
+                                                    <div className="flex items-center gap-2">
+                                                        <status.icon className="h-4 w-4" />
+                                                        {status.label}
+                                                    </div>
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => generateInvoicePDF(selectedOrder)}
+                                    className="gap-2"
                                 >
-                                    <SelectTrigger className="w-40">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {ORDER_STATUSES.map((status) => (
-                                            <SelectItem key={status.value} value={status.value}>
-                                                <div className="flex items-center gap-2">
-                                                    <status.icon className="h-4 w-4" />
-                                                    {status.label}
-                                                </div>
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                    <Download className="h-4 w-4" />
+                                    Download Invoice
+                                </Button>
                             </div>
                         </div>
                     )}
