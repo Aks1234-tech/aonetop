@@ -28,14 +28,19 @@ export function Header() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const handleSignOut = async () => {
+  const handleSignOut = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     console.log('[Header] Sign out clicked');
     try {
       await signOut();
-      console.log('[Header] Sign out completed');
-      navigate('/');
+      console.log('[Header] Sign out completed successfully');
     } catch (error) {
       console.error('[Header] Sign out error:', error);
+    } finally {
+      // Always navigate to home, even if signOut had issues
+      console.log('[Header] Navigating to home');
+      navigate('/');
     }
   };
 
@@ -84,7 +89,7 @@ export function Header() {
             <Button variant="ghost" size="icon" className="hidden sm:flex">
               <Search className="h-5 w-5" />
             </Button>
-            
+
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -113,11 +118,9 @@ export function Header() {
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem 
-                    onSelect={(e) => {
-                      e.preventDefault();
-                      handleSignOut();
-                    }} 
+                  <DropdownMenuItem
+                    onSelect={(e) => e.preventDefault()}
+                    onClick={handleSignOut}
                     className="text-destructive cursor-pointer"
                   >
                     <LogOut className="h-4 w-4 mr-2" />
@@ -132,7 +135,7 @@ export function Header() {
                 </Button>
               </Link>
             )}
-            
+
             <Button
               variant="ghost"
               size="icon"
@@ -192,8 +195,8 @@ export function Header() {
               </Link>
               {user ? (
                 <button
-                  onClick={() => {
-                    handleSignOut();
+                  onClick={(e) => {
+                    handleSignOut(e);
                     setMobileMenuOpen(false);
                   }}
                   className="px-4 py-3 rounded-lg text-base font-medium text-destructive hover:bg-muted flex items-center gap-2 w-full text-left"

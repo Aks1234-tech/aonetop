@@ -44,7 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Initialize auth state
     useEffect(() => {
         console.log('[Auth] Initializing auth state');
-        
+
         // Set timeout to prevent infinite loading
         const timeout = setTimeout(() => {
             console.warn('[Auth] Auth initialization timeout - setting isLoading to false');
@@ -115,18 +115,59 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     const signOut = async () => {
+        console.log('[Auth] signOut() called - starting sign out process');
+
+        // Wrap in timeout to prevent hanging
+        const signOutWithTimeout = async () => {
+            const timeoutPromise = new Promise<{ error: Error }>((_, reject) =>
+                setTimeout(() => reject(new Error('Sign out timed out after 3 seconds')), 3000)
+            );
+
+            try {
+                console.log('[Auth] Calling supabase.auth.signOut()...');
+                const result = await Promise.race([
+                    supabase.auth.signOut(),
+                    timeoutPromise
+                ]);
+                console.log('[Auth] supabase.auth.signOut() completed');
+                return result;
+            } catch (err) {
+                console.warn('[Auth] Sign out timed out or failed, forcing local cleanup:', err);
+                return { error: err as Error };
+            }
+        };
+
         try {
-            const { error } = await supabase.auth.signOut();
+            const { error } = await signOutWithTimeout();
             if (error) {
-                console.error('[Auth] Sign out error:', error);
+                console.error('[Auth] Sign out returned error:', error);
+            } else {
+                console.log('[Auth] Sign out successful - no error');
             }
         } catch (err) {
             console.error('[Auth] Sign out exception:', err);
         } finally {
-            // Always clear local state
+            console.log('[Auth] Clearing local state and storage...');
+
+            // Clear Supabase localStorage entries (session storage)
+            // Supabase stores tokens with key pattern: sb-<project-ref>-auth-token
+            const keysToRemove: string[] = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && (key.startsWith('sb-') || key.includes('supabase'))) {
+                    keysToRemove.push(key);
+                }
+            }
+            keysToRemove.forEach(key => {
+                console.log('[Auth] Removing localStorage key:', key);
+                localStorage.removeItem(key);
+            });
+
+            // Clear React state
             setUser(null);
             setSession(null);
             setProfile(null);
+            console.log('[Auth] Local state and storage cleared');
         }
     };
 
