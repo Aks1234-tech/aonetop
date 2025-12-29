@@ -18,6 +18,7 @@ import BulkOrders from "./pages/BulkOrders";
 import Admin from "./pages/Admin";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Profile from "./pages/Profile";
 import OrderHistory from "./pages/OrderHistory";
 import NotFound from "./pages/NotFound";
 
@@ -46,6 +47,14 @@ const App = () => (
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/bulk-orders" element={<BulkOrders />} />
+                <Route
+                  path="/profile"
+                  element={
+                    <ProtectedRoute>
+                      <Profile />
+                    </ProtectedRoute>
+                  }
+                />
                 <Route
                   path="/orders"
                   element={
