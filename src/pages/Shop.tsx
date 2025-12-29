@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Filter, Grid, List, Star, ShoppingBag, X, ChevronDown, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useProducts, useCategories } from '@/hooks/useProducts';
+import { useProducts, useCategories, type Product } from '@/hooks/useProducts';
 import { useCart } from '@/contexts/CartContext';
 import { cn } from '@/lib/utils';
 
@@ -12,13 +12,14 @@ const Shop = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [loadTimeout, setLoadTimeout] = useState(false);
   const { addToCart } = useCart();
 
   const selectedCategory = searchParams.get('category') || '';
   const sortBy = (searchParams.get('sort') || 'featured') as 'featured' | 'price-asc' | 'price-desc' | 'name' | 'rating';
 
   // Fetch products from Supabase with filters
-  const { data: products = [], isLoading, error } = useProducts({
+  const { data: products = [] as Product[], isLoading, error } = useProducts({
     filters: {
       category: selectedCategory || undefined,
       search: searchQuery || undefined,
@@ -29,6 +30,15 @@ const Shop = () => {
   // Fetch categories from Supabase
   const { data: categories = [] } = useCategories();
 
+  // Loading timeout fallback
+  useEffect(() => {
+    if (isLoading) {
+      const t = setTimeout(() => setLoadTimeout(true), 8000);
+      return () => clearTimeout(t);
+    }
+    setLoadTimeout(false);
+  }, [isLoading]);
+
   const formatPrice = (price: number) => {
     // Prices are stored in paise, convert to rupees
     return new Intl.NumberFormat('en-IN', {
@@ -38,7 +48,7 @@ const Shop = () => {
     }).format(price / 100);
   };
 
-  const getProductImage = (product: typeof products[0]) => {
+  const getProductImage = (product: Product) => {
     const primaryImage = product.images?.find(img => img.is_primary);
     return primaryImage?.url || product.images?.[0]?.url || 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=800&q=80';
   };
@@ -200,9 +210,35 @@ const Shop = () => {
             </div>
 
             {/* Product Grid */}
-            {isLoading ? (
+            {isLoading && !loadTimeout ? (
               <div className="flex items-center justify-center py-16">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : (isLoading && loadTimeout) ? (
+              <div className="text-center py-16">
+                <p className="text-muted-foreground mb-4">Still loading products… This can take a moment.</p>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setSearchParams({});
+                  }}
+                >
+                  Clear Filters
+                </Button>
+              </div>
+            ) : error ? (
+              <div className="text-center py-16">
+                <p className="text-muted-foreground mb-4">Couldn't load products. Please try again.</p>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setSearchParams({});
+                  }}
+                >
+                  Clear Filters
+                </Button>
               </div>
             ) : products.length === 0 ? (
               <div className="text-center py-16">

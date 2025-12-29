@@ -24,7 +24,7 @@ interface ProductsQueryOptions {
 export function useProducts(options: ProductsQueryOptions = {}) {
     const { filters = {}, sortBy = 'featured', limit } = options;
 
-    return useQuery({
+    return useQuery<Product[]>({
         queryKey: ['products', filters, sortBy, limit],
         queryFn: async () => {
             let query = supabase
@@ -94,12 +94,15 @@ export function useProducts(options: ProductsQueryOptions = {}) {
 
             return data as Product[];
         },
+        retry: false,
+        staleTime: 60 * 1000,
+        refetchOnWindowFocus: false,
     });
 }
 
 // Fetch a single product by slug or id
 export function useProduct(identifier: string) {
-    return useQuery({
+    return useQuery<Product>({
         queryKey: ['product', identifier],
         queryFn: async () => {
             // Try to fetch by slug first, then by id
@@ -134,6 +137,8 @@ export function useProduct(identifier: string) {
             return data as Product;
         },
         enabled: !!identifier,
+        retry: false,
+        refetchOnWindowFocus: false,
     });
 }
 
@@ -163,7 +168,7 @@ export function useNewProducts(limit = 6) {
 
 // Fetch all categories
 export function useCategories() {
-    return useQuery({
+    return useQuery<Tables<'categories'>[]>({
         queryKey: ['categories'],
         queryFn: async () => {
             const { data, error } = await supabase
@@ -177,6 +182,8 @@ export function useCategories() {
 
             return data as Tables<'categories'>[];
         },
+        retry: false,
+        refetchOnWindowFocus: false,
     });
 }
 
