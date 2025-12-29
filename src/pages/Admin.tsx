@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { ShoppingBag, Users, Plus, Edit, Trash2, Eye, Tag } from 'lucide-react';
+import { ShoppingBag, Users, Eye, Tag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { products } from '@/data/products';
 import { OffersManager } from '@/components/admin/OffersManager';
+import { ProductsManager } from '@/components/admin/ProductsManager';
 
 type Order = {
   id: string;
@@ -79,72 +79,7 @@ const Admin = () => {
         </div>
 
         <div className="p-6 border rounded-lg">
-          {activeTab === 'products' && (
-            <div>
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="font-display text-lg font-semibold text-foreground">
-                  Product Management
-                </h2>
-                <Button variant="gold">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Product
-                </Button>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-border">
-                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Product</th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Category</th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Price</th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Status</th>
-                      <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {products.slice(0, 5).map((product) => (
-                      <tr key={product.id} className="border-b border-border last:border-0">
-                        <td className="py-3 px-4">
-                          <div className="flex items-center gap-3">
-                            <img
-                              src={product.image}
-                              alt={product.name}
-                              className="w-10 h-10 rounded-lg object-cover"
-                            />
-                            <span className="font-medium text-foreground">{product.name}</span>
-                          </div>
-                        </td>
-                        <td className="py-3 px-4 text-muted-foreground">{product.category}</td>
-                        <td className="py-3 px-4 text-foreground">{formatPrice(product.price)}</td>
-                        <td className="py-3 px-4">
-                          <span
-                            className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              product.inStock ? 'bg-primary/10 text-primary' : 'bg-destructive/10 text-destructive'
-                            }`}
-                          >
-                            {product.inStock ? 'In Stock' : 'Out of Stock'}
-                          </span>
-                        </td>
-                        <td className="py-3 px-4">
-                          <div className="flex justify-end gap-2">
-                            <Button variant="ghost" size="icon">
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="icon">
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="icon" className="text-destructive">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
+          {activeTab === 'products' && <ProductsManager />}
 
           {activeTab === 'orders' && (
             <div>
@@ -169,13 +104,12 @@ const Admin = () => {
                         <td className="py-3 px-4 text-foreground">{formatPrice(order.total)}</td>
                         <td className="py-3 px-4">
                           <span
-                            className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              order.status === 'Delivered'
-                                ? 'bg-primary/10 text-primary'
-                                : order.status === 'Shipped'
+                            className={`px-2 py-1 rounded-full text-xs font-medium ${order.status === 'Delivered'
+                              ? 'bg-primary/10 text-primary'
+                              : order.status === 'Shipped'
                                 ? 'bg-accent/10 text-accent'
                                 : 'bg-muted text-muted-foreground'
-                            }`}
+                              }`}
                           >
                             {order.status}
                           </span>
