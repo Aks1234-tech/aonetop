@@ -1,9 +1,9 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Filter, Grid, List, Star, ShoppingBag, X, ChevronDown } from 'lucide-react';
+import { Filter, Grid, List, Star, ShoppingBag, X, ChevronDown, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { products, categories } from '@/data/products';
+import { useProducts, useCategories } from '@/hooks/useProducts';
 import { useCart } from '@/contexts/CartContext';
 import { cn } from '@/lib/utils';
 
@@ -15,54 +15,32 @@ const Shop = () => {
   const { addToCart } = useCart();
 
   const selectedCategory = searchParams.get('category') || '';
-  const sortBy = searchParams.get('sort') || 'featured';
+  const sortBy = (searchParams.get('sort') || 'featured') as 'featured' | 'price-asc' | 'price-desc' | 'name' | 'rating';
 
-  const filteredProducts = useMemo(() => {
-    let filtered = [...products];
+  // Fetch products from Supabase with filters
+  const { data: products = [], isLoading, error } = useProducts({
+    filters: {
+      category: selectedCategory || undefined,
+      search: searchQuery || undefined,
+    },
+    sortBy,
+  });
 
-    // Filter by category
-    if (selectedCategory) {
-      filtered = filtered.filter(
-        (p) => p.category.toLowerCase().replace(/\s+/g, '-') === selectedCategory
-      );
-    }
-
-    // Filter by search
-    if (searchQuery) {
-      filtered = filtered.filter(
-        (p) =>
-          p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          p.description.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    // Sort
-    switch (sortBy) {
-      case 'price-asc':
-        filtered.sort((a, b) => a.price - b.price);
-        break;
-      case 'price-desc':
-        filtered.sort((a, b) => b.price - a.price);
-        break;
-      case 'name':
-        filtered.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      case 'rating':
-        filtered.sort((a, b) => b.rating - a.rating);
-        break;
-      default:
-        filtered.sort((a, b) => (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0));
-    }
-
-    return filtered;
-  }, [selectedCategory, sortBy, searchQuery]);
+  // Fetch categories from Supabase
+  const { data: categories = [] } = useCategories();
 
   const formatPrice = (price: number) => {
+    // Prices are stored in paise, convert to rupees
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
       minimumFractionDigits: 0,
-    }).format(price);
+    }).format(price / 100);
+  };
+
+  const getProductImage = (product: typeof products[0]) => {
+    const primaryImage = product.images?.find(img => img.is_primary);
+    return primaryImage?.url || product.images?.[0]?.url || 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=800&q=80';
   };
 
   const handleCategoryChange = (category: string) => {
@@ -179,7 +157,7 @@ const Shop = () => {
                   Filters
                 </Button>
                 <span className="text-muted-foreground">
-                  {filteredProducts.length} products
+                  {isLoading ? 'Loading...' : `${products.length} products`}
                 </span>
               </div>
 
@@ -223,7 +201,11 @@ const Shop = () => {
             </div>
 
             {/* Product Grid */}
-            {filteredProducts.length === 0 ? (
+            {isLoading ? (
+              <div className="flex items-center justify-center py-16">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : products.length === 0 ? (
               <div className="text-center py-16">
                 <p className="text-muted-foreground mb-4">No products found</p>
                 <Button
@@ -244,7 +226,7 @@ const Shop = () => {
                     : "space-y-4"
                 )}
               >
-                {filteredProducts.map((product, index) => (
+                {products.map((product, index) => (
                   <div
                     key={product.id}
                     className={cn(
@@ -255,30 +237,30 @@ const Shop = () => {
                   >
                     {/* Image */}
                     <Link
-                      to={`/products/${product.id}`}
+                      to={`/products/${product.slug}`}
                       className={cn(
                         "block relative overflow-hidden",
                         viewMode === 'grid' ? "aspect-square" : "w-48 shrink-0"
                       )}
                     >
                       <img
-                        src={product.image}
+                        src={getProductImage(product)}
                         alt={product.name}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                       />
                       {/* Badges */}
                       <div className="absolute top-3 left-3 flex flex-col gap-2">
-                        {product.isBestseller && (
+                        {product.is_bestseller && (
                           <span className="px-2 py-1 bg-accent text-accent-foreground text-xs font-semibold rounded-full">
                             Bestseller
                           </span>
                         )}
-                        {product.isNew && (
+                        {product.is_new && (
                           <span className="px-2 py-1 bg-primary text-primary-foreground text-xs font-semibold rounded-full">
                             New
                           </span>
                         )}
-                        {product.originalPrice && (
+                        {product.original_price && (
                           <span className="px-2 py-1 bg-destructive text-destructive-foreground text-xs font-semibold rounded-full">
                             Sale
                           </span>
@@ -294,10 +276,10 @@ const Shop = () => {
                           {product.rating}
                         </span>
                         <span className="text-sm text-muted-foreground">
-                          ({product.reviews})
+                          ({product.reviews_count})
                         </span>
                       </div>
-                      <Link to={`/products/${product.id}`}>
+                      <Link to={`/products/${product.slug}`}>
                         <h3 className="font-display text-lg font-medium text-foreground group-hover:text-primary transition-colors">
                           {product.name}
                         </h3>
@@ -310,9 +292,9 @@ const Shop = () => {
                           <span className="font-display text-xl font-semibold text-primary">
                             {formatPrice(product.price)}
                           </span>
-                          {product.originalPrice && (
+                          {product.original_price && (
                             <span className="text-sm text-muted-foreground line-through">
-                              {formatPrice(product.originalPrice)}
+                              {formatPrice(product.original_price)}
                             </span>
                           )}
                         </div>
@@ -323,9 +305,9 @@ const Shop = () => {
                             addToCart({
                               id: product.id,
                               name: product.name,
-                              price: product.price,
-                              image: product.image,
-                              weight: product.weight,
+                              price: product.price / 100, // Convert from paise
+                              image: getProductImage(product),
+                              weight: product.weight || undefined,
                             })
                           }
                         >

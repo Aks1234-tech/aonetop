@@ -1,3 +1,5 @@
+set session_replication_role = replica;
+
 -- Seed data for aonetop e-commerce
 -- Run this after migrations to populate initial data
 
@@ -205,3 +207,5 @@ INSERT INTO offers (name, code, type, value, min_order_value, is_active, starts_
   ('Welcome Discount', 'WELCOME10', 'percentage', 10, 99900, true, NOW(), NOW() + INTERVAL '1 year'),
   ('Free Shipping', 'FREESHIP', 'free_shipping', NULL, 99900, true, NOW(), NOW() + INTERVAL '6 months'),
   ('New Year Sale', 'NEWYEAR25', 'percentage', 25, 199900, true, NOW(), '2025-01-31 23:59:59');
+
+set session_replication_role = origin;
