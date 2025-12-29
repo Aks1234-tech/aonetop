@@ -185,14 +185,16 @@ export function Header() {
                   {item.name}
                 </Link>
               ))}
-              <Link
-                to="/profile"
-                onClick={() => setMobileMenuOpen(false)}
-                className="px-4 py-3 rounded-lg text-base font-medium text-foreground hover:bg-muted flex items-center gap-2"
-              >
-                <User className="h-5 w-5" />
-                Profile
-              </Link>
+              {user && (
+                <Link
+                  to="/profile"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="px-4 py-3 rounded-lg text-base font-medium text-foreground hover:bg-muted flex items-center gap-2"
+                >
+                  <User className="h-5 w-5" />
+                  Profile
+                </Link>
+              )}
               {user ? (
                 <button
                   onClick={(e) => {
