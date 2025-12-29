@@ -138,11 +138,13 @@ export function useCreateOrder() {
                 discount_amount: discount,
             };
 
-            const { data: order, error: orderError } = await supabase
+            const { data: orderResult, error: orderError } = await supabase
                 .from('orders')
                 .insert(orderData as any)
-                .select()
+                .select('*')
                 .single();
+
+            const order = orderResult as Tables<'orders'> | null;
 
             if (orderError) {
                 throw orderError;
@@ -206,9 +208,9 @@ export function useUpdateOrderStatus() {
 
     return useMutation({
         mutationFn: async ({ orderId, status }: { orderId: string; status: string }) => {
-            const { data, error } = await supabase
-                .from('orders')
-                .update({ status } as any)
+            const { data, error } = await (supabase
+                .from('orders') as any)
+                .update({ status })
                 .eq('id', orderId)
                 .select()
                 .single();
