@@ -175,7 +175,8 @@ export function useCategories() {
                 throw error;
             }
 
-            return data;
+            return data as Tables<'categories'>[];
         },
     });
 }
+

@@ -121,7 +121,6 @@ const Shop = () => {
                       )}
                     >
                       <span>{category.name}</span>
-                      <span className="text-xs opacity-60">{category.count}</span>
                     </button>
                   ))}
                 </div>
