@@ -140,12 +140,16 @@ export function useCreateOrder() {
 
             const { data: order, error: orderError } = await supabase
                 .from('orders')
-                .insert(orderData)
+                .insert(orderData as any)
                 .select()
                 .single();
 
             if (orderError) {
                 throw orderError;
+            }
+
+            if (!order) {
+                throw new Error('Order creation failed');
             }
 
             // Create order items
@@ -160,7 +164,7 @@ export function useCreateOrder() {
 
             const { error: itemsError } = await supabase
                 .from('order_items')
-                .insert(orderItems);
+                .insert(orderItems as any);
 
             if (itemsError) {
                 throw itemsError;
@@ -204,7 +208,7 @@ export function useUpdateOrderStatus() {
         mutationFn: async ({ orderId, status }: { orderId: string; status: string }) => {
             const { data, error } = await supabase
                 .from('orders')
-                .update({ status })
+                .update({ status } as any)
                 .eq('id', orderId)
                 .select()
                 .single();
