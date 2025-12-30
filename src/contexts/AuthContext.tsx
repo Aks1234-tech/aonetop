@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session, AuthError } from '@supabase/supabase-js';
 import { supabase, Tables, UpdateTables } from '@/lib/supabase';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface AuthContextType {
     user: User | null;
@@ -17,6 +18,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+    const queryClient = useQueryClient();
     const [user, setUser] = useState<User | null>(null);
     const [session, setSession] = useState<Session | null>(null);
     const [profile, setProfile] = useState<Tables<'profiles'> | null>(null);
@@ -116,6 +118,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const signOut = async () => {
         console.log('[Auth] signOut() called - starting sign out process');
+
+        // Clear all React Query cache to prevent stale data on re-login
+        console.log('[Auth] Clearing React Query cache...');
+        queryClient.clear();
+
         // Wrap in timeout to prevent hanging
         /*const signOutWithTimeout = async () => {
             const timeoutPromise = new Promise<{ error: Error }>((_, reject) =>
@@ -148,7 +155,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } finally {
             console.log('[Auth] Clearing local state and storage...');
         }*/
-       
+
         // INSTANT: Clear local state and storage FIRST for immediate UI feedback
         console.log('[Auth] Clearing local state and storage immediately...');
 
