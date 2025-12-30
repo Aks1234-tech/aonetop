@@ -123,74 +123,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.log('[Auth] Clearing React Query cache...');
         queryClient.clear();
 
-        // Wrap in timeout to prevent hanging
-        /*const signOutWithTimeout = async () => {
-            const timeoutPromise = new Promise<{ error: Error }>((_, reject) =>
-                setTimeout(() => reject(new Error('Sign out timed out after 10 seconds')), 10000)
-            );
-
-            try {
-                console.log('[Auth] Calling supabase.auth.signOut()...');
-                const result = await Promise.race([
-                    supabase.auth.signOut(),
-                    timeoutPromise
-                ]);
-                console.log('[Auth] supabase.auth.signOut() completed');
-                return result;
-            } catch (err) {
-                console.warn('[Auth] Sign out timed out or failed, forcing local cleanup:', err);
-                return { error: err as Error };
-            }
-        };
-
-        try {
-            const { error } = await signOutWithTimeout();
-            if (error) {
-                console.error('[Auth] Sign out returned error:', error);
-            } else {
-                console.log('[Auth] Sign out successful - no error');
-            }
-        } catch (err) {
-            console.error('[Auth] Sign out exception:', err);
-        } finally {
-            console.log('[Auth] Clearing local state and storage...');
-        }*/
-
-        // INSTANT: Clear local state and storage FIRST for immediate UI feedback
-        console.log('[Auth] Clearing local state and storage immediately...');
-
-        // Clear React state immediately (user sees instant sign out)
+        // Clear React state immediately for instant UI feedback
+        console.log('[Auth] Clearing React state...');
         setUser(null);
         setSession(null);
         setProfile(null);
 
-        // Clear Supabase localStorage entries (session storage)
-        const keysToRemove: string[] = [];
-        for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            if (key && (key.startsWith('sb-') || key.includes('supabase'))) {
-                keysToRemove.push(key);
-            }
-        }
-        keysToRemove.forEach(key => {
-            console.log('[Auth] Removing localStorage key:', key);
-            localStorage.removeItem(key);
-        });
-        console.log('[Auth] Local state and storage cleared - user is now signed out locally');
+        // Call Supabase signOut with timeout protection
+        // This properly clears both server session AND client internal state
+        try {
+            console.log('[Auth] Calling supabase.auth.signOut()...');
+            const signOutPromise = supabase.auth.signOut();
+            const timeoutPromise = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Sign out timed out')), 5000)
+            );
 
-        // BACKGROUND: Call Supabase signOut (don't await - fire and forget)
-        // This invalidates the session on the server but user is already signed out locally
-        supabase.auth.signOut()
-            .then(({ error }) => {
-                if (error) {
-                    console.warn('[Auth] Supabase signOut returned error (ignored):', error);
-                } else {
-                    console.log('[Auth] Supabase signOut completed successfully');
+            await Promise.race([signOutPromise, timeoutPromise]);
+            console.log('[Auth] Supabase signOut completed successfully');
+        } catch (err) {
+            console.warn('[Auth] Supabase signOut failed or timed out:', err);
+            // If signOut fails, manually clear localStorage as fallback
+            const keysToRemove: string[] = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && (key.startsWith('sb-') || key.includes('supabase'))) {
+                    keysToRemove.push(key);
                 }
-            })
-            .catch((err) => {
-                console.warn('[Auth] Supabase signOut failed (ignored):', err);
+            }
+            keysToRemove.forEach(key => {
+                console.log('[Auth] Fallback: Removing localStorage key:', key);
+                localStorage.removeItem(key);
             });
+        }
+
+        console.log('[Auth] Sign out complete');
     };
 
     const updateProfile = async (updates: UpdateTables<'profiles'>) => {

@@ -12,7 +12,13 @@ export interface ContactFormInput {
 export function useSubmitContactForm() {
     return useMutation({
         mutationFn: async (input: ContactFormInput) => {
-            const { data, error } = await supabase
+            // Force refresh auth state to ensure we use current session (or anon key if logged out)
+            // This prevents stale Authorization headers from causing 401 errors
+            await supabase.auth.getSession();
+
+            // Insert without .select() to avoid needing SELECT permission
+            // This allows anonymous users to submit without RLS SELECT policy
+            const { error } = await supabase
                 .from('contact_messages')
                 .insert({
                     name: input.name,
@@ -20,15 +26,14 @@ export function useSubmitContactForm() {
                     phone: input.phone || null,
                     subject: input.subject || null,
                     message: input.message,
-                } as any)
-                .select()
-                .single();
+                } as any);
 
             if (error) {
+                console.error('[Contact Form] Insert error:', error);
                 throw error;
             }
 
-            return data;
+            return { success: true };
         },
     });
 }
