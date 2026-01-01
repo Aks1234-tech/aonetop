@@ -35,9 +35,9 @@ export function useMarkContactMessageAsRead() {
 
     return useMutation({
         mutationFn: async ({ messageId, isRead }: { messageId: string; isRead: boolean }) => {
-            const { error } = await supabase
-                .from('contact_messages')
-                .update({ is_read: isRead } as any)
+            const { error } = await (supabase
+                .from('contact_messages') as any)
+                .update({ is_read: isRead })
                 .eq('id', messageId);
 
             if (error) {
