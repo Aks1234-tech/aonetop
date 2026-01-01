@@ -2,10 +2,17 @@ import { Link } from 'react-router-dom';
 import { X, Plus, Minus, ShoppingBag, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/contexts/CartContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 
 export function CartDrawer() {
   const { items, isOpen, closeCart, removeFromCart, updateQuantity, cartTotal, cartCount } = useCart();
+  const { isAdmin } = useAuth();
+
+  // Don't render cart drawer for admin users
+  if (isAdmin) {
+    return null;
+  }
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-IN', {

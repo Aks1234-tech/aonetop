@@ -136,19 +136,21 @@ export function Header() {
               </Link>
             )}
 
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleCart}
-              className="relative"
-            >
-              <ShoppingBag className="h-5 w-5" />
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-accent text-accent-foreground text-xs font-bold flex items-center justify-center animate-scale-in">
-                  {cartCount}
-                </span>
-              )}
-            </Button>
+            {!isAdmin && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleCart}
+                className="relative"
+              >
+                <ShoppingBag className="h-5 w-5" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-accent text-accent-foreground text-xs font-bold flex items-center justify-center animate-scale-in">
+                    {cartCount}
+                  </span>
+                )}
+              </Button>
+            )}
 
             {/* Mobile menu button */}
             <Button
