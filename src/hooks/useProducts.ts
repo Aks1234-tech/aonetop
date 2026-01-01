@@ -315,6 +315,47 @@ export function useDeleteProduct() {
         mutationFn: async (id: string) => {
             console.log('[useDeleteProduct] Deleting product:', id);
 
+            // First, fetch all images for this product
+            const { data: productImages, error: fetchError } = await supabase
+                .from('product_images')
+                .select('id, url')
+                .eq('product_id', id) as { data: { id: string; url: string }[] | null; error: any };
+
+            if (fetchError) {
+                console.error('[useDeleteProduct] Error fetching images:', fetchError);
+                // Continue with deletion even if we can't fetch images
+            }
+
+            // Delete images from storage
+            if (productImages && productImages.length > 0) {
+                console.log(`[useDeleteProduct] Found ${productImages.length} images to delete from storage`);
+
+                for (const image of productImages) {
+                    try {
+                        // Extract file path from URL
+                        const urlObj = new URL(image.url);
+                        const pathMatch = urlObj.pathname.match(/\/product-images\/(.+)$/);
+                        if (pathMatch) {
+                            const filePath = pathMatch[1];
+                            const { error: storageError } = await supabase.storage
+                                .from('product-images')
+                                .remove([filePath]);
+
+                            if (storageError) {
+                                console.warn('[useDeleteProduct] Failed to delete from storage:', filePath, storageError);
+                            } else {
+                                console.log('[useDeleteProduct] Deleted from storage:', filePath);
+                            }
+                        }
+                    } catch (err) {
+                        console.warn('[useDeleteProduct] Could not parse image URL:', image.url, err);
+                    }
+                }
+            } else {
+                console.log('[useDeleteProduct] No images to delete from storage');
+            }
+
+            // Now delete the product (cascade will delete product_images records)
             const { error } = await supabase
                 .from('products')
                 .delete()
