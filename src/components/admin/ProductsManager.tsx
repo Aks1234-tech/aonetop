@@ -213,6 +213,7 @@ export function ProductsManager() {
             await uploadImage.mutateAsync({
                 productId: editingProduct.id,
                 file,
+                category: editingProduct.category,
                 isPrimary
             });
             toast({ title: 'Image uploaded successfully' });

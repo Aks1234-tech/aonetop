@@ -343,17 +343,26 @@ export function useUploadProductImage() {
         mutationFn: async ({
             productId,
             file,
+            category,
             isPrimary = false
         }: {
             productId: string;
             file: File;
+            category: string;
             isPrimary?: boolean;
         }) => {
-            console.log('[useUploadProductImage] Uploading image for product:', productId);
+            console.log('[useUploadProductImage] Uploading image for product:', productId, 'category:', category);
 
-            // Generate unique filename
+            // Determine category folder based on product category
+            const categoryFolder = category.toLowerCase().includes('honey')
+                ? 'honey-products'
+                : 'tea-products';
+
+            console.log('[useUploadProductImage] Routing to folder:', categoryFolder);
+
+            // Generate unique filename with category folder
             const fileExt = file.name.split('.').pop();
-            const fileName = `${productId}/${Date.now()}.${fileExt}`;
+            const fileName = `${categoryFolder}/${productId}/${Date.now()}.${fileExt}`;
 
             // Upload to Supabase Storage
             const { data: uploadData, error: uploadError } = await supabase.storage
