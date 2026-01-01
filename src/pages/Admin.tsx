@@ -1,13 +1,14 @@
 import { useState } from 'react';
-import { ShoppingBag, Users, Eye, Tag } from 'lucide-react';
+import { ShoppingBag, Users, Eye, Tag, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { OffersManager } from '@/components/admin/OffersManager';
 import { ProductsManager } from '@/components/admin/ProductsManager';
 import { OrdersManager } from '@/components/admin/OrdersManager';
 import { InquiriesManager } from '@/components/admin/InquiriesManager';
+import { ContactMessagesManager } from '@/components/admin/ContactMessagesManager';
 
 const Admin = () => {
-  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'inquiries' | 'offers'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'inquiries' | 'offers' | 'contact'>('products');
 
   return (
     <div className="min-h-screen bg-background">
@@ -42,6 +43,13 @@ const Admin = () => {
               <Tag className="mr-2 h-4 w-4" />
               Offers
             </Button>
+            <Button
+              variant={activeTab === 'contact' ? 'default' : 'ghost'}
+              onClick={() => setActiveTab('contact')}
+            >
+              <MessageSquare className="mr-2 h-4 w-4" />
+              Contact Messages
+            </Button>
           </div>
         </div>
 
@@ -53,6 +61,8 @@ const Admin = () => {
           {activeTab === 'inquiries' && <InquiriesManager />}
 
           {activeTab === 'offers' && <OffersManager />}
+
+          {activeTab === 'contact' && <ContactMessagesManager />}
         </div>
       </div>
     </div>
