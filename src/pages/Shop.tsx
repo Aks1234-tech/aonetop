@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useProducts, useCategories, type Product } from '@/hooks/useProducts';
 import { useCart } from '@/contexts/CartContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 
 const Shop = () => {
@@ -14,6 +15,7 @@ const Shop = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [loadTimeout, setLoadTimeout] = useState(false);
   const { addToCart } = useCart();
+  const { isAdmin } = useAuth();
 
   const selectedCategory = searchParams.get('category') || '';
   const sortBy = (searchParams.get('sort') || 'featured') as 'featured' | 'price-asc' | 'price-desc' | 'name' | 'rating';
@@ -333,21 +335,23 @@ const Shop = () => {
                             </span>
                           )}
                         </div>
-                        <Button
-                          variant="gold"
-                          size="sm"
-                          onClick={() =>
-                            addToCart({
-                              id: product.id,
-                              name: product.name,
-                              price: product.price / 100, // Convert from paise
-                              image: getProductImage(product),
-                              weight: product.weight || undefined,
-                            })
-                          }
-                        >
-                          <ShoppingBag className="h-4 w-4" />
-                        </Button>
+                        {!isAdmin && (
+                          <Button
+                            variant="gold"
+                            size="sm"
+                            onClick={() =>
+                              addToCart({
+                                id: product.id,
+                                name: product.name,
+                                price: product.price / 100, // Convert from paise
+                                image: getProductImage(product),
+                                weight: product.weight || undefined,
+                              })
+                            }
+                          >
+                            <ShoppingBag className="h-4 w-4" />
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </div>

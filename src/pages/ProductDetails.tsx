@@ -4,6 +4,7 @@ import { ArrowLeft, Star, Plus, Minus, ShoppingBag, Leaf, Thermometer, Clock, Sc
 import { Button } from '@/components/ui/button';
 import { useProduct, useProducts } from '@/hooks/useProducts';
 import { useCart } from '@/contexts/CartContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
 const ProductDetails = () => {
@@ -12,6 +13,7 @@ const ProductDetails = () => {
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
   const { addToCart } = useCart();
+  const { isAdmin } = useAuth();
   const { toast } = useToast();
 
   // Fetch related products from same category
@@ -235,36 +237,38 @@ const ProductDetails = () => {
             </div>
 
             {/* Quantity & Add to Cart */}
-            <div className="flex flex-col sm:flex-row gap-4 mb-8">
-              <div className="flex items-center border border-border rounded-lg">
+            {!isAdmin && (
+              <div className="flex flex-col sm:flex-row gap-4 mb-8">
+                <div className="flex items-center border border-border rounded-lg">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    disabled={quantity <= 1}
+                  >
+                    <Minus className="h-4 w-4" />
+                  </Button>
+                  <span className="w-12 text-center font-medium">{quantity}</span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setQuantity(quantity + 1)}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
                 <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  disabled={quantity <= 1}
+                  variant="gold"
+                  size="lg"
+                  className="flex-1"
+                  onClick={handleAddToCart}
+                  disabled={!product.in_stock}
                 >
-                  <Minus className="h-4 w-4" />
-                </Button>
-                <span className="w-12 text-center font-medium">{quantity}</span>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setQuantity(quantity + 1)}
-                >
-                  <Plus className="h-4 w-4" />
+                  <ShoppingBag className="mr-2 h-5 w-5" />
+                  {product.in_stock ? 'Add to Cart' : 'Out of Stock'}
                 </Button>
               </div>
-              <Button
-                variant="gold"
-                size="lg"
-                className="flex-1"
-                onClick={handleAddToCart}
-                disabled={!product.in_stock}
-              >
-                <ShoppingBag className="mr-2 h-5 w-5" />
-                {product.in_stock ? 'Add to Cart' : 'Out of Stock'}
-              </Button>
-            </div>
+            )}
 
             {/* Tags */}
             <div className="flex flex-wrap gap-2">
