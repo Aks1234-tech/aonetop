@@ -7,14 +7,19 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRouteProps) => {
-    const { user, isAdmin, isLoading } = useAuth();
+    const { user, profile, isAdmin, isLoading, profileLoading } = useAuth();
     const location = useLocation();
 
-    // Show loading state
-    if (isLoading) {
+    // Show loading state while auth is initializing or profile is loading
+    if (isLoading || (user && profileLoading)) {
         return (
             <div className="min-h-screen bg-background flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                    <p className="text-muted-foreground">
+                        {profileLoading ? 'Loading profile...' : 'Loading...'}
+                    </p>
+                </div>
             </div>
         );
     }
@@ -24,7 +29,7 @@ const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRouteProps)
         return <Navigate to="/login" state={{ from: location }} replace />;
     }
 
-    // Requires admin but user is not admin
+    // Requires admin but user is not admin (only check after profile has loaded)
     if (requireAdmin && !isAdmin) {
         return (
             <div className="min-h-screen bg-background flex items-center justify-center">
