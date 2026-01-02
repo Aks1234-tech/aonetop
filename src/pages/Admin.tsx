@@ -24,6 +24,13 @@ const Admin = () => {
               Products
             </Button>
             <Button
+              variant={activeTab === 'categories' ? 'default' : 'ghost'}
+              onClick={() => setActiveTab('categories')}
+            >
+              <FolderTree className="mr-2 h-4 w-4" />
+              Categories
+            </Button>
+            <Button
               variant={activeTab === 'orders' ? 'default' : 'ghost'}
               onClick={() => setActiveTab('orders')}
             >
@@ -51,18 +58,13 @@ const Admin = () => {
               <MessageSquare className="mr-2 h-4 w-4" />
               Contact Messages
             </Button>
-            <Button
-              variant={activeTab === 'categories' ? 'default' : 'ghost'}
-              onClick={() => setActiveTab('categories')}
-            >
-              <FolderTree className="mr-2 h-4 w-4" />
-              Categories
-            </Button>
           </div>
         </div>
 
         <div className="p-6 border rounded-lg">
           {activeTab === 'products' && <ProductsManager />}
+
+          {activeTab === 'categories' && <CategoryManager />}
 
           {activeTab === 'orders' && <OrdersManager />}
 
@@ -71,8 +73,6 @@ const Admin = () => {
           {activeTab === 'offers' && <OffersManager />}
 
           {activeTab === 'contact' && <ContactMessagesManager />}
-
-          {activeTab === 'categories' && <CategoryManager />}
         </div>
       </div>
     </div>
