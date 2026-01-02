@@ -26,9 +26,9 @@ import {
     useDeleteProduct,
     useUploadProductImage,
     useDeleteProductImage,
-    useCategories,
     Product,
 } from '@/hooks/useProducts';
+import { useCategories } from '@/hooks/useCategories';
 import { Tables } from '@/lib/supabase';
 
 // Helper for currency

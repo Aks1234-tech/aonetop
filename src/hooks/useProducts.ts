@@ -184,29 +184,6 @@ export function useNewProducts(limit = 6) {
     });
 }
 
-// Fetch all categories
-export function useCategories() {
-    return useQuery<Tables<'categories'>[]>({
-        queryKey: ['categories'],
-        queryFn: async () => {
-            console.log('[useCategories] Query starting');
-            const { data, error } = await supabase
-                .from('categories')
-                .select('*')
-                .order('sort_order', { ascending: true });
-
-            if (error) {
-                console.error('[useCategories] Query error:', error);
-                throw error;
-            }
-
-            console.log('[useCategories] Query success, returned', (data as Tables<'categories'>[])?.length || 0, 'categories');
-            return data as Tables<'categories'>[];
-        },
-        retry: false,
-        refetchOnWindowFocus: false,
-    });
-}
 
 // ============== ADMIN CRUD OPERATIONS ==============
 

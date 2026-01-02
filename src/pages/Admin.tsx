@@ -1,14 +1,15 @@
 import { useState } from 'react';
-import { ShoppingBag, Users, Eye, Tag, MessageSquare } from 'lucide-react';
+import { ShoppingBag, Users, Eye, Tag, MessageSquare, FolderTree } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { OffersManager } from '@/components/admin/OffersManager';
 import { ProductsManager } from '@/components/admin/ProductsManager';
 import { OrdersManager } from '@/components/admin/OrdersManager';
 import { InquiriesManager } from '@/components/admin/InquiriesManager';
 import { ContactMessagesManager } from '@/components/admin/ContactMessagesManager';
+import { CategoryManager } from '@/components/admin/CategoryManager';
 
 const Admin = () => {
-  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'inquiries' | 'offers' | 'contact'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'inquiries' | 'offers' | 'contact' | 'categories'>('products');
 
   return (
     <div className="min-h-screen bg-background">
@@ -50,6 +51,13 @@ const Admin = () => {
               <MessageSquare className="mr-2 h-4 w-4" />
               Contact Messages
             </Button>
+            <Button
+              variant={activeTab === 'categories' ? 'default' : 'ghost'}
+              onClick={() => setActiveTab('categories')}
+            >
+              <FolderTree className="mr-2 h-4 w-4" />
+              Categories
+            </Button>
           </div>
         </div>
 
@@ -63,6 +71,8 @@ const Admin = () => {
           {activeTab === 'offers' && <OffersManager />}
 
           {activeTab === 'contact' && <ContactMessagesManager />}
+
+          {activeTab === 'categories' && <CategoryManager />}
         </div>
       </div>
     </div>
