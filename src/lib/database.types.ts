@@ -141,18 +141,24 @@ export interface Database {
                     name: string;
                     description: string | null;
                     sort_order: number;
+                    parent_id: string | null;
+                    image_url: string | null;
                 };
                 Insert: {
                     id: string;
                     name: string;
                     description?: string | null;
                     sort_order?: number;
+                    parent_id?: string | null;
+                    image_url?: string | null;
                 };
                 Update: {
                     id?: string;
                     name?: string;
                     description?: string | null;
                     sort_order?: number;
+                    parent_id?: string | null;
+                    image_url?: string | null;
                 };
             };
             carts: {
