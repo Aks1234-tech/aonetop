@@ -58,10 +58,10 @@ interface ProductFormData {
     original_price: string;
     category: string;
     weight: string;
-    origin: string;
-    brewing_temp: string;
-    brewing_time: string;
-    brewing_amount: string;
+    // origin: string;
+    // brewing_temp: string;
+    // brewing_time: string;
+    // brewing_amount: string;
     in_stock: boolean;
     is_featured: boolean;
     is_bestseller: boolean;
@@ -77,10 +77,10 @@ const initialFormData: ProductFormData = {
     original_price: '',
     category: 'Black Tea',
     weight: '100g',
-    origin: '',
-    brewing_temp: '',
-    brewing_time: '',
-    brewing_amount: '',
+    // origin: '',
+    // brewing_temp: '',
+    // brewing_time: '',
+    // brewing_amount: '',
     in_stock: true,
     is_featured: false,
     is_bestseller: false,
@@ -120,10 +120,10 @@ export function ProductsManager() {
                 original_price: product.original_price?.toString() || '',
                 category: product.category,
                 weight: product.weight || '100g',
-                origin: product.origin || '',
-                brewing_temp: product.brewing_temp || '',
-                brewing_time: product.brewing_time || '',
-                brewing_amount: product.brewing_amount || '',
+                // origin: product.origin || '',
+                // brewing_temp: product.brewing_temp || '',
+                // brewing_time: product.brewing_time || '',
+                // brewing_amount: product.brewing_amount || '',
                 in_stock: product.in_stock,
                 is_featured: product.is_featured,
                 is_bestseller: product.is_bestseller,
@@ -154,10 +154,10 @@ export function ProductsManager() {
             original_price: formData.original_price ? parseInt(formData.original_price) : null,
             category: formData.category,
             weight: formData.weight || null,
-            origin: formData.origin || null,
-            brewing_temp: formData.brewing_temp || null,
-            brewing_time: formData.brewing_time || null,
-            brewing_amount: formData.brewing_amount || null,
+            // origin: formData.origin || null,
+            // brewing_temp: formData.brewing_temp || null,
+            // brewing_time: formData.brewing_time || null,
+            // brewing_amount: formData.brewing_amount || null,
             in_stock: formData.in_stock,
             is_featured: formData.is_featured,
             is_bestseller: formData.is_bestseller,
@@ -458,7 +458,7 @@ export function ProductsManager() {
                             </div>
                         </div>
 
-                        {/* Origin */}
+                        {/* Origin 
                         <div className="space-y-2">
                             <Label htmlFor="origin">Origin</Label>
                             <Input
@@ -469,7 +469,7 @@ export function ProductsManager() {
                             />
                         </div>
 
-                        {/* Brewing Info */}
+                        {/* Brewing Info 
                         <div className="grid grid-cols-3 gap-4">
                             <div className="space-y-2">
                                 <Label htmlFor="brewing_temp">Brewing Temp</Label>
@@ -498,7 +498,7 @@ export function ProductsManager() {
                                     placeholder="2g/cup"
                                 />
                             </div>
-                        </div>
+                        </div> */}
 
                         {/* Flags */}
                         <div className="flex flex-wrap gap-4 pt-2">
