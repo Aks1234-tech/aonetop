@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Package, Clock, ChevronRight, Loader2, FileDown } from 'lucide-react';
+import { Package, Clock, ChevronRight, Loader2, FileDown, CreditCard, Banknote, CheckCircle, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useOrders } from '@/hooks/useOrders';
 import { useAuth } from '@/contexts/AuthContext';
@@ -37,6 +37,40 @@ const OrderHistory = () => {
                 return 'bg-red-100 text-red-800';
             default:
                 return 'bg-yellow-100 text-yellow-800';
+        }
+    };
+
+    const getPaymentInfo = (order: any) => {
+        const gateway = order.payment_gateway || 'cod';
+        const status = order.payment_status || 'pending';
+        
+        if (gateway === 'cod') {
+            return {
+                label: 'Cash on Delivery',
+                icon: Banknote,
+                color: 'text-muted-foreground',
+            };
+        }
+        
+        // Online payment
+        if (status === 'completed') {
+            return {
+                label: 'Paid Online',
+                icon: CheckCircle,
+                color: 'text-green-600',
+            };
+        } else if (status === 'failed') {
+            return {
+                label: 'Payment Failed',
+                icon: AlertTriangle,
+                color: 'text-red-600',
+            };
+        } else {
+            return {
+                label: 'Payment Pending',
+                icon: CreditCard,
+                color: 'text-yellow-600',
+            };
         }
     };
 
@@ -109,7 +143,7 @@ const OrderHistory = () => {
                             >
                                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
                                     <div>
-                                        <div className="flex items-center gap-3">
+                                        <div className="flex items-center gap-3 flex-wrap">
                                             <h3 className="font-display text-lg font-semibold text-foreground">
                                                 Order {order.order_number}
                                             </h3>
@@ -120,6 +154,16 @@ const OrderHistory = () => {
                                             >
                                                 {order.status}
                                             </span>
+                                            {(() => {
+                                                const paymentInfo = getPaymentInfo(order);
+                                                const PaymentIcon = paymentInfo.icon;
+                                                return (
+                                                    <span className={`flex items-center gap-1 text-xs ${paymentInfo.color}`}>
+                                                        <PaymentIcon className="h-3 w-3" />
+                                                        {paymentInfo.label}
+                                                    </span>
+                                                );
+                                            })()}
                                         </div>
                                         <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                                             <Clock className="h-4 w-4" />
