@@ -3,6 +3,7 @@ import { supabase, Tables, InsertTables, UpdateTables } from '@/lib/supabase';
 
 export type Product = Tables<'products'> & {
     images?: Tables<'product_images'>[];
+    weight_variants?: Tables<'product_weight_variants'>[];
 };
 
 interface ProductFilters {
@@ -33,7 +34,8 @@ export function useProducts(options: ProductsQueryOptions = {}) {
                     .from('products')
                     .select(`
           *,
-          images:product_images(*)
+          images:product_images(*),
+          weight_variants:product_weight_variants(*)
         `);
 
                 console.log('[useProducts] Query builder created');
@@ -155,7 +157,8 @@ export function useProduct(identifier: string) {
                 .from('products')
                 .select(`
           *,
-          images:product_images(*)
+          images:product_images(*),
+          weight_variants:product_weight_variants(*)
         `)
                 .eq('slug', identifier)
                 .single();
@@ -166,7 +169,8 @@ export function useProduct(identifier: string) {
                     .from('products')
                     .select(`
             *,
-            images:product_images(*)
+            images:product_images(*),
+            weight_variants:product_weight_variants(*)
           `)
                     .eq('id', identifier)
                     .single();
@@ -226,7 +230,8 @@ export function useAdminProducts() {
                 .from('products')
                 .select(`
                     *,
-                    images:product_images(*)
+                    images:product_images(*),
+                    weight_variants:product_weight_variants(*)
                 `)
                 .order('created_at', { ascending: false });
 
