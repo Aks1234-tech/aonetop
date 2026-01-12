@@ -246,7 +246,14 @@ export function OrdersManager() {
                                                 />
                                             )}
                                             <div className="flex-1">
-                                                <div className="font-medium">{item.product_name}</div>
+                                                <div className="font-medium">
+                                                    {item.product_name}
+                                                    {(item as any).weight_value && (
+                                                        <span className="ml-2 text-xs text-muted-foreground font-normal">
+                                                            ({(item as any).weight_value})
+                                                        </span>
+                                                    )}
+                                                </div>
                                                 <div className="text-sm text-muted-foreground">
                                                     {formatPrice(item.price)} × {item.quantity}
                                                 </div>
