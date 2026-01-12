@@ -233,7 +233,6 @@ const BulkOrders = () => {
                       <option value="cafe">Cafe</option>
                       <option value="retailer">Retailer</option>
                       <option value="distributor">Distributor</option>
-                      <option value="corporate">Corporate</option>
                       <option value="other">Other</option>
                     </select>
                   </div>
