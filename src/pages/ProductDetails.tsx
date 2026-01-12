@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Star, Plus, Minus, ShoppingBag, Leaf, Thermometer, Clock, Scale, MapPin, Check, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -6,15 +6,32 @@ import { useProduct, useProducts } from '@/hooks/useProducts';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { Tables } from '@/lib/supabase';
+import { cn } from '@/lib/utils';
+
+type WeightVariant = Tables<'product_weight_variants'>;
 
 const ProductDetails = () => {
   const { id } = useParams<{ id: string }>();
   const { data: product, isLoading, error } = useProduct(id || '');
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
+  const [selectedVariant, setSelectedVariant] = useState<WeightVariant | null>(null);
   const { addToCart } = useCart();
   const { isAdmin } = useAuth();
   const { toast } = useToast();
+
+  // Set default selected variant when product loads
+  useEffect(() => {
+    if (product?.weight_variants && product.weight_variants.length > 0) {
+      // Sort by sort_order and select first in-stock variant, or first variant if none in stock
+      const sortedVariants = [...product.weight_variants].sort((a, b) => a.sort_order - b.sort_order);
+      const inStockVariant = sortedVariants.find(v => v.in_stock);
+      setSelectedVariant(inStockVariant || sortedVariants[0]);
+    } else {
+      setSelectedVariant(null);
+    }
+  }, [product]);
 
   // Fetch related products from same category
   const { data: relatedProducts = [] } = useProducts({
@@ -23,6 +40,41 @@ const ProductDetails = () => {
   });
 
   const filteredRelated = relatedProducts.filter(p => p.id !== product?.id).slice(0, 4);
+
+  // Check if product has weight variants
+  const hasVariants = product?.weight_variants && product.weight_variants.length > 0;
+
+  // Get current price based on selected variant or product default
+  const getCurrentPrice = () => {
+    if (hasVariants && selectedVariant) {
+      return selectedVariant.price;
+    }
+    return product?.price || 0;
+  };
+
+  // Get current original price (for discount display)
+  const getCurrentOriginalPrice = () => {
+    if (hasVariants && selectedVariant) {
+      return selectedVariant.original_price;
+    }
+    return product?.original_price;
+  };
+
+  // Get current weight label
+  const getCurrentWeight = () => {
+    if (hasVariants && selectedVariant) {
+      return selectedVariant.weight;
+    }
+    return product?.weight;
+  };
+
+  // Check if current selection is in stock
+  const isCurrentInStock = () => {
+    if (hasVariants && selectedVariant) {
+      return selectedVariant.in_stock;
+    }
+    return product?.in_stock ?? true;
+  };
 
   const formatPrice = (price: number) => {
     // Prices are stored in paise, convert to rupees
@@ -72,18 +124,22 @@ const ProductDetails = () => {
   const images = getProductImages();
 
   const handleAddToCart = () => {
-    for (let i = 0; i < quantity; i++) {
-      addToCart({
-        id: product.id,
-        name: product.name,
-        price: product.price / 100, // Convert from paise
-        image: getProductImage(product),
-        weight: product.weight || undefined,
-      });
-    }
+    const price = getCurrentPrice();
+    const weight = getCurrentWeight();
+    
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: price / 100, // Convert from paise
+      image: getProductImage(product),
+      weight: weight || undefined,
+      weightVariantId: selectedVariant?.id,
+      quantity,
+    });
+    
     toast({
       title: 'Added to cart',
-      description: `${quantity} × ${product.name} added to your cart`,
+      description: `${quantity} × ${product.name}${weight ? ` (${weight})` : ''} added to your cart`,
     });
   };
 
@@ -143,9 +199,9 @@ const ProductDetails = () => {
                   New Arrival
                 </span>
               )}
-              {product.original_price && (
+              {getCurrentOriginalPrice() && (
                 <span className="px-3 py-1 bg-destructive text-destructive-foreground text-sm font-medium rounded-full">
-                  {Math.round((1 - product.price / product.original_price) * 100)}% Off
+                  {Math.round((1 - getCurrentPrice() / getCurrentOriginalPrice()!) * 100)}% Off
                 </span>
               )}
             </div>
@@ -174,15 +230,63 @@ const ProductDetails = () => {
             {/* Price */}
             <div className="flex items-baseline gap-4 mb-6">
               <span className="font-display text-3xl font-bold text-primary">
-                {formatPrice(product.price)}
+                {formatPrice(getCurrentPrice())}
               </span>
-              {product.original_price && (
+              {getCurrentOriginalPrice() && (
                 <span className="text-xl text-muted-foreground line-through">
-                  {formatPrice(product.original_price)}
+                  {formatPrice(getCurrentOriginalPrice()!)}
                 </span>
               )}
-              <span className="text-muted-foreground">/ {product.weight}</span>
+              {getCurrentWeight() && (
+                <span className="text-muted-foreground">/ {getCurrentWeight()}</span>
+              )}
             </div>
+
+            {/* Weight Variants Selector */}
+            {hasVariants && product.weight_variants && (
+              <div className="mb-8">
+                <h3 className="font-medium text-foreground mb-3">Select Weight</h3>
+                <div className="flex flex-wrap gap-3">
+                  {[...product.weight_variants]
+                    .sort((a, b) => a.sort_order - b.sort_order)
+                    .map((variant) => (
+                      <button
+                        key={variant.id}
+                        onClick={() => setSelectedVariant(variant)}
+                        disabled={!variant.in_stock}
+                        className={cn(
+                          "relative px-4 py-3 rounded-xl border-2 transition-all min-w-[100px]",
+                          selectedVariant?.id === variant.id
+                            ? "border-primary bg-primary/5"
+                            : variant.in_stock
+                              ? "border-border hover:border-primary/50"
+                              : "border-border bg-muted/50 opacity-60 cursor-not-allowed"
+                        )}
+                      >
+                        <div className="text-sm font-medium text-foreground">{variant.weight}</div>
+                        <div className="text-sm font-semibold text-primary">{formatPrice(variant.price)}</div>
+                        {variant.original_price && (
+                          <div className="text-xs text-muted-foreground line-through">
+                            {formatPrice(variant.original_price)}
+                          </div>
+                        )}
+                        {!variant.in_stock && (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <span className="text-xs font-medium text-destructive bg-background/80 px-2 py-0.5 rounded">
+                              Out of Stock
+                            </span>
+                          </div>
+                        )}
+                        {selectedVariant?.id === variant.id && (
+                          <div className="absolute -top-1 -right-1 w-5 h-5 bg-primary rounded-full flex items-center justify-center">
+                            <Check className="w-3 h-3 text-primary-foreground" />
+                          </div>
+                        )}
+                      </button>
+                    ))}
+                </div>
+              </div>
+            )}
 
             <p className="text-muted-foreground leading-relaxed mb-8">
               {product.long_description || product.description}
@@ -262,10 +366,10 @@ const ProductDetails = () => {
                   size="lg"
                   className="flex-1"
                   onClick={handleAddToCart}
-                  disabled={!product.in_stock}
+                  disabled={!isCurrentInStock()}
                 >
                   <ShoppingBag className="mr-2 h-5 w-5" />
-                  {product.in_stock ? 'Add to Cart' : 'Out of Stock'}
+                  {isCurrentInStock() ? 'Add to Cart' : 'Out of Stock'}
                 </Button>
               </div>
             )}
