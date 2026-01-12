@@ -10,12 +10,12 @@ export interface Product {
   category: string;
   tags: string[];
   weight: string;
-  origin: string;
-  brewingInstructions: {
-    temperature: string;
-    steepTime: string;
-    amount: string;
-  };
+  // origin: string;
+  // brewingInstructions: {
+  //   temperature: string;
+  //   steepTime: string;
+  //   amount: string;
+  // };
   inStock: boolean;
   isBestseller?: boolean;
   isFeatured?: boolean;
@@ -40,12 +40,6 @@ export const products: Product[] = [
     category: "Black Tea",
     tags: ["organic", "premium", "single-origin"],
     weight: "100g",
-    origin: "Darjeeling, India",
-    brewingInstructions: {
-      temperature: "85-90°C",
-      steepTime: "3-4 minutes",
-      amount: "2g per cup",
-    },
     inStock: true,
     isBestseller: true,
     isFeatured: true,
@@ -65,12 +59,6 @@ export const products: Product[] = [
     category: "Black Tea",
     tags: ["organic", "breakfast", "strong"],
     weight: "100g",
-    origin: "Assam, India",
-    brewingInstructions: {
-      temperature: "95-100°C",
-      steepTime: "4-5 minutes",
-      amount: "2.5g per cup",
-    },
     inStock: true,
     isBestseller: true,
     rating: 4.8,
@@ -89,12 +77,6 @@ export const products: Product[] = [
     category: "Black Tea",
     tags: ["organic", "high-altitude", "fruity"],
     weight: "100g",
-    origin: "Nilgiri, India",
-    brewingInstructions: {
-      temperature: "90-95°C",
-      steepTime: "3-4 minutes",
-      amount: "2g per cup",
-    },
     inStock: true,
     isFeatured: true,
     rating: 4.7,
@@ -113,12 +95,6 @@ export const products: Product[] = [
     category: "Specialty Tea",
     tags: ["spiced", "traditional", "saffron"],
     weight: "75g",
-    origin: "Kashmir, India",
-    brewingInstructions: {
-      temperature: "80-85°C",
-      steepTime: "4-5 minutes",
-      amount: "3g per cup",
-    },
     inStock: true,
     isBestseller: true,
     isNew: true,
@@ -138,12 +114,6 @@ export const products: Product[] = [
     category: "Chai Blends",
     tags: ["spiced", "traditional", "strong"],
     weight: "150g",
-    origin: "India",
-    brewingInstructions: {
-      temperature: "100°C",
-      steepTime: "5-6 minutes",
-      amount: "3g per cup",
-    },
     inStock: true,
     isBestseller: true,
     isFeatured: true,
@@ -163,12 +133,6 @@ export const products: Product[] = [
     category: "Green Tea",
     tags: ["organic", "high-altitude", "pure"],
     weight: "100g",
-    origin: "Himachal Pradesh, India",
-    brewingInstructions: {
-      temperature: "75-80°C",
-      steepTime: "2-3 minutes",
-      amount: "2g per cup",
-    },
     inStock: true,
     rating: 4.6,
     reviews: 89,
@@ -187,12 +151,6 @@ export const products: Product[] = [
     category: "White Tea",
     tags: ["rare", "premium", "limited-edition"],
     weight: "50g",
-    origin: "Darjeeling, India",
-    brewingInstructions: {
-      temperature: "70-75°C",
-      steepTime: "4-5 minutes",
-      amount: "3g per cup",
-    },
     inStock: true,
     isFeatured: true,
     isNew: true,
@@ -212,12 +170,6 @@ export const products: Product[] = [
     category: "Herbal Tea",
     tags: ["caffeine-free", "ayurvedic", "wellness"],
     weight: "100g",
-    origin: "India",
-    brewingInstructions: {
-      temperature: "95-100°C",
-      steepTime: "5-7 minutes",
-      amount: "2g per cup",
-    },
     inStock: true,
     rating: 4.7,
     reviews: 78,
@@ -235,12 +187,6 @@ export const products: Product[] = [
     category: "Oolong Tea",
     tags: ["artisanal", "complex", "multi-infusion"],
     weight: "75g",
-    origin: "Darjeeling, India",
-    brewingInstructions: {
-      temperature: "85-90°C",
-      steepTime: "3-4 minutes",
-      amount: "3g per cup",
-    },
     inStock: true,
     isFeatured: true,
     rating: 4.8,
@@ -259,12 +205,6 @@ export const products: Product[] = [
     category: "Flavored Tea",
     tags: ["classic", "aromatic", "afternoon-tea"],
     weight: "100g",
-    origin: "India",
-    brewingInstructions: {
-      temperature: "90-95°C",
-      steepTime: "3-4 minutes",
-      amount: "2g per cup",
-    },
     inStock: true,
     rating: 4.6,
     reviews: 112,
@@ -282,12 +222,6 @@ export const products: Product[] = [
     category: "Herbal Tea",
     tags: ["caffeine-free", "calming", "bedtime"],
     weight: "75g",
-    origin: "Egypt",
-    brewingInstructions: {
-      temperature: "95-100°C",
-      steepTime: "5-7 minutes",
-      amount: "3g per cup",
-    },
     inStock: true,
     rating: 4.5,
     reviews: 89,
@@ -305,12 +239,6 @@ export const products: Product[] = [
     category: "Green Tea",
     tags: ["scented", "artisanal", "floral"],
     weight: "75g",
-    origin: "Fujian, China",
-    brewingInstructions: {
-      temperature: "75-80°C",
-      steepTime: "2-3 minutes",
-      amount: "4-5 pearls per cup",
-    },
     inStock: true,
     isNew: true,
     rating: 4.9,
