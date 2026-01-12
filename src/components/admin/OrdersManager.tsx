@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Eye, Loader2, Package, Truck, CheckCircle, XCircle, Clock, Download } from 'lucide-react';
+import { Eye, Loader2, Package, Truck, CheckCircle, XCircle, Clock, Download, CreditCard, Wallet, AlertTriangle, RefreshCw, Banknote } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { generateInvoicePDF } from '@/lib/generateInvoicePDF';
 import {
@@ -28,6 +28,22 @@ const ORDER_STATUSES = [
     { value: 'delivered', label: 'Delivered', icon: CheckCircle, color: 'bg-green-100 text-green-700' },
     { value: 'cancelled', label: 'Cancelled', icon: XCircle, color: 'bg-red-100 text-red-700' },
 ];
+
+// Payment status options
+const PAYMENT_STATUSES: Record<string, { label: string; icon: typeof Clock; color: string }> = {
+    pending: { label: 'Pending', icon: Clock, color: 'bg-yellow-100 text-yellow-700' },
+    initiated: { label: 'Initiated', icon: RefreshCw, color: 'bg-blue-100 text-blue-700' },
+    processing: { label: 'Processing', icon: RefreshCw, color: 'bg-indigo-100 text-indigo-700' },
+    completed: { label: 'Paid', icon: CheckCircle, color: 'bg-green-100 text-green-700' },
+    failed: { label: 'Failed', icon: AlertTriangle, color: 'bg-red-100 text-red-700' },
+    refunded: { label: 'Refunded', icon: RefreshCw, color: 'bg-gray-100 text-gray-700' },
+};
+
+// Payment gateway display
+const PAYMENT_GATEWAYS: Record<string, { label: string; icon: typeof CreditCard }> = {
+    cod: { label: 'COD', icon: Banknote },
+    razorpay: { label: 'Online', icon: CreditCard },
+};
 
 // Helper for currency
 const formatPrice = (priceInPaise: number) => {
@@ -103,6 +119,7 @@ export function OrdersManager() {
                                 <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Customer</th>
                                 <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Items</th>
                                 <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Total</th>
+                                <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Payment</th>
                                 <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Status</th>
                                 <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Date</th>
                                 <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Actions</th>
@@ -129,6 +146,26 @@ export function OrdersManager() {
                                         </td>
                                         <td className="py-3 px-4 font-medium">
                                             {formatPrice(order.total)}
+                                        </td>
+                                        <td className="py-3 px-4">
+                                            {(() => {
+                                                const paymentStatus = PAYMENT_STATUSES[(order as any).payment_status] || PAYMENT_STATUSES.pending;
+                                                const paymentGateway = PAYMENT_GATEWAYS[(order as any).payment_gateway] || PAYMENT_GATEWAYS.cod;
+                                                const PaymentIcon = paymentStatus.icon;
+                                                const GatewayIcon = paymentGateway.icon;
+                                                return (
+                                                    <div className="flex flex-col gap-1">
+                                                        <span className={`text-xs px-2 py-0.5 rounded-full inline-flex items-center gap-1 w-fit ${paymentStatus.color}`}>
+                                                            <PaymentIcon className="h-3 w-3" />
+                                                            {paymentStatus.label}
+                                                        </span>
+                                                        <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                                            <GatewayIcon className="h-3 w-3" />
+                                                            {paymentGateway.label}
+                                                        </span>
+                                                    </div>
+                                                );
+                                            })()}
                                         </td>
                                         <td className="py-3 px-4">
                                             <Select
@@ -170,7 +207,7 @@ export function OrdersManager() {
                             })}
                             {orders?.length === 0 && (
                                 <tr>
-                                    <td colSpan={7} className="py-8 text-center text-muted-foreground">
+                                    <td colSpan={8} className="py-8 text-center text-muted-foreground">
                                         No orders found.
                                     </td>
                                 </tr>
@@ -191,19 +228,64 @@ export function OrdersManager() {
 
                     {selectedOrder && (
                         <div className="space-y-6 py-4">
-                            {/* Order Status */}
-                            <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
+                            {/* Order Status & Payment */}
+                            <div className="grid grid-cols-2 gap-4 p-4 bg-muted/30 rounded-lg">
                                 <div>
-                                    <Label className="text-muted-foreground">Status</Label>
+                                    <Label className="text-muted-foreground">Order Status</Label>
                                     <div className={`mt-1 px-3 py-1 rounded-full text-sm font-medium inline-block ${getStatusInfo(selectedOrder.status).color}`}>
                                         {getStatusInfo(selectedOrder.status).label}
                                     </div>
                                 </div>
-                                <div className="text-right">
+                                <div>
+                                    <Label className="text-muted-foreground">Payment Status</Label>
+                                    {(() => {
+                                        const paymentStatus = PAYMENT_STATUSES[(selectedOrder as any).payment_status] || PAYMENT_STATUSES.pending;
+                                        const PaymentIcon = paymentStatus.icon;
+                                        return (
+                                            <div className={`mt-1 px-3 py-1 rounded-full text-sm font-medium inline-flex items-center gap-1 ${paymentStatus.color}`}>
+                                                <PaymentIcon className="h-3 w-3" />
+                                                {paymentStatus.label}
+                                            </div>
+                                        );
+                                    })()}
+                                </div>
+                                <div>
+                                    <Label className="text-muted-foreground">Payment Method</Label>
+                                    {(() => {
+                                        const gateway = PAYMENT_GATEWAYS[(selectedOrder as any).payment_gateway] || PAYMENT_GATEWAYS.cod;
+                                        const GatewayIcon = gateway.icon;
+                                        return (
+                                            <div className="mt-1 text-sm flex items-center gap-1">
+                                                <GatewayIcon className="h-4 w-4" />
+                                                {gateway.label === 'COD' ? 'Cash on Delivery' : 'Online Payment (Razorpay)'}
+                                            </div>
+                                        );
+                                    })()}
+                                </div>
+                                <div>
                                     <Label className="text-muted-foreground">Order Date</Label>
                                     <div className="mt-1 text-sm">{formatDate(selectedOrder.created_at)}</div>
                                 </div>
                             </div>
+
+                            {/* Payment IDs (if online payment) */}
+                            {(selectedOrder as any).payment_gateway === 'razorpay' && (selectedOrder as any).razorpay_payment_id && (
+                                <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                                    <Label className="text-sm font-medium text-green-800">Payment Details</Label>
+                                    <div className="mt-2 space-y-1 text-sm">
+                                        <div className="flex justify-between">
+                                            <span className="text-green-700">Payment ID:</span>
+                                            <span className="font-mono text-green-900">{(selectedOrder as any).razorpay_payment_id}</span>
+                                        </div>
+                                        {(selectedOrder as any).paid_at && (
+                                            <div className="flex justify-between">
+                                                <span className="text-green-700">Paid At:</span>
+                                                <span className="text-green-900">{formatDate((selectedOrder as any).paid_at)}</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
 
                             {/* Customer Info */}
                             <div>
