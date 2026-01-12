@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Plus, Edit, Trash2, Loader2, Package, Upload, X, Image as ImageIcon } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader2, Package, Upload, X, Image as ImageIcon, Scale } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -30,6 +30,13 @@ import {
 } from '@/hooks/useProducts';
 import { useCategories } from '@/hooks/useCategories';
 import { Tables } from '@/lib/supabase';
+import {
+    useWeightVariants,
+    useCreateWeightVariant,
+    useUpdateWeightVariant,
+    useDeleteWeightVariant,
+    type WeightVariant,
+} from '@/hooks/useWeightVariants';
 
 // Helper for currency
 const formatPrice = (price: number) => {
@@ -88,6 +95,24 @@ const initialFormData: ProductFormData = {
     image_url: '',
 };
 
+interface WeightVariantFormData {
+    weight: string;
+    price: string;
+    original_price: string;
+    stock_quantity: string;
+    in_stock: boolean;
+    sort_order: string;
+}
+
+const initialVariantFormData: WeightVariantFormData = {
+    weight: '',
+    price: '',
+    original_price: '',
+    stock_quantity: '',
+    in_stock: true,
+    sort_order: '0',
+};
+
 export function ProductsManager() {
     const { data: products, isLoading } = useAdminProducts();
     const { data: categories } = useCategories();
@@ -103,6 +128,17 @@ export function ProductsManager() {
     const [formData, setFormData] = useState<ProductFormData>(initialFormData);
     const [isUploading, setIsUploading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Weight variants state
+    const [isVariantDialogOpen, setIsVariantDialogOpen] = useState(false);
+    const [editingVariant, setEditingVariant] = useState<WeightVariant | null>(null);
+    const [variantFormData, setVariantFormData] = useState<WeightVariantFormData>(initialVariantFormData);
+
+    // Weight variants hooks - only fetch when editing a product
+    const { data: weightVariants = [] } = useWeightVariants(editingProduct?.id || '');
+    const createVariant = useCreateWeightVariant();
+    const updateVariant = useUpdateWeightVariant();
+    const deleteVariant = useDeleteWeightVariant();
 
     const resetForm = () => {
         setFormData(initialFormData);
@@ -241,6 +277,76 @@ export function ProductsManager() {
             toast({ title: 'Image deleted' });
         } catch (error) {
             toast({ title: 'Failed to delete image', variant: 'destructive' });
+        }
+    };
+
+    // Weight variant handlers
+    const resetVariantForm = () => {
+        setVariantFormData(initialVariantFormData);
+        setEditingVariant(null);
+    };
+
+    const handleOpenVariantDialog = (variant?: WeightVariant) => {
+        if (variant) {
+            setEditingVariant(variant);
+            setVariantFormData({
+                weight: variant.weight,
+                price: variant.price.toString(),
+                original_price: variant.original_price?.toString() || '',
+                stock_quantity: variant.stock_quantity?.toString() || '',
+                in_stock: variant.in_stock,
+                sort_order: variant.sort_order.toString(),
+            });
+        } else {
+            resetVariantForm();
+        }
+        setIsVariantDialogOpen(true);
+    };
+
+    const handleSubmitVariant = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!editingProduct) return;
+
+        if (!variantFormData.weight || !variantFormData.price) {
+            toast({ title: 'Please fill weight and price', variant: 'destructive' });
+            return;
+        }
+
+        const variantData = {
+            product_id: editingProduct.id,
+            weight: variantFormData.weight,
+            price: parseInt(variantFormData.price),
+            original_price: variantFormData.original_price ? parseInt(variantFormData.original_price) : null,
+            stock_quantity: variantFormData.stock_quantity ? parseInt(variantFormData.stock_quantity) : null,
+            in_stock: variantFormData.in_stock,
+            sort_order: parseInt(variantFormData.sort_order) || 0,
+        };
+
+        try {
+            if (editingVariant) {
+                await updateVariant.mutateAsync({ id: editingVariant.id, updates: variantData });
+                toast({ title: 'Weight variant updated' });
+            } else {
+                await createVariant.mutateAsync(variantData);
+                toast({ title: 'Weight variant added' });
+            }
+            setIsVariantDialogOpen(false);
+            resetVariantForm();
+        } catch (error) {
+            console.error(error);
+            toast({ title: 'Failed to save weight variant', variant: 'destructive' });
+        }
+    };
+
+    const handleDeleteVariant = async (variant: WeightVariant) => {
+        if (!editingProduct || !confirm(`Delete variant "${variant.weight}"?`)) return;
+
+        try {
+            await deleteVariant.mutateAsync({ id: variant.id, productId: editingProduct.id });
+            toast({ title: 'Weight variant deleted' });
+        } catch (error) {
+            toast({ title: 'Failed to delete variant', variant: 'destructive' });
         }
     };
 
@@ -540,6 +646,95 @@ export function ProductsManager() {
                             </label>
                         </div>
 
+                        {/* Weight Variants - Only show for existing products */}
+                        {editingProduct && (
+                            <div className="space-y-3 pt-4 border-t">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <Scale className="h-4 w-4 text-muted-foreground" />
+                                        <Label>Weight Variants</Label>
+                                    </div>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => handleOpenVariantDialog()}
+                                    >
+                                        <Plus className="h-4 w-4 mr-1" />
+                                        Add Variant
+                                    </Button>
+                                </div>
+
+                                {/* Weight variants list */}
+                                {weightVariants.length > 0 ? (
+                                    <div className="border rounded-lg overflow-hidden">
+                                        <table className="w-full text-sm">
+                                            <thead className="bg-muted/50">
+                                                <tr>
+                                                    <th className="text-left px-3 py-2 font-medium">Weight</th>
+                                                    <th className="text-left px-3 py-2 font-medium">Price</th>
+                                                    <th className="text-left px-3 py-2 font-medium">Stock</th>
+                                                    <th className="text-right px-3 py-2 font-medium">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {weightVariants.map((variant) => (
+                                                    <tr key={variant.id} className="border-t">
+                                                        <td className="px-3 py-2 font-medium">{variant.weight}</td>
+                                                        <td className="px-3 py-2">
+                                                            {formatPrice(variant.price)}
+                                                            {variant.original_price && (
+                                                                <span className="ml-1 text-muted-foreground line-through text-xs">
+                                                                    {formatPrice(variant.original_price)}
+                                                                </span>
+                                                            )}
+                                                        </td>
+                                                        <td className="px-3 py-2">
+                                                            <span className={`px-1.5 py-0.5 rounded text-xs ${variant.in_stock ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                                                {variant.in_stock
+                                                                    ? variant.stock_quantity ? `${variant.stock_quantity} qty` : 'In Stock'
+                                                                    : 'Out of Stock'}
+                                                            </span>
+                                                        </td>
+                                                        <td className="px-3 py-2 text-right">
+                                                            <div className="flex justify-end gap-1">
+                                                                <Button
+                                                                    type="button"
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    className="h-7 w-7"
+                                                                    onClick={() => handleOpenVariantDialog(variant)}
+                                                                >
+                                                                    <Edit className="h-3 w-3" />
+                                                                </Button>
+                                                                <Button
+                                                                    type="button"
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    className="h-7 w-7 text-destructive"
+                                                                    onClick={() => handleDeleteVariant(variant)}
+                                                                >
+                                                                    <Trash2 className="h-3 w-3" />
+                                                                </Button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                ) : (
+                                    <div className="py-4 text-center text-muted-foreground border border-dashed rounded-lg">
+                                        <Scale className="h-6 w-6 mx-auto mb-2 opacity-50" />
+                                        <p className="text-sm">No weight variants. Uses default price/weight.</p>
+                                    </div>
+                                )}
+                                <p className="text-xs text-muted-foreground">
+                                    Add weight variants if this product is available in multiple sizes. Otherwise, default price and weight will be used.
+                                </p>
+                            </div>
+                        )}
+
                         {/* Product Images - Only show for existing products */}
                         {editingProduct && (
                             <div className="space-y-3 pt-4 border-t">
@@ -619,6 +814,101 @@ export function ProductsManager() {
                                 {(createProduct.isPending || updateProduct.isPending) ? (
                                     <Loader2 className="h-4 w-4 animate-spin" />
                                 ) : editingProduct ? 'Update Product' : 'Add Product'}
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
+
+            {/* Weight Variant Dialog */}
+            <Dialog open={isVariantDialogOpen} onOpenChange={setIsVariantDialogOpen}>
+                <DialogContent className="sm:max-w-[400px]">
+                    <DialogHeader>
+                        <DialogTitle>
+                            {editingVariant ? 'Edit Weight Variant' : 'Add Weight Variant'}
+                        </DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={handleSubmitVariant} className="space-y-4 py-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="variant_weight">Weight *</Label>
+                            <Input
+                                id="variant_weight"
+                                value={variantFormData.weight}
+                                onChange={(e) => setVariantFormData({ ...variantFormData, weight: e.target.value })}
+                                placeholder="e.g. 100g, 250g, 500g, 1kg"
+                                required
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="variant_price">Price (paise) *</Label>
+                                <Input
+                                    id="variant_price"
+                                    type="number"
+                                    value={variantFormData.price}
+                                    onChange={(e) => setVariantFormData({ ...variantFormData, price: e.target.value })}
+                                    placeholder="14900 (= ₹149)"
+                                    required
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="variant_original_price">Original Price</Label>
+                                <Input
+                                    id="variant_original_price"
+                                    type="number"
+                                    value={variantFormData.original_price}
+                                    onChange={(e) => setVariantFormData({ ...variantFormData, original_price: e.target.value })}
+                                    placeholder="19900"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="variant_stock">Stock Quantity</Label>
+                                <Input
+                                    id="variant_stock"
+                                    type="number"
+                                    value={variantFormData.stock_quantity}
+                                    onChange={(e) => setVariantFormData({ ...variantFormData, stock_quantity: e.target.value })}
+                                    placeholder="Leave empty for unlimited"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="variant_sort">Sort Order</Label>
+                                <Input
+                                    id="variant_sort"
+                                    type="number"
+                                    value={variantFormData.sort_order}
+                                    onChange={(e) => setVariantFormData({ ...variantFormData, sort_order: e.target.value })}
+                                    placeholder="0"
+                                />
+                            </div>
+                        </div>
+
+                        <label className="flex items-center gap-2 cursor-pointer pt-2">
+                            <input
+                                type="checkbox"
+                                className="h-4 w-4 rounded border-gray-300"
+                                checked={variantFormData.in_stock}
+                                onChange={(e) => setVariantFormData({ ...variantFormData, in_stock: e.target.checked })}
+                            />
+                            <span className="text-sm">In Stock</span>
+                        </label>
+
+                        <DialogFooter>
+                            <Button type="button" variant="outline" onClick={() => setIsVariantDialogOpen(false)}>
+                                Cancel
+                            </Button>
+                            <Button
+                                type="submit"
+                                variant="gold"
+                                disabled={createVariant.isPending || updateVariant.isPending}
+                            >
+                                {(createVariant.isPending || updateVariant.isPending) ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : editingVariant ? 'Update' : 'Add'}
                             </Button>
                         </DialogFooter>
                     </form>
