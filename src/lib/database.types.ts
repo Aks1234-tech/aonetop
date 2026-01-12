@@ -135,6 +135,41 @@ export interface Database {
                     sort_order?: number;
                 };
             };
+            product_weight_variants: {
+                Row: {
+                    id: string;
+                    product_id: string;
+                    weight: string;
+                    price: number;
+                    original_price: number | null;
+                    stock_quantity: number;
+                    in_stock: boolean;
+                    sort_order: number;
+                    created_at: string;
+                };
+                Insert: {
+                    id?: string;
+                    product_id: string;
+                    weight: string;
+                    price: number;
+                    original_price?: number | null;
+                    stock_quantity?: number;
+                    in_stock?: boolean;
+                    sort_order?: number;
+                    created_at?: string;
+                };
+                Update: {
+                    id?: string;
+                    product_id?: string;
+                    weight?: string;
+                    price?: number;
+                    original_price?: number | null;
+                    stock_quantity?: number;
+                    in_stock?: boolean;
+                    sort_order?: number;
+                    created_at?: string;
+                };
+            };
             categories: {
                 Row: {
                     id: string;
@@ -184,18 +219,21 @@ export interface Database {
                     cart_id: string;
                     product_id: string;
                     quantity: number;
+                    weight_variant_id: string | null;
                 };
                 Insert: {
                     id?: string;
                     cart_id: string;
                     product_id: string;
                     quantity?: number;
+                    weight_variant_id?: string | null;
                 };
                 Update: {
                     id?: string;
                     cart_id?: string;
                     product_id?: string;
                     quantity?: number;
+                    weight_variant_id?: string | null;
                 };
             };
             orders: {
@@ -275,6 +313,8 @@ export interface Database {
                     product_image: string | null;
                     quantity: number;
                     price: number;
+                    weight_variant_id: string | null;
+                    weight_value: string | null;
                 };
                 Insert: {
                     id?: string;
@@ -284,6 +324,8 @@ export interface Database {
                     product_image?: string | null;
                     quantity: number;
                     price: number;
+                    weight_variant_id?: string | null;
+                    weight_value?: string | null;
                 };
                 Update: {
                     id?: string;
@@ -293,6 +335,8 @@ export interface Database {
                     product_image?: string | null;
                     quantity?: number;
                     price?: number;
+                    weight_variant_id?: string | null;
+                    weight_value?: string | null;
                 };
             };
             contact_messages: {
