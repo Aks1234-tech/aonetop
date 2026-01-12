@@ -30,6 +30,8 @@ export function CategoryManager() {
         name: '',
         description: '',
         sort_order: '0',
+        parent_id: '',
+        image_url: '',
     });
 
     const resetForm = () => {
@@ -37,6 +39,8 @@ export function CategoryManager() {
             name: '',
             description: '',
             sort_order: '0',
+            parent_id: '',
+            image_url: '',
         });
         setEditingCategory(null);
     };
@@ -48,6 +52,8 @@ export function CategoryManager() {
                 name: category.name,
                 description: category.description || '',
                 sort_order: category.sort_order?.toString() || '0',
+                parent_id: category.parent_id || '',
+                image_url: category.image_url || '',
             });
         } else {
             resetForm();
@@ -68,6 +74,8 @@ export function CategoryManager() {
             name: formData.name,
             description: formData.description || null,
             sort_order: parseInt(formData.sort_order) || 0,
+            parent_id: formData.parent_id || null,
+            image_url: formData.image_url || null,
         };
 
         try {
@@ -125,44 +133,52 @@ export function CategoryManager() {
                             <tr className="border-b border-border bg-muted/30">
                                 <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">ID</th>
                                 <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Name</th>
+                                <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Parent</th>
                                 <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Description</th>
                                 <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Sort Order</th>
                                 <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {categories?.map((category) => (
-                                <tr key={category.id} className="border-b border-border last:border-0 hover:bg-muted/10 transition-colors">
-                                    <td className="py-3 px-4">
-                                        <div className="flex items-center gap-2">
-                                            <FolderTree className="h-4 w-4 text-primary" />
-                                            <span className="font-mono text-sm text-muted-foreground">{category.id}</span>
-                                        </div>
-                                    </td>
-                                    <td className="py-3 px-4">
-                                        <span className="font-medium font-display">{category.name}</span>
-                                    </td>
-                                    <td className="py-3 px-4 text-sm text-muted-foreground max-w-md">
-                                        {category.description || <span className="italic">No description</span>}
-                                    </td>
-                                    <td className="py-3 px-4 text-sm">
-                                        {category.sort_order}
-                                    </td>
-                                    <td className="py-3 px-4">
-                                        <div className="flex justify-end gap-2">
-                                            <Button variant="ghost" size="icon" onClick={() => handleOpenDialog(category)}>
-                                                <Edit className="h-4 w-4" />
-                                            </Button>
-                                            <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(category.id)}>
-                                                <Trash2 className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
+                            {categories?.map((category) => {
+                                const parentCategory = categories?.find(c => c.id === category.parent_id);
+                                return (
+                                    <tr key={category.id} className="border-b border-border last:border-0 hover:bg-muted/10 transition-colors">
+                                        <td className="py-3 px-4">
+                                            <div className="flex items-center gap-2">
+                                                {category.parent_id && <span className="ml-4">↳</span>}
+                                                <FolderTree className="h-4 w-4 text-primary" />
+                                                <span className="font-mono text-sm text-muted-foreground">{category.id}</span>
+                                            </div>
+                                        </td>
+                                        <td className="py-3 px-4">
+                                            <span className="font-medium font-display">{category.name}</span>
+                                        </td>
+                                        <td className="py-3 px-4 text-sm text-muted-foreground">
+                                            {parentCategory?.name || <span className="italic">—</span>}
+                                        </td>
+                                        <td className="py-3 px-4 text-sm text-muted-foreground max-w-md">
+                                            {category.description || <span className="italic">No description</span>}
+                                        </td>
+                                        <td className="py-3 px-4 text-sm">
+                                            {category.sort_order}
+                                        </td>
+                                        <td className="py-3 px-4">
+                                            <div className="flex justify-end gap-2">
+                                                <Button variant="ghost" size="icon" onClick={() => handleOpenDialog(category)}>
+                                                    <Edit className="h-4 w-4" />
+                                                </Button>
+                                                <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(category.id)}>
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                             {categories?.length === 0 && (
                                 <tr>
-                                    <td colSpan={5} className="py-8 text-center text-muted-foreground">
+                                    <td colSpan={6} className="py-8 text-center text-muted-foreground">
                                         No categories found. Create one to get started.
                                     </td>
                                 </tr>
@@ -202,6 +218,37 @@ export function CategoryManager() {
                                 placeholder="Brief description of this category"
                                 rows={3}
                             />
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="parent_id">Parent Category</Label>
+                            <select
+                                id="parent_id"
+                                value={formData.parent_id}
+                                onChange={(e) => setFormData({ ...formData, parent_id: e.target.value })}
+                                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                            >
+                                <option value="">None (Top-level category)</option>
+                                {categories?.filter(c => !c.parent_id && c.id !== editingCategory?.id).map((cat) => (
+                                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                ))}
+                            </select>
+                            <p className="text-xs text-muted-foreground">
+                                Select a parent to make this a subcategory
+                            </p>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="image_url">Image URL</Label>
+                            <Input
+                                id="image_url"
+                                value={formData.image_url}
+                                onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                                placeholder="https://example.com/image.jpg"
+                            />
+                            <p className="text-xs text-muted-foreground">
+                                Optional image for category display
+                            </p>
                         </div>
 
                         <div className="space-y-2">
