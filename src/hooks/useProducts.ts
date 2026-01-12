@@ -40,20 +40,36 @@ export function useProducts(options: ProductsQueryOptions = {}) {
 
                 // Apply filters
                 if (filters.category) {
-                    // Handle parent category filtering - if it's a parent category (tea, honey, ghee),
-                    // also include subcategories (tea-domestic, tea-masala)
-                    const parentCategories: Record<string, string[]> = {
-                        'tea': ['tea', 'tea-domestic', 'tea-masala'],
-                    };
-                    
-                    const categoryIds = parentCategories[filters.category] || [filters.category];
-                    
-                    // Use 'in' filter for multiple categories
-                    query = query.in('category', categoryIds.flatMap(cat => [
-                        cat,
-                        cat.replace(/-/g, ' '), // Also match space-separated versions
-                        cat.charAt(0).toUpperCase() + cat.slice(1).replace(/-/g, ' '), // Title case
-                    ]));
+                    // Handle parent category filtering - if it's "tea", include all tea-related products
+                    if (filters.category === 'tea') {
+                        // Match all tea-related categories (old and new naming conventions)
+                        const teaCategories = [
+                            'tea', 'Tea',
+                            'tea-domestic', 'tea domestic', 'Domestic Tea',
+                            'tea-masala', 'tea masala', 'Masala Tea',
+                            'black-tea', 'black tea', 'Black Tea',
+                            'green-tea', 'green tea', 'Green Tea',
+                            'white-tea', 'white tea', 'White Tea',
+                            'oolong-tea', 'oolong tea', 'Oolong Tea',
+                            'herbal-tea', 'herbal tea', 'Herbal Tea',
+                            'chai-blends', 'chai blends', 'Chai Blends',
+                            'specialty-tea', 'specialty tea', 'Specialty Tea',
+                            'flavored-tea', 'flavored tea', 'Flavored Tea',
+                        ];
+                        query = query.in('category', teaCategories);
+                    } else if (filters.category === 'honey') {
+                        query = query.in('category', ['honey', 'Honey']);
+                    } else if (filters.category === 'ghee') {
+                        query = query.in('category', ['ghee', 'Ghee']);
+                    } else {
+                        // For subcategories or other categories
+                        const cat = filters.category;
+                        query = query.in('category', [
+                            cat,
+                            cat.replace(/-/g, ' '),
+                            cat.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+                        ]);
+                    }
                 }
 
                 if (filters.search) {
