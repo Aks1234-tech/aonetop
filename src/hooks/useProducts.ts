@@ -40,7 +40,20 @@ export function useProducts(options: ProductsQueryOptions = {}) {
 
                 // Apply filters
                 if (filters.category) {
-                    query = query.ilike('category', `%${filters.category.replace(/-/g, ' ')}%`);
+                    // Handle parent category filtering - if it's a parent category (tea, honey, ghee),
+                    // also include subcategories (tea-domestic, tea-masala)
+                    const parentCategories: Record<string, string[]> = {
+                        'tea': ['tea', 'tea-domestic', 'tea-masala'],
+                    };
+                    
+                    const categoryIds = parentCategories[filters.category] || [filters.category];
+                    
+                    // Use 'in' filter for multiple categories
+                    query = query.in('category', categoryIds.flatMap(cat => [
+                        cat,
+                        cat.replace(/-/g, ' '), // Also match space-separated versions
+                        cat.charAt(0).toUpperCase() + cat.slice(1).replace(/-/g, ' '), // Title case
+                    ]));
                 }
 
                 if (filters.search) {
