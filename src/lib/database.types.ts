@@ -256,6 +256,13 @@ export interface Database {
                     notes: string | null;
                     offer_id: string | null;
                     discount_amount: number;
+                    // Payment gateway fields
+                    razorpay_order_id: string | null;
+                    razorpay_payment_id: string | null;
+                    razorpay_signature: string | null;
+                    payment_status: 'pending' | 'initiated' | 'processing' | 'completed' | 'failed' | 'refunded';
+                    payment_gateway: 'cod' | 'razorpay';
+                    paid_at: string | null;
                     created_at: string;
                     updated_at: string;
                 };
@@ -278,6 +285,13 @@ export interface Database {
                     notes?: string | null;
                     offer_id?: string | null;
                     discount_amount?: number;
+                    // Payment gateway fields
+                    razorpay_order_id?: string | null;
+                    razorpay_payment_id?: string | null;
+                    razorpay_signature?: string | null;
+                    payment_status?: 'pending' | 'initiated' | 'processing' | 'completed' | 'failed' | 'refunded';
+                    payment_gateway?: 'cod' | 'razorpay';
+                    paid_at?: string | null;
                     created_at?: string;
                     updated_at?: string;
                 };
@@ -300,6 +314,13 @@ export interface Database {
                     notes?: string | null;
                     offer_id?: string | null;
                     discount_amount?: number;
+                    // Payment gateway fields
+                    razorpay_order_id?: string | null;
+                    razorpay_payment_id?: string | null;
+                    razorpay_signature?: string | null;
+                    payment_status?: 'pending' | 'initiated' | 'processing' | 'completed' | 'failed' | 'refunded';
+                    payment_gateway?: 'cod' | 'razorpay';
+                    paid_at?: string | null;
                     created_at?: string;
                     updated_at?: string;
                 };
@@ -488,6 +509,68 @@ export interface Database {
                     offer_id?: string;
                     product_id?: string | null;
                     category?: string | null;
+                    created_at?: string;
+                };
+            };
+            payment_transactions: {
+                Row: {
+                    id: string;
+                    order_id: string;
+                    payment_gateway: string;
+                    gateway_order_id: string | null;
+                    gateway_payment_id: string | null;
+                    amount: number;
+                    currency: string;
+                    status: 'created' | 'authorized' | 'captured' | 'failed' | 'refunded';
+                    method: string | null;
+                    bank: string | null;
+                    wallet: string | null;
+                    vpa: string | null;
+                    card_last4: string | null;
+                    card_network: string | null;
+                    error_code: string | null;
+                    error_description: string | null;
+                    raw_response: Record<string, unknown> | null;
+                    created_at: string;
+                };
+                Insert: {
+                    id?: string;
+                    order_id: string;
+                    payment_gateway?: string;
+                    gateway_order_id?: string | null;
+                    gateway_payment_id?: string | null;
+                    amount: number;
+                    currency?: string;
+                    status: 'created' | 'authorized' | 'captured' | 'failed' | 'refunded';
+                    method?: string | null;
+                    bank?: string | null;
+                    wallet?: string | null;
+                    vpa?: string | null;
+                    card_last4?: string | null;
+                    card_network?: string | null;
+                    error_code?: string | null;
+                    error_description?: string | null;
+                    raw_response?: Record<string, unknown> | null;
+                    created_at?: string;
+                };
+                Update: {
+                    id?: string;
+                    order_id?: string;
+                    payment_gateway?: string;
+                    gateway_order_id?: string | null;
+                    gateway_payment_id?: string | null;
+                    amount?: number;
+                    currency?: string;
+                    status?: 'created' | 'authorized' | 'captured' | 'failed' | 'refunded';
+                    method?: string | null;
+                    bank?: string | null;
+                    wallet?: string | null;
+                    vpa?: string | null;
+                    card_last4?: string | null;
+                    card_network?: string | null;
+                    error_code?: string | null;
+                    error_description?: string | null;
+                    raw_response?: Record<string, unknown> | null;
                     created_at?: string;
                 };
             };
