@@ -91,6 +91,8 @@ const Checkout = () => {
           productImage: item.image,
           quantity: item.quantity,
           price: item.price * 100, // Convert to paise
+          weightVariantId: item.weightVariantId,
+          weightValue: item.weight,
         })),
         shippingInfo: {
           name: `${formData.firstName} ${formData.lastName}`,
