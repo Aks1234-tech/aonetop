@@ -47,6 +47,8 @@ export interface BulkInquiryInput {
     estimatedVolume?: string;
     productsInterested?: string;
     message?: string;
+    address?: string;
+    pincode?: string;
 }
 
 export function useSubmitBulkInquiry() {
@@ -63,6 +65,8 @@ export function useSubmitBulkInquiry() {
                     estimated_volume: input.estimatedVolume || null,
                     products_interested: input.productsInterested || null,
                     message: input.message || null,
+                    address: input.address || null,
+                    pincode: input.pincode || null,
                 } as any)
                 .select()
                 .single();
