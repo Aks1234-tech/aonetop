@@ -188,7 +188,7 @@ const ProductDetails = () => {
               {product.long_description || product.description}
             </p>
 
-            {/* Info Grid */}
+            {/* Info Grid 
             <div className="grid grid-cols-2 gap-4 mb-8">
               <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-xl">
                 <MapPin className="h-5 w-5 text-primary" />
@@ -206,7 +206,7 @@ const ProductDetails = () => {
               </div>
             </div>
 
-            {/* Brewing Instructions */}
+            {/* Brewing Instructions 
             <div className="bg-muted/50 rounded-xl p-6 mb-8">
               <h3 className="font-display text-lg font-semibold text-foreground mb-4">
                 Brewing Instructions
@@ -234,7 +234,7 @@ const ProductDetails = () => {
                   <p className="font-medium text-foreground">{product.brewing_amount || 'N/A'}</p>
                 </div>
               </div>
-            </div>
+            </div>*/}
 
             {/* Quantity & Add to Cart */}
             {!isAdmin && (
