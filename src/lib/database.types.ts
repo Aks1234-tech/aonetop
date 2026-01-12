@@ -332,6 +332,8 @@ export interface Database {
                     estimated_volume: string | null;
                     products_interested: string | null;
                     message: string | null;
+                    address: string | null;
+                    pincode: string | null;
                     status: string;
                     created_at: string;
                 };
@@ -345,6 +347,8 @@ export interface Database {
                     estimated_volume?: string | null;
                     products_interested?: string | null;
                     message?: string | null;
+                    address?: string | null;
+                    pincode?: string | null;
                     status?: string;
                     created_at?: string;
                 };
@@ -358,6 +362,8 @@ export interface Database {
                     estimated_volume?: string | null;
                     products_interested?: string | null;
                     message?: string | null;
+                    address?: string | null;
+                    pincode?: string | null;
                     status?: string;
                     created_at?: string;
                 };
