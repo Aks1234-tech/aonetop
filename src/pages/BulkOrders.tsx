@@ -42,6 +42,8 @@ const BulkOrders = () => {
     businessType: '',
     estimatedVolume: '',
     productsInterested: '',
+    address: '',
+    pincode: '',
     message: '',
   });
 
@@ -70,6 +72,8 @@ const BulkOrders = () => {
         businessType: formData.businessType || undefined,
         estimatedVolume: formData.estimatedVolume || undefined,
         productsInterested: formData.productsInterested || undefined,
+        address: formData.address || undefined,
+        pincode: formData.pincode || undefined,
         message: formData.message || undefined,
       });
 
@@ -264,6 +268,33 @@ const BulkOrders = () => {
                     onChange={handleChange}
                     placeholder="e.g., Darjeeling, Assam, Chai Blends"
                   />
+                </div>
+
+                <div>
+                  <Label htmlFor="address">Delivery Address</Label>
+                  <Textarea
+                    id="address"
+                    name="address"
+                    value={formData.address}
+                    onChange={handleChange}
+                    placeholder="Enter complete delivery address"
+                    rows={3}
+                  />
+                </div>
+
+                <div className="grid sm:grid-cols-2 gap-6">
+                  <div>
+                    <Label htmlFor="pincode">Pincode</Label>
+                    <Input
+                      id="pincode"
+                      name="pincode"
+                      value={formData.pincode}
+                      onChange={handleChange}
+                      placeholder="Enter 6-digit pincode"
+                      maxLength={6}
+                      pattern="[0-9]{6}"
+                    />
+                  </div>
                 </div>
 
                 <div>
