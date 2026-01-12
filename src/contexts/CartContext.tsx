@@ -10,6 +10,12 @@ export interface CartItem {
   image: string;
   quantity: number;
   weight?: string;
+  weightVariantId?: string; // References product_weight_variants.id
+}
+
+// Generate a unique key for cart item (product + variant combination)
+function getCartItemKey(productId: string, weightVariantId?: string): string {
+  return weightVariantId ? `${productId}:${weightVariantId}` : productId;
 }
 
 interface CartState {
@@ -20,8 +26,8 @@ interface CartState {
 
 type CartAction =
   | { type: 'ADD_TO_CART'; payload: Omit<CartItem, 'quantity'> & { quantity?: number } }
-  | { type: 'REMOVE_FROM_CART'; payload: string }
-  | { type: 'UPDATE_QUANTITY'; payload: { id: string; quantity: number } }
+  | { type: 'REMOVE_FROM_CART'; payload: { productId: string; weightVariantId?: string } }
+  | { type: 'UPDATE_QUANTITY'; payload: { productId: string; weightVariantId?: string; quantity: number } }
   | { type: 'CLEAR_CART' }
   | { type: 'TOGGLE_CART' }
   | { type: 'OPEN_CART' }
@@ -34,8 +40,8 @@ interface CartContextType {
   isOpen: boolean;
   isLoading: boolean;
   addToCart: (item: Omit<CartItem, 'quantity'> & { quantity?: number }) => Promise<void>;
-  removeFromCart: (id: string) => Promise<void>;
-  updateQuantity: (id: string, quantity: number) => Promise<void>;
+  removeFromCart: (productId: string, weightVariantId?: string) => Promise<void>;
+  updateQuantity: (productId: string, weightVariantId: string | undefined, quantity: number) => Promise<void>;
   clearCart: () => Promise<void>;
   toggleCart: () => void;
   openCart: () => void;
@@ -57,8 +63,9 @@ function cartReducer(state: CartState, action: CartAction): CartState {
   switch (action.type) {
     case 'ADD_TO_CART': {
       const quantity = action.payload.quantity || 1;
+      const itemKey = getCartItemKey(action.payload.id, action.payload.weightVariantId);
       const existingItemIndex = state.items.findIndex(
-        (item) => item.id === action.payload.id
+        (item) => getCartItemKey(item.id, item.weightVariantId) === itemKey
       );
 
       let updatedItems;
@@ -74,24 +81,27 @@ function cartReducer(state: CartState, action: CartAction): CartState {
       return { ...state, items: updatedItems, isOpen: true };
     }
 
-    case 'REMOVE_FROM_CART':
+    case 'REMOVE_FROM_CART': {
+      const removeKey = getCartItemKey(action.payload.productId, action.payload.weightVariantId);
       return {
         ...state,
-        items: state.items.filter((item) => item.id !== action.payload),
+        items: state.items.filter((item) => getCartItemKey(item.id, item.weightVariantId) !== removeKey),
       };
+    }
 
     case 'UPDATE_QUANTITY': {
+      const updateKey = getCartItemKey(action.payload.productId, action.payload.weightVariantId);
       if (action.payload.quantity <= 0) {
         return {
           ...state,
-          items: state.items.filter((item) => item.id !== action.payload.id),
+          items: state.items.filter((item) => getCartItemKey(item.id, item.weightVariantId) !== updateKey),
         };
       }
 
       return {
         ...state,
         items: state.items.map((item) =>
-          item.id === action.payload.id
+          getCartItemKey(item.id, item.weightVariantId) === updateKey
             ? { ...item, quantity: action.payload.quantity }
             : item
         ),
@@ -348,32 +358,51 @@ export function CartProvider({ children }: { children: ReactNode }) {
         const cartId = await getOrCreateCart(user.id);
         const quantityToAdd = item.quantity || 1;
 
-        // Check existing quantity inside DB to sum it?
-        // Actually, the reducer already calculated the new quantity for local state.
-        // We really want to set the DB quantity to match the new local state.
-        // Or cleaner: Fetch current DB quantity and add.
-
-        // Simpler: Just get the new quantity from the updated state? 
-        // We don't have access to the *next* state here easily without wait.
-        // So we'll fetch then upsert.
-
-        const { data: existing } = await (supabase
-          .from('cart_items') as any)
+        // Build query to check for existing item with same product AND variant
+        let existingQuery = (supabase.from('cart_items') as any)
           .select('quantity')
           .eq('cart_id', cartId)
-          .eq('product_id', item.id)
-          .single();
+          .eq('product_id', item.id);
+        
+        if (item.weightVariantId) {
+          existingQuery = existingQuery.eq('weight_variant_id', item.weightVariantId);
+        } else {
+          existingQuery = existingQuery.is('weight_variant_id', null);
+        }
+
+        const { data: existing } = await existingQuery.single();
 
         const existingQty = ((existing as any)?.quantity || 0) as number;
         const newQuantity = existingQty + quantityToAdd;
 
-        await (supabase
-          .from('cart_items') as any)
-          .upsert({
-            cart_id: cartId,
-            product_id: item.id,
-            quantity: newQuantity
-          } as any, { onConflict: 'cart_id,product_id' });
+        // Upsert with weight_variant_id
+        const upsertData: any = {
+          cart_id: cartId,
+          product_id: item.id,
+          quantity: newQuantity,
+          weight_variant_id: item.weightVariantId || null,
+        };
+
+        // For upsert, we need to handle the conflict properly
+        // Since cart_items has unique(cart_id, product_id), we may need to delete and insert
+        // Or update the unique constraint to include weight_variant_id
+        // For now, let's use delete + insert approach for simplicity
+        
+        let deleteQuery = supabase
+          .from('cart_items')
+          .delete()
+          .eq('cart_id', cartId)
+          .eq('product_id', item.id);
+        
+        if (item.weightVariantId) {
+          deleteQuery = deleteQuery.eq('weight_variant_id', item.weightVariantId);
+        } else {
+          deleteQuery = deleteQuery.is('weight_variant_id', null);
+        }
+        
+        await deleteQuery;
+        
+        await (supabase.from('cart_items') as any).insert(upsertData);
 
       } catch (err) {
         console.error('Error adding to remote cart:', err);
@@ -382,43 +411,65 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const removeFromCart = async (id: string) => {
-    dispatch({ type: 'REMOVE_FROM_CART', payload: id });
+  const removeFromCart = async (productId: string, weightVariantId?: string) => {
+    dispatch({ type: 'REMOVE_FROM_CART', payload: { productId, weightVariantId } });
 
     if (user) {
       try {
         const cartId = await getOrCreateCart(user.id);
-        await supabase
+        let query = supabase
           .from('cart_items')
           .delete()
           .eq('cart_id', cartId)
-          .eq('product_id', id);
+          .eq('product_id', productId);
+        
+        if (weightVariantId) {
+          query = query.eq('weight_variant_id', weightVariantId);
+        } else {
+          query = query.is('weight_variant_id', null);
+        }
+        
+        await query;
       } catch (err) {
         console.error('Error removing from remote cart:', err);
       }
     }
   };
 
-  const updateQuantity = async (id: string, quantity: number) => {
-    dispatch({ type: 'UPDATE_QUANTITY', payload: { id, quantity } });
+  const updateQuantity = async (productId: string, weightVariantId: string | undefined, quantity: number) => {
+    dispatch({ type: 'UPDATE_QUANTITY', payload: { productId, weightVariantId, quantity } });
 
     if (user) {
       try {
         const cartId = await getOrCreateCart(user.id);
+        let query;
+        
         if (quantity > 0) {
-          await (supabase
-            .from('cart_items') as any)
+          query = (supabase.from('cart_items') as any)
             .update({ quantity } as any)
             .eq('cart_id', cartId)
-            .eq('product_id', id);
+            .eq('product_id', productId);
+          
+          if (weightVariantId) {
+            query = query.eq('weight_variant_id', weightVariantId);
+          } else {
+            query = query.is('weight_variant_id', null);
+          }
         } else {
           // If quantity is 0, remove (though reducer handles this too)
-          await (supabase
-            .from('cart_items') as any)
+          query = (supabase.from('cart_items') as any)
             .delete()
             .eq('cart_id', cartId)
-            .eq('product_id', id);
+            .eq('product_id', productId);
+          
+          if (weightVariantId) {
+            query = query.eq('weight_variant_id', weightVariantId);
+          } else {
+            query = query.is('weight_variant_id', null);
+          }
         }
+        
+        await query;
       } catch (err) {
         console.error('Error updating remote cart:', err);
       }
