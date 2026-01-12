@@ -121,75 +121,24 @@ const Shop = () => {
               {/* Categories */}
               <div className="mb-6">
                 <h4 className="font-medium text-foreground mb-3">Categories</h4>
-                <div className="space-y-1">
-                  {/* Group categories by parent */}
+                <div className="space-y-2">
+                  {/* Show only main categories: Tea, Honey, Ghee */}
                   {categories
                     .filter((cat) => !cat.parent_id)
-                    .map((parentCategory) => {
-                      const childCategories = categories.filter(
-                        (cat) => cat.parent_id === parentCategory.id
-                      );
-                      const isParentSelected = selectedCategory === parentCategory.id;
-                      const hasSelectedChild = childCategories.some(
-                        (child) => child.id === selectedCategory
-                      );
-
-                      return (
-                        <div key={parentCategory.id}>
-                          {/* Parent category button */}
-                          <button
-                            onClick={() => handleCategoryChange(parentCategory.id)}
-                            className={cn(
-                              "w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors",
-                              isParentSelected
-                                ? "bg-primary text-primary-foreground"
-                                : hasSelectedChild
-                                  ? "bg-primary/10 text-primary hover:bg-primary/20"
-                                  : "hover:bg-muted text-muted-foreground hover:text-foreground"
-                            )}
-                          >
-                            <span className="font-medium">{parentCategory.name}</span>
-                            {childCategories.length > 0 && (
-                              <ChevronDown
-                                className={cn(
-                                  "h-4 w-4 transition-transform",
-                                  (isParentSelected || hasSelectedChild) && "rotate-180"
-                                )}
-                              />
-                            )}
-                          </button>
-
-                          {/* Child categories */}
-                          {childCategories.length > 0 && (
-                            <div
-                              className={cn(
-                                "overflow-hidden transition-all duration-200",
-                                isParentSelected || hasSelectedChild
-                                  ? "max-h-40 opacity-100"
-                                  : "max-h-0 opacity-0"
-                              )}
-                            >
-                              <div className="ml-3 mt-1 space-y-1 border-l-2 border-muted pl-3">
-                                {childCategories.map((childCategory) => (
-                                  <button
-                                    key={childCategory.id}
-                                    onClick={() => handleCategoryChange(childCategory.id)}
-                                    className={cn(
-                                      "w-full flex items-center px-3 py-1.5 rounded-lg text-sm transition-colors",
-                                      selectedCategory === childCategory.id
-                                        ? "bg-primary text-primary-foreground"
-                                        : "hover:bg-muted text-muted-foreground hover:text-foreground"
-                                    )}
-                                  >
-                                    <span>{childCategory.name}</span>
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
+                    .map((category) => (
+                      <button
+                        key={category.id}
+                        onClick={() => handleCategoryChange(category.id)}
+                        className={cn(
+                          "w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors",
+                          selectedCategory === category.id
+                            ? "bg-primary text-primary-foreground"
+                            : "hover:bg-muted text-muted-foreground hover:text-foreground"
+                        )}
+                      >
+                        <span className="font-medium">{category.name}</span>
+                      </button>
+                    ))}
                 </div>
               </div>
 
