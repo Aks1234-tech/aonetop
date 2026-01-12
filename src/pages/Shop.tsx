@@ -8,6 +8,7 @@ import { useCategories } from '@/hooks/useCategories';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
+import { getMinVariantPrice, hasWeightVariants } from '@/hooks/useWeightVariants';
 
 const Shop = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -54,6 +55,23 @@ const Shop = () => {
   const getProductImage = (product: Product) => {
     const primaryImage = product.images?.find(img => img.is_primary);
     return primaryImage?.url || product.images?.[0]?.url || 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=800&q=80';
+  };
+
+  // Get display price for a product (min variant price or regular price)
+  const getDisplayPrice = (product: Product): { price: number; isFromPrice: boolean } => {
+    if (hasWeightVariants(product.weight_variants)) {
+      const minPrice = getMinVariantPrice(product.weight_variants);
+      return { price: minPrice!, isFromPrice: true };
+    }
+    return { price: product.price, isFromPrice: false };
+  };
+
+  // Check if product has any stock available
+  const isProductAvailable = (product: Product): boolean => {
+    if (hasWeightVariants(product.weight_variants)) {
+      return product.weight_variants!.some(v => v.in_stock);
+    }
+    return product.in_stock;
   };
 
   const handleCategoryChange = (category: string) => {
@@ -330,31 +348,48 @@ const Shop = () => {
                       </p>
                       <div className="flex items-center justify-between mt-4">
                         <div className="flex items-center gap-2">
-                          <span className="font-display text-xl font-semibold text-primary">
-                            {formatPrice(product.price)}
-                          </span>
-                          {product.original_price && (
-                            <span className="text-sm text-muted-foreground line-through">
-                              {formatPrice(product.original_price)}
-                            </span>
-                          )}
+                          {(() => {
+                            const { price, isFromPrice } = getDisplayPrice(product);
+                            return (
+                              <>
+                                <span className="font-display text-xl font-semibold text-primary">
+                                  {isFromPrice && 'From '}
+                                  {formatPrice(price)}
+                                </span>
+                                {!isFromPrice && product.original_price && (
+                                  <span className="text-sm text-muted-foreground line-through">
+                                    {formatPrice(product.original_price)}
+                                  </span>
+                                )}
+                              </>
+                            );
+                          })()}
                         </div>
                         {!isAdmin && (
-                          <Button
-                            variant="gold"
-                            size="sm"
-                            onClick={() =>
-                              addToCart({
-                                id: product.id,
-                                name: product.name,
-                                price: product.price / 100, // Convert from paise
-                                image: getProductImage(product),
-                                weight: product.weight || undefined,
-                              })
-                            }
-                          >
-                            <ShoppingBag className="h-4 w-4" />
-                          </Button>
+                          hasWeightVariants(product.weight_variants) ? (
+                            <Link to={`/products/${product.slug}`}>
+                              <Button variant="gold" size="sm">
+                                View Options
+                              </Button>
+                            </Link>
+                          ) : (
+                            <Button
+                              variant="gold"
+                              size="sm"
+                              disabled={!isProductAvailable(product)}
+                              onClick={() =>
+                                addToCart({
+                                  id: product.id,
+                                  name: product.name,
+                                  price: product.price / 100, // Convert from paise
+                                  image: getProductImage(product),
+                                  weight: product.weight || undefined,
+                                })
+                              }
+                            >
+                              <ShoppingBag className="h-4 w-4" />
+                            </Button>
+                          )
                         )}
                       </div>
                     </div>
