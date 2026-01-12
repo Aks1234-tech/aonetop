@@ -1,20 +1,28 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, CreditCard, Truck, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { ArrowLeft, CreditCard, Truck, CheckCircle, AlertCircle, Loader2, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
-import { useCreateOrder } from '@/hooks/useOrders';
+import { useCreateOrder, useCreateRazorpayOrder, useVerifyPayment, useUpdatePaymentStatus } from '@/hooks/useOrders';
+import { initiateRazorpayPayment, formatRazorpayError, PaymentMethodType } from '@/lib/razorpay';
+import { cn } from '@/lib/utils';
 
 const Checkout = () => {
   const { items, cartTotal, clearCart, cartCount, appliedOffer, discount, finalTotal, removeOffer } = useCart();
   const navigate = useNavigate();
   const { toast } = useToast();
   const createOrder = useCreateOrder();
+  const createRazorpayOrder = useCreateRazorpayOrder();
+  const verifyPayment = useVerifyPayment();
+  const updatePaymentStatus = useUpdatePaymentStatus();
+  
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [orderNumber, setOrderNumber] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethodType>('cod');
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -83,7 +91,10 @@ const Checkout = () => {
       return;
     }
 
+    const orderTotal = (finalTotal + shippingCost) * 100; // Convert to paise
+
     try {
+      // Step 1: Create order in database
       const order = await createOrder.mutateAsync({
         items: items.map((item) => ({
           productId: item.id,
@@ -103,22 +114,114 @@ const Checkout = () => {
           state: formData.state,
           pincode: formData.pincode,
         },
-        paymentMethod: 'cod',
+        paymentMethod: paymentMethod === 'online' ? 'razorpay' : 'cod',
+        paymentGateway: paymentMethod === 'online' ? 'razorpay' : 'cod',
         notes: formData.notes || undefined,
         offerId: appliedOffer?.id,
         discountAmount: discount * 100, // Convert to paise for DB
         shippingCost: shippingCost * 100, // Convert to paise
       });
 
-      setOrderPlaced(true);
-      setOrderNumber(order.order_number);
-      clearCart();
-      removeOffer(); // Clear offer from state
+      // Step 2: If online payment, initiate Razorpay
+      if (paymentMethod === 'online') {
+        setIsProcessingPayment(true);
 
-      toast({
-        title: 'Order placed successfully!',
-        description: `Order ${order.order_number} - You will receive a confirmation email shortly.`,
-      });
+        try {
+          // Create Razorpay order
+          const razorpayOrder = await createRazorpayOrder.mutateAsync({
+            orderId: order.id,
+            amount: orderTotal,
+          });
+
+          // Open Razorpay checkout
+          await initiateRazorpayPayment({
+            orderId: razorpayOrder.id,
+            amount: razorpayOrder.amount,
+            currency: razorpayOrder.currency,
+            name: 'Aonetop',
+            description: `Order ${order.order_number}`,
+            prefill: {
+              name: `${formData.firstName} ${formData.lastName}`,
+              email: formData.email,
+              contact: formData.phone,
+            },
+            notes: {
+              order_id: order.id,
+              order_number: order.order_number || '',
+            },
+            onSuccess: async (response) => {
+              try {
+                // Verify payment on server
+                await verifyPayment.mutateAsync({
+                  orderId: order.id,
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+                });
+
+                setOrderPlaced(true);
+                setOrderNumber(order.order_number);
+                clearCart();
+                removeOffer();
+
+                toast({
+                  title: 'Payment successful!',
+                  description: `Order ${order.order_number} confirmed. Thank you for your purchase!`,
+                });
+              } catch (verifyError) {
+                toast({
+                  title: 'Payment verification failed',
+                  description: 'Please contact support with your order number.',
+                  variant: 'destructive',
+                });
+              } finally {
+                setIsProcessingPayment(false);
+              }
+            },
+            onError: async (error) => {
+              setIsProcessingPayment(false);
+              
+              // Update order payment status to failed
+              await updatePaymentStatus.mutateAsync({
+                orderId: order.id,
+                paymentStatus: 'failed',
+                errorMessage: formatRazorpayError(error),
+              });
+
+              toast({
+                title: 'Payment failed',
+                description: formatRazorpayError(error),
+                variant: 'destructive',
+              });
+            },
+            onDismiss: () => {
+              setIsProcessingPayment(false);
+              toast({
+                title: 'Payment cancelled',
+                description: 'You can retry the payment or choose Cash on Delivery.',
+              });
+            },
+          });
+        } catch (razorpayError) {
+          setIsProcessingPayment(false);
+          toast({
+            title: 'Payment initialization failed',
+            description: 'Unable to start payment. Please try again.',
+            variant: 'destructive',
+          });
+        }
+      } else {
+        // COD flow - order is complete
+        setOrderPlaced(true);
+        setOrderNumber(order.order_number);
+        clearCart();
+        removeOffer();
+
+        toast({
+          title: 'Order placed successfully!',
+          description: `Order ${order.order_number} - You will receive a confirmation email shortly.`,
+        });
+      }
     } catch (error) {
       toast({
         title: 'Order failed',
@@ -320,23 +423,93 @@ const Checkout = () => {
                 <h2 className="font-display text-xl font-semibold text-foreground mb-6">
                   Payment Method
                 </h2>
-                <div className="p-4 bg-muted/50 rounded-xl border-2 border-primary flex items-start gap-4">
-                  <div className="w-5 h-5 rounded-full border-2 border-primary flex items-center justify-center mt-0.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-primary" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <Truck className="h-5 w-5 text-primary" />
-                      <span className="font-semibold text-foreground">Cash on Delivery</span>
+                <div className="space-y-3">
+                  {/* Cash on Delivery Option */}
+                  <label
+                    className={cn(
+                      "flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all",
+                      paymentMethod === 'cod'
+                        ? "border-primary bg-primary/5"
+                        : "border-border hover:border-primary/50"
+                    )}
+                  >
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="cod"
+                      checked={paymentMethod === 'cod'}
+                      onChange={() => setPaymentMethod('cod')}
+                      className="sr-only"
+                    />
+                    <div className={cn(
+                      "w-5 h-5 rounded-full border-2 flex items-center justify-center mt-0.5 shrink-0",
+                      paymentMethod === 'cod' ? "border-primary" : "border-muted-foreground"
+                    )}>
+                      {paymentMethod === 'cod' && (
+                        <div className="w-2.5 h-2.5 rounded-full bg-primary" />
+                      )}
                     </div>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Pay when your order arrives at your doorstep
-                    </p>
-                  </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <Truck className="h-5 w-5 text-primary" />
+                        <span className="font-semibold text-foreground">Cash on Delivery</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Pay when your order arrives at your doorstep
+                      </p>
+                    </div>
+                  </label>
+
+                  {/* Online Payment Option */}
+                  <label
+                    className={cn(
+                      "flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all",
+                      paymentMethod === 'online'
+                        ? "border-primary bg-primary/5"
+                        : "border-border hover:border-primary/50"
+                    )}
+                  >
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="online"
+                      checked={paymentMethod === 'online'}
+                      onChange={() => setPaymentMethod('online')}
+                      className="sr-only"
+                    />
+                    <div className={cn(
+                      "w-5 h-5 rounded-full border-2 flex items-center justify-center mt-0.5 shrink-0",
+                      paymentMethod === 'online' ? "border-primary" : "border-muted-foreground"
+                    )}>
+                      {paymentMethod === 'online' && (
+                        <div className="w-2.5 h-2.5 rounded-full bg-primary" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <CreditCard className="h-5 w-5 text-primary" />
+                        <span className="font-semibold text-foreground">Pay Online</span>
+                        <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">
+                          Secure
+                        </span>
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        UPI, Credit/Debit Card, Net Banking, Wallets
+                      </p>
+                      <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
+                        <span className="bg-muted px-2 py-1 rounded">UPI</span>
+                        <span className="bg-muted px-2 py-1 rounded">Cards</span>
+                        <span className="bg-muted px-2 py-1 rounded">NetBanking</span>
+                        <span className="bg-muted px-2 py-1 rounded">Wallets</span>
+                      </div>
+                    </div>
+                  </label>
                 </div>
-                <div className="flex items-start gap-2 mt-4 text-sm text-muted-foreground">
-                  <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
-                  <p>Online payment options coming soon!</p>
+
+                {/* Security Notice */}
+                <div className="flex items-start gap-2 mt-4 p-3 bg-green-50 rounded-lg text-sm text-green-700">
+                  <Shield className="h-4 w-4 mt-0.5 shrink-0" />
+                  <p>Your payment information is encrypted and secure. Powered by Razorpay.</p>
                 </div>
               </div>
             </div>
@@ -409,12 +582,17 @@ const Checkout = () => {
                   variant="gold"
                   size="lg"
                   className="w-full"
-                  disabled={createOrder.isPending}
+                  disabled={createOrder.isPending || isProcessingPayment}
                 >
-                  {createOrder.isPending ? (
+                  {createOrder.isPending || isProcessingPayment ? (
                     <>
                       <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Processing...
+                      {isProcessingPayment ? 'Processing Payment...' : 'Creating Order...'}
+                    </>
+                  ) : paymentMethod === 'online' ? (
+                    <>
+                      Pay {formatPrice(finalTotal + shippingCost)}
+                      <CreditCard className="ml-2 h-5 w-5" />
                     </>
                   ) : (
                     <>
@@ -423,6 +601,12 @@ const Checkout = () => {
                     </>
                   )}
                 </Button>
+
+                {paymentMethod === 'online' && (
+                  <p className="text-xs text-muted-foreground text-center mt-2">
+                    You will be redirected to Razorpay secure payment gateway
+                  </p>
+                )}
 
                 <p className="text-xs text-muted-foreground text-center mt-4">
                   By placing this order, you agree to our Terms of Service and Privacy Policy

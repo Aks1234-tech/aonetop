@@ -102,6 +102,7 @@ export interface CreateOrderInput {
         pincode: string;
     };
     paymentMethod: string;
+    paymentGateway?: 'cod' | 'razorpay'; // Payment gateway type
     notes?: string;
     offerId?: string;
     discountAmount?: number;
@@ -129,6 +130,8 @@ export function useCreateOrder() {
                 shipping_cost: shippingCost,
                 total,
                 payment_method: input.paymentMethod,
+                payment_gateway: input.paymentGateway || 'cod',
+                payment_status: input.paymentGateway === 'razorpay' ? 'initiated' : 'pending',
                 shipping_name: input.shippingInfo.name,
                 shipping_email: input.shippingInfo.email,
                 shipping_phone: input.shippingInfo.phone,
@@ -225,6 +228,137 @@ export function useUpdateOrderStatus() {
             }
 
             return data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['orders'] });
+            queryClient.invalidateQueries({ queryKey: ['admin', 'orders'] });
+        },
+    });
+}
+
+// ============================================
+// PAYMENT INTEGRATION HOOKS
+// ============================================
+
+export interface CreateRazorpayOrderInput {
+    orderId: string;
+    amount: number; // in paise
+}
+
+export interface CreateRazorpayOrderResponse {
+    id: string;
+    amount: number;
+    currency: string;
+}
+
+// Create Razorpay order (calls Edge Function)
+export function useCreateRazorpayOrder() {
+    return useMutation({
+        mutationFn: async ({ orderId, amount }: CreateRazorpayOrderInput): Promise<CreateRazorpayOrderResponse> => {
+            const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+            const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+            const response = await fetch(
+                `${supabaseUrl}/functions/v1/create-razorpay-order`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${supabaseAnonKey}`,
+                    },
+                    body: JSON.stringify({ orderId, amount }),
+                }
+            );
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.error || 'Failed to create payment order');
+            }
+
+            return response.json();
+        },
+    });
+}
+
+export interface VerifyPaymentInput {
+    orderId: string;
+    razorpay_order_id: string;
+    razorpay_payment_id: string;
+    razorpay_signature: string;
+}
+
+// Verify payment (calls Edge Function)
+export function useVerifyPayment() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (data: VerifyPaymentInput) => {
+            const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+            const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+            const response = await fetch(
+                `${supabaseUrl}/functions/v1/verify-payment`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${supabaseAnonKey}`,
+                    },
+                    body: JSON.stringify(data),
+                }
+            );
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.error || 'Payment verification failed');
+            }
+
+            return response.json();
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['orders'] });
+        },
+    });
+}
+
+// Update payment status (for failed/cancelled payments)
+export function useUpdatePaymentStatus() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({
+            orderId,
+            paymentStatus,
+            errorMessage,
+        }: {
+            orderId: string;
+            paymentStatus: string;
+            errorMessage?: string;
+        }) => {
+            const updateData: Record<string, unknown> = {
+                payment_status: paymentStatus,
+            };
+
+            // Append error to notes if payment failed
+            if (errorMessage && paymentStatus === 'failed') {
+                const { data: order } = await supabase
+                    .from('orders')
+                    .select('notes')
+                    .eq('id', orderId)
+                    .single();
+
+                const existingNotes = (order as { notes: string | null } | null)?.notes;
+                updateData.notes = existingNotes
+                    ? `${existingNotes}\n\nPayment Error: ${errorMessage}`
+                    : `Payment Error: ${errorMessage}`;
+            }
+
+            const { error } = await (supabase
+                .from('orders') as any)
+                .update(updateData)
+                .eq('id', orderId);
+
+            if (error) throw error;
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['orders'] });
