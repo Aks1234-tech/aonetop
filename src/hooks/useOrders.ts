@@ -89,6 +89,8 @@ export interface CreateOrderInput {
         productImage?: string;
         quantity: number;
         price: number; // in paise
+        weightVariantId?: string;
+        weightValue?: string; // The weight string like "100g", "250g"
     }[];
     shippingInfo: {
         name: string;
@@ -163,6 +165,8 @@ export function useCreateOrder() {
                 product_image: item.productImage || null,
                 quantity: item.quantity,
                 price: item.price,
+                weight_variant_id: item.weightVariantId || null,
+                weight_value: item.weightValue || null,
             }));
 
             const { error: itemsError } = await supabase
