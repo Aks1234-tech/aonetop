@@ -7,7 +7,32 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
+
+// Idempotency check - ensure we don't create duplicate Razorpay orders
+async function checkExistingRazorpayOrder(
+  supabase: any,
+  orderId: string
+): Promise<string | null> {
+  const { data, error } = await supabase
+    .from('orders')
+    .select('razorpay_order_id, payment_status')
+    .eq('id', orderId)
+    .single();
+
+  if (error) {
+    console.error('Error checking existing order:', error);
+    return null;
+  }
+
+  // If already has a Razorpay order ID and payment is initiated/completed, return it
+  if (data?.razorpay_order_id && ['initiated', 'completed', 'captured'].includes(data?.payment_status)) {
+    return data.razorpay_order_id;
+  }
+
+  return null;
+}
 
 interface RazorpayOrder {
   id: string;
@@ -17,10 +42,10 @@ interface RazorpayOrder {
   status: string;
 }
 
-serve(async (req) => {
+serve(async (req: Request) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+    return new Response(null, { status: 204, headers: corsHeaders });
   }
 
   try {
@@ -28,6 +53,30 @@ serve(async (req) => {
 
     if (!orderId || !amount) {
       throw new Error('Missing required fields: orderId and amount');
+    }
+
+    // Initialize Supabase once
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
+
+    // Check if we already created a Razorpay order for this order (idempotency)
+    const existingRazorpayOrderId = await checkExistingRazorpayOrder(supabase, orderId);
+    if (existingRazorpayOrderId) {
+      console.log('Returning existing Razorpay order:', existingRazorpayOrderId);
+      return new Response(
+        JSON.stringify({
+          id: existingRazorpayOrderId,
+          amount: amount,
+          currency: 'INR',
+          idempotent: true,
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
+        }
+      );
     }
 
     const razorpayKeyId = Deno.env.get('RAZORPAY_KEY_ID');
@@ -62,12 +111,7 @@ serve(async (req) => {
 
     const razorpayOrder: RazorpayOrder = await razorpayResponse.json();
 
-    // Update order with Razorpay order ID
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
+    // Update order with Razorpay order ID (supabase already initialized above)
     const { error: updateError } = await supabase
       .from('orders')
       .update({
