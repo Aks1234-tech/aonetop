@@ -45,38 +45,68 @@ Aonetop is a comprehensive, full-featured e-commerce application built with mode
 
 ## Tech Stack
 
-This project is built using a modern, type-safe, and production-ready stack:
+This project is built using a modern, type-safe, and production-ready stack, organized by architecture layers:
 
-### Frontend
--   **Framework**: [React 18](https://react.dev/) - Modern UI library with hooks
--   **Language**: [TypeScript](https://www.typescriptlang.org/) - Type-safe JavaScript
--   **Build Tool**: [Vite](https://vitejs.dev/) - Lightning-fast frontend build tool
--   **Styling**: [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
--   **UI Components**: [shadcn/ui](https://ui.shadcn.com/) - Accessible component library with Radix UI primitives
+### Frontend Stack
 
-### State Management & Data Fetching
--   **State Management**: [TanStack Query (React Query)](https://tanstack.com/query/latest) - Powerful server state management
--   **Local State**: Context API with custom hooks (AuthContext, CartContext)
--   **Form Handling**: [React Hook Form](https://react-hook-form.com/) with [Zod](https://zod.dev/) for validation
+| Technology | Purpose | Link |
+|-----------|---------|------|
+| **React 18** | Modern UI library with hooks for building interactive components | [react.dev](https://react.dev/) |
+| **TypeScript** | Type-safe JavaScript for improved code quality and developer experience | [typescriptlang.org](https://www.typescriptlang.org/) |
+| **Vite** | Lightning-fast frontend build tool and dev server with HMR | [vitejs.dev](https://vitejs.dev/) |
+| **Tailwind CSS** | Utility-first CSS framework for rapid UI development | [tailwindcss.com](https://tailwindcss.com/) |
+| **shadcn/ui** | Accessible, customizable component library with Radix UI primitives | [ui.shadcn.com](https://ui.shadcn.com/) |
+| **TanStack Query (React Query)** | Powerful server state management and data synchronization | [tanstack.com/query](https://tanstack.com/query/latest) |
+| **React Hook Form** | Performant, flexible form validation and management | [react-hook-form.com](https://react-hook-form.com/) |
+| **Zod** | TypeScript-first schema validation library | [zod.dev](https://zod.dev/) |
+| **React Router DOM v6** | Modern client-side routing with protected routes and dynamic segments | [reactrouter.com](https://reactrouter.com/) |
+| **Context API** | Built-in React solution for global state (AuthContext, CartContext) | [react.dev](https://react.dev/) |
+| **Lucide React** | Beautiful, consistent icon library with 460+ icons | [lucide.dev](https://lucide.dev/) |
+| **Embla Carousel** | Flexible carousel/slider component for product galleries | [embla-carousel.com](https://www.embla-carousel.com/) |
+| **jsPDF** | Library for generating PDF invoices and receipts | [github.com/parallax/jsPDF](https://github.com/parallax/jsPDF) |
+| **Recharts** | Lightweight charting library for analytics and dashboards | [recharts.org](https://recharts.org/) |
+| **date-fns** | Lightweight date utility library for date manipulation | [date-fns.org](https://date-fns.org/) |
+| **Sonner** | Beautiful, accessible toast notification system | [sonner.emilkowal.ski](https://sonner.emilkowal.ski/) |
+| **clsx** | Utility for constructing className strings conditionally | [github.com/lukeed/clsx](https://github.com/lukeed/clsx) |
+| **tailwind-merge** | Utility for merging Tailwind CSS classes intelligently | [github.com/dcastil/tailwind-merge](https://github.com/dcastil/tailwind-merge) |
+| **tailwindcss-animate** | Pre-built animation utilities for Tailwind CSS | [github.com/hypesystem/tailwindcss-animate](https://github.com/hypesystem/tailwindcss-animate) |
+| **Radix UI** | Unstyled, accessible UI primitives as foundation for shadcn/ui | [radix-ui.com](https://www.radix-ui.com/) |
+| **react-resizable-panels** | Resizable panel layout component for flexible layouts | [github.com/bvaughn/react-resizable-panels](https://github.com/bvaughn/react-resizable-panels) |
+| **cmdk** | Fast command palette component for keyboard navigation | [github.com/pacocoursey/cmdk](https://github.com/pacocoursey/cmdk) |
+| **input-otp** | Accessible OTP input component for two-factor authentication | [github.com/dcousens/input-otp](https://github.com/dcousens/input-otp) |
 
-### Routing & Navigation
--   **Routing**: [React Router DOM v6](https://reactrouter.com/) - Client-side routing with protected routes
+### Backend Stack
 
-### Backend & Database
--   **Backend-as-a-Service**: [Supabase](https://supabase.com/) - PostgreSQL database with real-time capabilities
--   **Authentication**: Supabase Auth with JWT tokens
--   **Database**: PostgreSQL with Row Level Security (RLS) policies
--   **Real-time Sync**: Supabase Realtime for live updates
+| Technology | Purpose | Link |
+|-----------|---------|------|
+| **Supabase** | Backend-as-a-Service platform with PostgreSQL and real-time capabilities | [supabase.com](https://supabase.com/) |
+| **PostgreSQL** | Powerful, open-source relational database with advanced features | [postgresql.org](https://www.postgresql.org/) |
+| **Supabase Auth** | JWT token-based authentication with email verification and OAuth | [supabase.com](https://supabase.com/) |
+| **Row Level Security (RLS)** | Database-level access control policies for data protection | [supabase.com](https://supabase.com/) |
+| **Supabase Realtime** | Live data synchronization across clients using WebSockets | [supabase.com](https://supabase.com/) |
+| **Supabase Edge Functions** | Serverless functions for custom backend logic and webhook handling | [supabase.com](https://supabase.com/) |
 
-### Payment Processing
--   **Payment Gateway**: [Razorpay](https://razorpay.com/) - Indian payment aggregator supporting UPI, cards, net banking, and wallets
+### APIs & External Services
 
-### Additional Libraries
--   **PDF Generation**: [jsPDF](https://github.com/parallax/jsPDF) - Invoice and receipt generation
--   **Charts & Analytics**: [Recharts](https://recharts.org/) - Data visualization
--   **Date Handling**: [date-fns](https://date-fns.org/) - Lightweight date utility
--   **Notifications**: [Sonner](https://sonner.emilkowal.ski/) - Toast notifications
--   **UI Enhancement**: [Embla Carousel](https://www.embla-carousel.com/) for product carousels
+| Service | Purpose | Link |
+|---------|---------|------|
+| **Razorpay** | Payment gateway supporting UPI, card payments, net banking, and digital wallets | [razorpay.com](https://razorpay.com/) |
+| **Razorpay Orders API** | Create and manage payment orders | [razorpay.com/docs](https://razorpay.com/docs/) |
+| **Razorpay Payments API** | Verify and manage payment transactions | [razorpay.com/docs](https://razorpay.com/docs/) |
+| **Razorpay Webhooks** | Real-time payment status notifications | [razorpay.com/docs](https://razorpay.com/docs/) |
+
+### Development Tools & Configuration
+
+| Tool | Purpose | Category |
+|------|---------|----------|
+| **ESLint** | Code quality and style checking with modern JavaScript rules | Linting |
+| **Vite Config** | Build configuration for optimized production builds | Build Configuration |
+| **TypeScript Config** | Type checking and compilation configuration | Type Checking |
+| **Tailwind Config** | Customization for Tailwind CSS framework | Styling Configuration |
+| **PostCSS** | CSS transformation tool with plugins (Tailwind, Autoprefixer) | CSS Processing |
+| **Autoprefixer** | Automatically add vendor prefixes for cross-browser compatibility | CSS Processing |
+| **npm/yarn** | Package manager for dependency management and scripting | Package Management |
+| **ES Modules** | Modern JavaScript module system for code organization | Module System |
 
 ## Getting Started
 
