@@ -1,28 +1,82 @@
 # Aonetop - Modern E-commerce Platform
 
-Aonetop is a comprehensive e-commerce application built with modern web technologies, offering a seamless shopping experience for users and robust management tools for administrators.
+Aonetop is a comprehensive, full-featured e-commerce application built with modern web technologies, offering a seamless shopping experience for users and robust management tools for administrators. Built with React, TypeScript, and Supabase, it provides enterprise-grade features including real-time inventory management, secure payment processing, and advanced order tracking.
 
 ## Features
 
--   **Product Browsing**: Intuitive product catalog with detailed product pages.
--   **Shopping Cart & Checkout**: Smooth cart management and secure checkout process.
--   **Bulk Orders**: Specialized functionality for managing bulk orders.
--   **Admin Dashboard**: Dedicated area for store administration.
--   **Responsive Design**: optimized for all device sizes.
--   **Contact & About**: Informational pages for customer engagement.
+### Customer Features
+-   **Product Browsing & Discovery**: Intuitive product catalog with advanced filtering by category, price, and ratings
+-   **Product Details**: Comprehensive product pages with images, specifications, and weight variants
+-   **Shopping Cart**: Smart cart management with local/cloud synchronization, quantity updates, and item removal
+-   **Checkout Process**: Streamlined checkout with address validation and order summary
+-   **Payment Integration**: Razorpay payment gateway supporting:
+    -   UPI payments (Google Pay, PhonePe, Paytm, etc.)
+    -   Card payments (Credit/Debit cards)
+    -   Net Banking
+    -   Digital Wallets
+    -   Cash on Delivery
+-   **Order Management**: Complete order tracking with status updates (Pending, Processing, Shipped, Delivered)
+-   **Order History**: View past orders with detailed information and PDF invoice generation
+-   **User Authentication**: Secure signup/login with email verification and password reset
+-   **User Profile**: Manage profile information, contact details, and preferences
+-   **Bulk Orders**: Specialized functionality for wholesale/bulk purchasing with custom pricing
+-   **Customer Testimonials**: Browse and submit reviews/ratings
+-   **Newsletter Subscription**: Stay updated with latest offers and products
+-   **Responsive Design**: Fully optimized for all device sizes (mobile, tablet, desktop)
+
+### Admin Features
+-   **Admin Dashboard**: Comprehensive management panel with analytics and key metrics
+-   **Product Management**: Add, edit, delete, and manage product inventory with weight variants
+-   **Category Management**: Create and manage product categories
+-   **Order Management**: View, filter, and manage all customer orders with payment status tracking
+-   **Payment Tracking**: Monitor payment status, transaction IDs, and payment confirmations
+-   **Contact Messages**: Manage customer inquiries and support messages
+-   **Bulk Order Inquiries**: Handle and respond to bulk order requests
+-   **Offers & Coupon Management**: Create and manage discount offers
+-   **Customer Reviews**: Manage and moderate customer reviews and testimonials
+
+### Additional Features
+-   **Contact & About Pages**: Informational pages for customer engagement
+-   **Search Functionality**: Quick product search across catalog
+-   **Category Navigation**: Easy browsing by product categories
+-   **Error Handling**: Comprehensive error management with user-friendly messages
+-   **Protected Routes**: Role-based access control (Admin/Customer)
+-   **Real-time Updates**: Live inventory and order status synchronization
 
 ## Tech Stack
 
-This project is built using a modern, type-safe stack:
+This project is built using a modern, type-safe, and production-ready stack:
 
--   **Frontend Framework**: [React](https://react.dev/)
--   **Language**: [TypeScript](https://www.typescriptlang.org/)
--   **Build Tool**: [Vite](https://vitejs.dev/)
--   **Styling**: [Tailwind CSS](https://tailwindcss.com/)
--   **UI Components**: [shadcn/ui](https://ui.shadcn.com/)
--   **State Management**: [TanStack Query (React Query)](https://tanstack.com/query/latest)
--   **Routing**: [React Router DOM](https://reactrouter.com/)
--   **Form Handling**: [React Hook Form](https://react-hook-form.com/) & [Zod](https://zod.dev/)
+### Frontend
+-   **Framework**: [React 18](https://react.dev/) - Modern UI library with hooks
+-   **Language**: [TypeScript](https://www.typescriptlang.org/) - Type-safe JavaScript
+-   **Build Tool**: [Vite](https://vitejs.dev/) - Lightning-fast frontend build tool
+-   **Styling**: [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
+-   **UI Components**: [shadcn/ui](https://ui.shadcn.com/) - Accessible component library with Radix UI primitives
+
+### State Management & Data Fetching
+-   **State Management**: [TanStack Query (React Query)](https://tanstack.com/query/latest) - Powerful server state management
+-   **Local State**: Context API with custom hooks (AuthContext, CartContext)
+-   **Form Handling**: [React Hook Form](https://react-hook-form.com/) with [Zod](https://zod.dev/) for validation
+
+### Routing & Navigation
+-   **Routing**: [React Router DOM v6](https://reactrouter.com/) - Client-side routing with protected routes
+
+### Backend & Database
+-   **Backend-as-a-Service**: [Supabase](https://supabase.com/) - PostgreSQL database with real-time capabilities
+-   **Authentication**: Supabase Auth with JWT tokens
+-   **Database**: PostgreSQL with Row Level Security (RLS) policies
+-   **Real-time Sync**: Supabase Realtime for live updates
+
+### Payment Processing
+-   **Payment Gateway**: [Razorpay](https://razorpay.com/) - Indian payment aggregator supporting UPI, cards, net banking, and wallets
+
+### Additional Libraries
+-   **PDF Generation**: [jsPDF](https://github.com/parallax/jsPDF) - Invoice and receipt generation
+-   **Charts & Analytics**: [Recharts](https://recharts.org/) - Data visualization
+-   **Date Handling**: [date-fns](https://date-fns.org/) - Lightweight date utility
+-   **Notifications**: [Sonner](https://sonner.emilkowal.ski/) - Toast notifications
+-   **UI Enhancement**: [Embla Carousel](https://www.embla-carousel.com/) for product carousels
 
 ## Getting Started
 
@@ -30,44 +84,370 @@ Follow these steps to set up the project locally.
 
 ### Prerequisites
 
--   Node.js (LTS version recommended)
--   npm or yarn
+-   **Node.js** (v16 or higher)
+-   **npm** or **yarn** package manager
+-   **Supabase Account** (for backend services)
+-   **Razorpay Account** (for payment processing - test/production keys)
 
-### Installation
+### Installation & Setup
 
-1.  Clone the repository:
+1.  **Clone the repository:**
     ```bash
     git clone <repository-url>
     cd aonetop
     ```
 
-2.  Install dependencies:
+2.  **Install dependencies:**
     ```bash
     npm install
+    # or
+    yarn install
     ```
 
-3.  Start the development server:
+3.  **Set up environment variables:**
+    Create a `.env.local` file in the project root:
+    ```env
+    # Supabase Configuration
+    VITE_SUPABASE_URL=your_supabase_project_url
+    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+    
+    # Razorpay Configuration
+    VITE_RAZORPAY_KEY_ID=your_razorpay_test_key_id
+    
+    # Optional: For production
+    # RAZORPAY_KEY_SECRET=your_razorpay_secret_key (backend only)
+    ```
+
+4.  **Start the development server:**
     ```bash
     npm run dev
     ```
+    The application will be available at `http://localhost:5173`
 
-4.  Open your browser and navigate to `http://localhost:8080` (or the port shown in your terminal).
+5.  **Build for production:**
+    ```bash
+    npm run build
+    ```
 
-## Scripts
+6.  **Preview production build:**
+    ```bash
+    npm run preview
+    ```
 
--   `npm run dev`: Starts the development server.
--   `npm run build`: Builds the app for production.
--   `npm run preview`: Preview the production build locally.
--   `npm run lint`: Runs ESLint to check for code quality issues.
+### Database Setup (Supabase)
+
+The project uses Supabase for backend services. Migrations are automatically applied via the migrations directory.
+
+To manually run migrations:
+```bash
+supabase migration up
+```
+
+### Payment Testing (Razorpay)
+
+Use Razorpay test credentials for testing:
+- **Test Card**: 4111 1111 1111 1111 (Visa)
+- **Expiry**: Any future date
+- **CVV**: Any 3 digits
+- **OTP**: 123456
+
+## Available Scripts
+
+### Development
+-   `npm run dev`: Starts the Vite development server with hot module reloading.
+
+### Build & Deployment
+-   `npm run build`: Creates an optimized production build.
+-   `npm run build:dev`: Creates a development-mode build for debugging.
+-   `npm run preview`: Serves the production build locally for testing before deployment.
+
+### Code Quality
+-   `npm run lint`: Runs ESLint to check for code quality issues and style violations.
 
 ## Project Structure
 
--   `src/pages`: Contains the main application pages (Shop, Cart, Checkout, Admin, etc.).
--   `src/components`: Reusable UI components.
--   `src/hooks`: Custom React hooks.
--   `src/lib`: Utility functions and configuration.
--   `src/data`: Static data or mock data files.
+```
+aonetop/
+├── src/
+│   ├── pages/                 # Page components
+│   │   ├── Index.tsx         # Home page with hero, featured products, testimonials
+│   │   ├── Shop.tsx          # Product listing with filters
+│   │   ├── ProductDetails.tsx # Individual product page with variants
+│   │   ├── Cart.tsx          # Shopping cart management
+│   │   ├── Checkout.tsx      # Checkout with payment integration
+│   │   ├── OrderHistory.tsx  # User's past orders
+│   │   ├── Profile.tsx       # User profile management
+│   │   ├── Admin.tsx         # Admin dashboard
+│   │   ├── BulkOrders.tsx    # Bulk order requests
+│   │   ├── About.tsx         # About page
+│   │   ├── Contact.tsx       # Contact page
+│   │   ├── Login.tsx         # User login
+│   │   ├── Signup.tsx        # User registration
+│   │   └── NotFound.tsx      # 404 page
+│   │
+│   ├── components/
+│   │   ├── ProtectedRoute.tsx      # Customer route protection
+│   │   ├── AdminProtectedRoute.tsx # Admin route protection
+│   │   ├── NavLink.tsx            # Navigation links
+│   │   │
+│   │   ├── home/                  # Home page components
+│   │   │   ├── Hero.tsx
+│   │   │   ├── FeaturedProducts.tsx
+│   │   │   ├── Bestsellers.tsx
+│   │   │   ├── ShopByCategory.tsx
+│   │   │   ├── CustomerReviews.tsx
+│   │   │   ├── BulkOrdersTeaser.tsx
+│   │   │   ├── WhyChoose.tsx
+│   │   │   ├── AboutPreview.tsx
+│   │   │   └── Newsletter.tsx
+│   │   │
+│   │   ├── admin/                 # Admin components
+│   │   │   ├── ProductsManager.tsx
+│   │   │   ├── CategoryManager.tsx
+│   │   │   ├── OrdersManager.tsx
+│   │   │   ├── ContactMessagesManager.tsx
+│   │   │   ├── InquiriesManager.tsx
+│   │   │   ├── OffersManager.tsx
+│   │   │   └── AdminProtectedRoute.tsx
+│   │   │
+│   │   ├── layout/                # Layout components
+│   │   │   ├── Header.tsx
+│   │   │   ├── Footer.tsx
+│   │   │   ├── Layout.tsx
+│   │   │   └── CartDrawer.tsx
+│   │   │
+│   │   └── ui/                    # shadcn/ui components
+│   │       ├── button.tsx
+│   │       ├── card.tsx
+│   │       ├── dialog.tsx
+│   │       ├── input.tsx
+│   │       ├── select.tsx
+│   │       ├── form.tsx
+│   │       └── ... (40+ UI components)
+│   │
+│   ├── contexts/               # State management
+│   │   ├── AuthContext.tsx     # Authentication state
+│   │   └── CartContext.tsx     # Shopping cart state
+│   │
+│   ├── hooks/                  # Custom React hooks
+│   │   ├── useProducts.ts      # Product data fetching
+│   │   ├── useCategories.ts    # Category management
+│   │   ├── useOrders.ts        # Order operations
+│   │   ├── useOffers.ts        # Discount offers
+│   │   ├── useContactMessages.ts # Contact form handling
+│   │   ├── useInquiries.ts     # Bulk order inquiries
+│   │   ├── useForms.ts         # Generic form utilities
+│   │   ├── useWeightVariants.ts # Product variants
+│   │   ├── use-mobile.tsx      # Mobile detection
+│   │   └── use-toast.ts        # Toast notifications
+│   │
+│   ├── lib/                    # Utility functions & configuration
+│   │   ├── supabase.ts         # Supabase client setup
+│   │   ├── razorpay.ts         # Razorpay payment integration
+│   │   ├── generateInvoicePDF.ts # PDF invoice generation
+│   │   ├── database.types.ts   # TypeScript types from Supabase
+│   │   └── utils.ts            # Common utility functions
+│   │
+│   ├── data/                   # Static/Mock data
+│   │   └── products.ts
+│   │
+│   ├── App.tsx                 # Main app component
+│   ├── main.tsx                # React entry point
+│   ├── index.css               # Global styles
+│   └── App.css
+│
+├── supabase/                   # Supabase configuration
+│   ├── config.toml             # Supabase project config
+│   ├── seed.sql                # Database seed data
+│   ├── migrations/             # Database migrations
+│   │   ├── 001_initial_schema.sql
+│   │   ├── 002_rls_policies.sql
+│   │   ├── 003_fix_order_number_race_condition.sql
+│   │   ├── 004_bulk_order_address.sql
+│   │   ├── 005_update_categories.sql
+│   │   ├── 006_weight_variants.sql
+│   │   └── 007_payment_integration.sql
+│   ├── functions/              # Edge functions
+│   │   ├── create-razorpay-order/
+│   │   └── verify-payment/
+│   └── snippets/               # SQL snippets
+│
+├── docs/                       # Documentation
+│   ├── BACKEND_DOCS.md
+│   ├── TECHNICAL_DOCS.md
+│   ├── PAYMENT_INTEGRATION_PLAN.md
+│   ├── NOTIFICATIONS_IMPLEMENTATION_PLAN.md
+│   ├── RAZORPAY_ISSUE_ANALYSIS.md
+│   ├── FIXES_APPLIED.md
+│   └── implementation_plan.md
+│
+├── public/                     # Static assets
+├── tailwind.config.ts          # Tailwind CSS configuration
+├── tsconfig.json               # TypeScript configuration
+├── vite.config.ts              # Vite build configuration
+├── package.json                # Project dependencies
+└── README.md                   # This file
+```
+
+## Key Modules & Features
+
+### Authentication Module (`src/contexts/AuthContext.tsx`)
+- User signup with email verification
+- Secure login/logout
+- Password reset functionality
+- Automatic session persistence
+- User profile management
+- Admin role detection
+
+### Cart Module (`src/contexts/CartContext.tsx`)
+- Local/cloud hybrid storage
+- Real-time cart synchronization
+- Quantity management
+- Discount offer application
+- Cart persistence across sessions
+
+### Product Management (`src/hooks/useProducts.ts`)
+- Fetch all products with filtering
+- Product search functionality
+- Category-based filtering
+- Weight variant management
+- Real-time inventory updates
+
+### Order Processing (`src/hooks/useOrders.ts`)
+- Order creation and tracking
+- Payment status management
+- Order history retrieval
+- Invoice PDF generation
+- Status update notifications
+
+### Payment Integration (`src/lib/razorpay.ts`)
+- Razorpay payment gateway integration
+- Multiple payment method support
+- Payment verification
+- Transaction logging
+- Error handling & retries
+
+### Admin Features
+- Product catalog management
+- Category management
+- Order management with payment tracking
+- Customer message management
+- Bulk order inquiry handling
+- Offer/coupon management
+
+## Database Schema
+
+The application uses PostgreSQL (via Supabase) with the following main tables:
+
+- **users** - User authentication and profiles
+- **profiles** - Extended user information (role, phone, address)
+- **products** - Product catalog with pricing
+- **product_variants** - Weight/size variants
+- **categories** - Product categories
+- **cart_items** - Shopping cart items
+- **orders** - Customer orders
+- **order_items** - Individual items in orders
+- **payments** - Payment transaction records
+- **offers** - Discount codes and offers
+- **contact_messages** - Customer inquiries
+- **bulk_order_inquiries** - Wholesale order requests
+- **customer_reviews** - Product reviews and ratings
+
+All tables implement Row Level Security (RLS) policies for data protection.
+
+## Security Features
+
+✅ **Authentication & Authorization**
+- JWT token-based authentication
+- Row Level Security (RLS) policies
+- Protected routes (Customer & Admin)
+- Session timeout protection
+
+✅ **Payment Security**
+- Razorpay integration with server-side verification
+- No sensitive card data stored locally
+- Transaction ID tracking
+- PCI compliance adherence
+
+✅ **Data Protection**
+- HTTPS-only communication
+- SQL injection prevention via parameterized queries
+- XSS protection via React's built-in escaping
+- CSRF token protection where applicable
+
+✅ **User Privacy**
+- Encrypted sensitive data
+- Secure password reset tokens (24-hour expiry)
+- User data isolation via RLS policies
+
+## Performance Optimizations
+
+- 🚀 **Code Splitting** - Route-based lazy loading
+- 📦 **Bundle Optimization** - Vite's native tree-shaking
+- 🎯 **Query Caching** - TanStack Query with stale-time management
+- 💾 **State Persistence** - Local storage for cart/auth
+- 🖼️ **Image Optimization** - Responsive images with proper sizing
+- 🔄 **Real-time Updates** - Supabase Realtime subscriptions
+
+## Deployment
+
+The application is optimized for deployment on platforms like:
+- **Vercel** - Recommended for optimal performance
+- **Netlify** - Full-stack deployment support
+- **AWS Amplify** - AWS ecosystem integration
+- **Docker** - Containerized deployment
+
+For deployment, ensure environment variables are properly configured in your hosting platform.
+
+## Documentation
+
+Comprehensive technical documentation is available in the `/docs` directory:
+- [Backend Documentation](./docs/BACKEND_DOCS.md) - Detailed backend architecture
+- [Technical Documentation](./docs/TECHNICAL_DOCS.md) - In-depth technical details
+- [Payment Integration Plan](./docs/PAYMENT_INTEGRATION_PLAN.md) - Razorpay integration guide
+- [Notifications Plan](./docs/NOTIFICATIONS_IMPLEMENTATION_PLAN.md) - Email/SMS/WhatsApp notifications
+- [Implementation Plan](./docs/implementation_plan.md) - Feature implementation roadmap
+
+## Contributing
+
+To contribute to this project:
+
+1. Create a new branch for your feature: `git checkout -b feature/your-feature-name`
+2. Make your changes and commit: `git commit -am 'Add feature'`
+3. Push to the branch: `git push origin feature/your-feature-name`
+4. Create a Pull Request with a detailed description
+
+## Troubleshooting
+
+### Common Issues
+
+**Issue**: Supabase connection errors
+- **Solution**: Verify `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in `.env.local`
+
+**Issue**: Payment integration not working
+- **Solution**: Check Razorpay keys and ensure webhook URL is properly configured
+
+**Issue**: Database migrations not applying
+- **Solution**: Run `supabase migration up` and check Supabase dashboard for errors
+
+**Issue**: Cart not syncing
+- **Solution**: Verify user is authenticated and Supabase connection is active
+
+For more help, check the documentation files in `/docs` or review the existing GitHub issues.
 
 ## License
 
 [Add License Information Here]
+
+## Support & Contact
+
+For support, questions, or bug reports:
+- Create an issue on GitHub
+- Contact the development team
+- Check documentation in `/docs` directory
+
+---
+
+**Last Updated**: January 2026  
+**Version**: 1.0.0  
+**Status**: Production Ready
