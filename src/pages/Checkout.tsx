@@ -127,13 +127,19 @@ const Checkout = () => {
         setIsProcessingPayment(true);
 
         try {
+          console.log('[Checkout] Initiating online payment for order:', order.id);
+          
           // Create Razorpay order
+          console.log('[Checkout] Creating Razorpay order...');
           const razorpayOrder = await createRazorpayOrder.mutateAsync({
             orderId: order.id,
             amount: orderTotal,
           });
+          
+          console.log('[Checkout] Razorpay order created:', razorpayOrder.id);
 
           // Open Razorpay checkout
+          console.log('[Checkout] Opening Razorpay checkout modal...');
           await initiateRazorpayPayment({
             orderId: razorpayOrder.id,
             amount: razorpayOrder.amount,
@@ -151,6 +157,7 @@ const Checkout = () => {
             },
             onSuccess: async (response) => {
               try {
+                console.log('[Checkout] Payment success, verifying signature...');
                 // Verify payment on server
                 await verifyPayment.mutateAsync({
                   orderId: order.id,
@@ -159,6 +166,7 @@ const Checkout = () => {
                   razorpay_signature: response.razorpay_signature,
                 });
 
+                console.log('[Checkout] Payment verified successfully');
                 setOrderPlaced(true);
                 setOrderNumber(order.order_number);
                 clearCart();
@@ -169,6 +177,7 @@ const Checkout = () => {
                   description: `Order ${order.order_number} confirmed. Thank you for your purchase!`,
                 });
               } catch (verifyError) {
+                console.error('[Checkout] Payment verification failed:', verifyError);
                 toast({
                   title: 'Payment verification failed',
                   description: 'Please contact support with your order number.',
@@ -179,6 +188,7 @@ const Checkout = () => {
               }
             },
             onError: async (error) => {
+              console.error('[Checkout] Payment error occurred:', error);
               setIsProcessingPayment(false);
               
               // Update order payment status to failed
@@ -195,6 +205,7 @@ const Checkout = () => {
               });
             },
             onDismiss: () => {
+              console.log('[Checkout] Payment modal dismissed by user');
               setIsProcessingPayment(false);
               toast({
                 title: 'Payment cancelled',
@@ -203,15 +214,17 @@ const Checkout = () => {
             },
           });
         } catch (razorpayError) {
+          console.error('[Checkout] Razorpay payment initialization error:', razorpayError);
           setIsProcessingPayment(false);
           toast({
             title: 'Payment initialization failed',
-            description: 'Unable to start payment. Please try again.',
+            description: razorpayError instanceof Error ? razorpayError.message : 'Unable to start payment. Please try again.',
             variant: 'destructive',
           });
         }
       } else {
         // COD flow - order is complete
+        console.log('[Checkout] COD payment selected, order complete');
         setOrderPlaced(true);
         setOrderNumber(order.order_number);
         clearCart();
@@ -223,9 +236,10 @@ const Checkout = () => {
         });
       }
     } catch (error) {
+      console.error('[Checkout] Order submission error:', error);
       toast({
         title: 'Order failed',
-        description: 'There was an error processing your order. Please try again.',
+        description: error instanceof Error ? error.message : 'There was an error processing your order. Please try again.',
         variant: 'destructive',
       });
     }
