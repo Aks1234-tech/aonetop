@@ -124,7 +124,7 @@ export const initiateRazorpayPayment = async (
     throw new Error('Failed to load Razorpay SDK. Please check your internet connection.');
   }
 
-  const razorpayKeyId = import.meta.env.VITE_RAZORPAY_KEY_ID;
+  const razorpayKeyId = import.meta.env.RAZORPAY_KEY_ID;
 
   if (!razorpayKeyId) {
     throw new Error('Razorpay key not configured. Please contact support.');
