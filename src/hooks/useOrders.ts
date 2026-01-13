@@ -258,24 +258,50 @@ export function useCreateRazorpayOrder() {
             const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
             const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-            const response = await fetch(
-                `${supabaseUrl}/functions/v1/create-razorpay-order`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${supabaseAnonKey}`,
-                    },
-                    body: JSON.stringify({ orderId, amount }),
+            try {
+                console.log('[Order] Creating Razorpay order with amount:', amount, 'orderId:', orderId);
+                
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+
+                const response = await fetch(
+                    `${supabaseUrl}/functions/v1/create-razorpay-order`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${supabaseAnonKey}`,
+                        },
+                        body: JSON.stringify({ orderId, amount }),
+                        signal: controller.signal,
+                    }
+                );
+
+                clearTimeout(timeoutId);
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    const errorMessage = errorData.error || 'Failed to create payment order';
+                    console.error('[Order] Edge Function error:', {
+                        status: response.status,
+                        statusText: response.statusText,
+                        message: errorMessage,
+                        fullError: errorData,
+                    });
+                    throw new Error(errorMessage);
                 }
-            );
 
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.error || 'Failed to create payment order');
+                const data = await response.json();
+                console.log('[Order] Razorpay order created successfully:', data.id);
+                return data;
+            } catch (error) {
+                if (error instanceof Error && error.name === 'AbortError') {
+                    console.error('[Order] Request timeout: Edge Function took too long to respond');
+                    throw new Error('Payment service timeout. Please check your internet connection and try again.');
+                }
+                console.error('[Order] Unexpected error:', error);
+                throw error;
             }
-
-            return response.json();
         },
     });
 }
