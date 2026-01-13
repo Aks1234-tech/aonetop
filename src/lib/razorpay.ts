@@ -140,6 +140,7 @@ export const initiateRazorpayPayment = async (
 
     const razorpayKeyId = import.meta.env.VITE_RAZORPAY_KEY_ID;
     console.log('[Razorpay] Key ID present:', !!razorpayKeyId);
+    console.log('[Razorpay] Key ID value:', razorpayKeyId);
     console.log('[Razorpay] Key ID length:', razorpayKeyId?.length);
 
     if (!razorpayKeyId) {
@@ -152,7 +153,7 @@ export const initiateRazorpayPayment = async (
       throw new Error('Invalid Razorpay key format. Key should start with rzp_test_ or rzp_live_');
     }
 
-    if (razorpayKeyId.length < 35) {
+    if (razorpayKeyId.length < 23) {
       console.error('[Razorpay] Key appears truncated. Expected 35+ chars, got:', razorpayKeyId.length);
       throw new Error('Razorpay key appears to be incomplete. Please verify your API key configuration.');
     }
