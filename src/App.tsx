@@ -21,6 +21,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
 import OrderHistory from "./pages/OrderHistory";
+import OrderDetails from "./pages/OrderDetails";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -75,6 +76,14 @@ const App = () => (
                   element={
                     <ProtectedRoute>
                       <OrderHistory />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/order/:orderId"
+                  element={
+                    <ProtectedRoute>
+                      <OrderDetails />
                     </ProtectedRoute>
                   }
                 />
