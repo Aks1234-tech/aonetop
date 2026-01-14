@@ -225,9 +225,11 @@ const OrderHistory = () => {
                                             <FileDown className="h-4 w-4" />
                                             Invoice
                                         </Button>
-                                        <Button variant="ghost" size="sm">
-                                            View Details
-                                            <ChevronRight className="ml-1 h-4 w-4" />
+                                        <Button variant="ghost" size="sm" asChild>
+                                            <Link to={`/order/${order.id}`}>
+                                                View Details
+                                                <ChevronRight className="ml-1 h-4 w-4" />
+                                            </Link>
                                         </Button>
                                     </div>
                                 </div>
