@@ -226,7 +226,7 @@ const Profile = () => {
                     </Link>
                   </div>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-x-0 sm:space-x-4 space-y-4 sm:space-y-0">
                     {orders.slice(0, 5).map((order) => (
                       <Link key={order.id} to={`/order/${order.id}`}>
                         <div className="flex items-center justify-between p-4 border border-border rounded-xl hover:border-primary/30 hover:bg-muted/50 transition-all duration-300 group cursor-pointer">
