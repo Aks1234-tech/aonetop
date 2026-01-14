@@ -135,7 +135,7 @@ const OrderHistory = () => {
                         </Button>
                     </div>
                 ) : (
-                    <div className="space-y-4">
+                    <div className="space-x-0 sm:space-x-4 sm:grid sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-8">
                         {orders.map((order) => (
                             <Link key={order.id} to={`/order/${order.id}`}>
                                 <div className="bg-card rounded-xl border border-border hover:border-primary/30 hover:shadow-elevated transition-all duration-300 overflow-hidden group cursor-pointer">
@@ -247,9 +247,9 @@ const OrderHistory = () => {
                                                 <FileDown className="h-4 w-4" />
                                                 <span className="hidden sm:inline">Invoice</span>
                                             </button>
-                                            <div className="text-primary group-hover:text-primary/80 transition-colors">
+                                            {/* <div className="text-primary group-hover:text-primary/80 transition-colors">
                                                 <ChevronRight className="h-5 w-5" />
-                                            </div>
+                                            </div> */}
                                         </div>
                                     </div>
                                 </div>
