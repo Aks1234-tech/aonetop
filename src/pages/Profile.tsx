@@ -226,32 +226,46 @@ const Profile = () => {
                     </Link>
                   </div>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {orders.slice(0, 5).map((order) => (
                       <Link key={order.id} to={`/order/${order.id}`}>
-                        <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 hover:border-primary/50 transition-colors cursor-pointer">
-                          <div>
-                            <p className="font-medium">
-                              Order #{order.order_number || order.id.slice(0, 8)}
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              {new Date(order.created_at).toLocaleDateString('en-IN')}
+                        <div className="flex items-center justify-between p-4 border border-border rounded-xl hover:border-primary/30 hover:bg-muted/50 transition-all duration-300 group cursor-pointer">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-3 mb-1">
+                              <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors text-sm sm:text-base">
+                                {order.order_number}
+                              </h4>
+                              <span
+                                className={`px-2 py-0.5 text-xs font-semibold rounded-full capitalize flex-shrink-0 ${order.status === 'delivered'
+                                  ? 'bg-green-100 text-green-800'
+                                  : order.status === 'shipped'
+                                    ? 'bg-blue-100 text-blue-800'
+                                    : order.status === 'cancelled'
+                                      ? 'bg-red-100 text-red-800'
+                                      : 'bg-yellow-100 text-yellow-800'
+                                  }`}
+                              >
+                                {order.status}
+                              </span>
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(order.created_at).toLocaleDateString('en-IN', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric'
+                              })}
                             </p>
                           </div>
-                          <div className="text-right">
-                            <p className="font-medium">{formatPrice(order.total)}</p>
-                            <span
-                              className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${order.status === 'delivered'
-                                ? 'bg-green-100 text-green-800'
-                                : order.status === 'shipped'
-                                  ? 'bg-blue-100 text-blue-800'
-                                  : order.status === 'cancelled'
-                                    ? 'bg-red-100 text-red-800'
-                                    : 'bg-yellow-100 text-yellow-800'
-                                }`}
-                            >
-                              {order.status}
-                            </span>
+                          <div className="text-right flex-shrink-0 ml-4">
+                            <p className="font-semibold text-primary text-sm sm:text-base">{formatPrice(order.total)}</p>
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                              {order.items?.length || 0} item(s)
+                            </p>
+                          </div>
+                          <div className="ml-2 text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
                           </div>
                         </div>
                       </Link>
