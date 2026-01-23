@@ -157,3 +157,145 @@ export function useDeleteOffer() {
         },
     });
 }
+
+// Check per-user offer usage
+export async function checkPerUserOfferUsage(offerId: string, userId: string, perUserLimit?: number | null): Promise<boolean> {
+    if (!perUserLimit) {
+        // No per-user limit set
+        return true;
+    }
+
+    const { data, error } = await supabase
+        .from('offer_usage')
+        .select('id')
+        .eq('offer_id', offerId)
+        .eq('user_id', userId);
+
+    if (error) {
+        console.error('Error checking offer usage:', error);
+        return false;
+    }
+
+    const usageCount = (data ?? []).length;
+    return usageCount < perUserLimit;
+}
+
+// Record offer usage for a user
+export async function recordOfferUsage(offerId: string, userId: string, orderId?: string): Promise<void> {
+    const { error } = await supabase
+        .from('offer_usage')
+        .insert({
+            offer_id: offerId,
+            user_id: userId,
+            order_id: orderId || null,
+        } as any);
+
+    if (error) {
+        console.error('Error recording offer usage:', error);
+        throw error;
+    }
+}
+
+// Check if cart items match offer's product/category restrictions
+export interface CartItem {
+    id: string;
+    category?: string;
+}
+
+export async function validateOfferAppliesToCart(
+    offerId: string,
+    appliesTo: string,
+    cartItems: CartItem[]
+): Promise<boolean> {
+    if (appliesTo === 'all') {
+        return true;
+    }
+
+    // Fetch the offer's product/category restrictions
+    const { data: offerProducts, error } = await supabase
+        .from('offer_products')
+        .select('product_id, category')
+        .eq('offer_id', offerId);
+
+    if (error) {
+        console.error('Error fetching offer products:', error);
+        return false;
+    }
+
+    if (!offerProducts || offerProducts.length === 0) {
+        // No restrictions defined - allow all
+        return true;
+    }
+
+    // Get the list of product IDs and categories from the offer
+    const offerProductIds = new Set(
+        (offerProducts as any[])
+            .filter((op: any) => op.product_id)
+            .map((op: any) => op.product_id)
+    );
+
+    const offerCategories = new Set(
+        (offerProducts as any[])
+            .filter((op: any) => op.category)
+            .map((op: any) => op.category)
+    );
+
+    // Check if at least one cart item matches the offer restrictions
+    for (const item of cartItems) {
+        if (appliesTo === 'products' && offerProductIds.has(item.id)) {
+            return true;
+        }
+        if (appliesTo === 'category' && item.category && offerCategories.has(item.category)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+// Get qualifying items from cart for an offer
+export async function getOfferQualifyingItems(
+    offerId: string,
+    appliesTo: string,
+    cartItems: CartItem[]
+): Promise<CartItem[]> {
+    if (appliesTo === 'all') {
+        return cartItems;
+    }
+
+    const { data: offerProducts, error } = await supabase
+        .from('offer_products')
+        .select('product_id, category')
+        .eq('offer_id', offerId);
+
+    if (error) {
+        console.error('Error fetching offer products:', error);
+        return cartItems;
+    }
+
+    if (!offerProducts || offerProducts.length === 0) {
+        return cartItems;
+    }
+
+    const offerProductIds = new Set(
+        (offerProducts as any[])
+            .filter((op: any) => op.product_id)
+            .map((op: any) => op.product_id)
+    );
+
+    const offerCategories = new Set(
+        (offerProducts as any[])
+            .filter((op: any) => op.category)
+            .map((op: any) => op.category)
+    );
+
+    return cartItems.filter((item) => {
+        if (appliesTo === 'products') {
+            return offerProductIds.has(item.id);
+        }
+        if (appliesTo === 'category') {
+            return item.category && offerCategories.has(item.category);
+        }
+        return true;
+    });
+}
