@@ -49,6 +49,7 @@ export function OffersManager() {
         value: '',
         min_order_value: '',
         usage_limit: '',
+        per_user_limit: '',
         starts_at: '',
         ends_at: '',
         is_active: true,
@@ -62,6 +63,7 @@ export function OffersManager() {
             value: '',
             min_order_value: '',
             usage_limit: '',
+            per_user_limit: '',
             starts_at: '',
             ends_at: '',
             is_active: true,
@@ -79,6 +81,7 @@ export function OffersManager() {
                 value: offer.value?.toString() || '',
                 min_order_value: offer.min_order_value ? (offer.min_order_value / 100).toString() : '',
                 usage_limit: offer.usage_limit?.toString() || '',
+                per_user_limit: (offer as any).per_user_limit?.toString() || '',
                 starts_at: offer.starts_at ? new Date(offer.starts_at).toISOString().split('T')[0] : '',
                 ends_at: offer.ends_at ? new Date(offer.ends_at).toISOString().split('T')[0] : '',
                 is_active: offer.is_active,
@@ -105,6 +108,7 @@ export function OffersManager() {
             value: parseFloat(formData.value),
             min_order_value: formData.min_order_value ? parseFloat(formData.min_order_value) * 100 : null, // Convert to paise
             usage_limit: formData.usage_limit ? parseInt(formData.usage_limit) : null,
+            per_user_limit: formData.per_user_limit ? parseInt(formData.per_user_limit) : null,
             starts_at: formData.starts_at ? new Date(formData.starts_at).toISOString() : null,
             ends_at: formData.ends_at ? new Date(formData.ends_at).toISOString() : null,
             is_active: formData.is_active,
@@ -288,7 +292,7 @@ export function OffersManager() {
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="usage_limit">Usage Limit</Label>
+                                <Label htmlFor="usage_limit">Total Usage Limit</Label>
                                 <Input
                                     id="usage_limit"
                                     type="number"
@@ -297,6 +301,18 @@ export function OffersManager() {
                                     placeholder="100"
                                 />
                             </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="per_user_limit">Per-User Limit (optional)</Label>
+                            <Input
+                                id="per_user_limit"
+                                type="number"
+                                value={formData.per_user_limit}
+                                onChange={(e) => setFormData({ ...formData, per_user_limit: e.target.value })}
+                                placeholder="e.g. 1 - allows each user to use offer once"
+                            />
+                            <p className="text-xs text-muted-foreground">Leave empty for unlimited per-user usage</p>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
