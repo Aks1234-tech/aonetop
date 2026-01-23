@@ -160,7 +160,7 @@ export function generateInvoicePDF(order: Order): void {
     yPos = 50;
 
     // ============================================
-    // 2. INVOICE DETAILS & PAYMENT INFO
+    // 2. INVOICE DETAILS & SHIPPING ADDRESS (Two Column)
     // ============================================
 
     yPos = drawSectionTitle(doc, 'INVOICE DETAILS', yPos, margin, 70);
@@ -168,7 +168,7 @@ export function generateInvoicePDF(order: Order): void {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(9);
 
-    // Left column
+    // Left column - Invoice Details
     let col1X = margin;
     let col1Y = yPos;
 
@@ -203,69 +203,43 @@ export function generateInvoicePDF(order: Order): void {
     const statusText = order.status.charAt(0).toUpperCase() + order.status.slice(1);
     doc.text(statusText, col1X + 35, col1Y);
 
-    // Right column - Payment gateway info
+    // Right column - Shipping Address
     const col2X = pageWidth / 2 + 10;
     let col2Y = yPos;
 
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(...colors.mutedText);
-    doc.text('Payment Method:', col2X, col2Y);
-    doc.setTextColor(...colors.darkText);
-    doc.setFont('helvetica', 'bold');
-    const paymentMethod =
-        order.payment_gateway === 'razorpay' ? 'Online (Razorpay)' : 'Cash on Delivery';
-    doc.text(paymentMethod, col2X + 40, col2Y);
-
-    col2Y += 6;
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(...colors.mutedText);
-    doc.text('Payment Status:', col2X, col2Y);
-    doc.setTextColor(...colors.darkText);
-    doc.setFont('helvetica', 'bold');
-    const paymentStatus = (order.payment_status || 'pending').toUpperCase();
-    const paymentStatusColor =
-        paymentStatus === 'COMPLETED' ? colors.success : 
-        paymentStatus === 'FAILED' ? colors.error : 
-        colors.warning;
-    doc.setTextColor(...paymentStatusColor);
-    doc.text(paymentStatus, col2X + 40, col2Y);
-
-    yPos = Math.max(col1Y, col2Y) + 12;
-
-    // ============================================
-    // 3. CUSTOMER INFORMATION SECTION
-    // ============================================
-
-    yPos = drawSectionTitle(doc, 'SHIPPING ADDRESS', yPos, margin, 70);
-
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(9);
-    doc.setTextColor(...colors.darkText);
-
-    doc.text(order.shipping_name || 'N/A', margin, yPos);
-
-    yPos += 5;
     doc.setFontSize(8);
-    doc.setTextColor(...colors.mutedText);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...colors.darkText);
+    doc.text('SHIPPING ADDRESS', col2X, col2Y);
 
-    const addressLines = [
+    col2Y += 5;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(...colors.darkText);
+
+    doc.text(order.shipping_name || 'N/A', col2X, col2Y);
+
+    col2Y += 4;
+    doc.setTextColor(...colors.mutedText);
+    doc.setFontSize(7);
+
+    const shippingLines = [
         order.shipping_address,
-        `${order.shipping_city}, ${order.shipping_state}`,
-        `PIN: ${order.shipping_pincode}`,
-        `Phone: ${order.shipping_phone}`,
-        `Email: ${order.shipping_email}`,
+        order.shipping_city + ', ' + order.shipping_state,
+        'PIN: ' + order.shipping_pincode,
+        'Phone: ' + order.shipping_phone,
+        'Email: ' + order.shipping_email,
     ].filter((line) => line && line !== 'undefined');
 
-    addressLines.forEach((line) => {
-        if (yPos > pageHeight - 60) {
-            doc.addPage();
-            yPos = margin;
-        }
-        doc.text(line, margin, yPos);
-        yPos += 4;
+    const rightColWidth = pageWidth - col2X - margin;
+    shippingLines.forEach((line) => {
+        doc.text(line, col2X, col2Y, { maxWidth: rightColWidth });
+        col2Y += 4;
     });
 
-    yPos += 4;
+    yPos = Math.max(col1Y, col2Y) + 8;
+
+
 
     // ============================================
     // 4. ORDER ITEMS TABLE
@@ -379,6 +353,14 @@ export function generateInvoicePDF(order: Order): void {
     doc.setTextColor(...colors.darkText);
     doc.setFont('helvetica', 'bold');
     doc.text(formatPrice(sgstAmount), valueCol, yPos, { align: 'right' });
+    
+    yPos += 6;
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...colors.mutedText);
+    doc.text('Total GST (18%):', labelCol, yPos);
+    doc.setTextColor(...colors.darkText);
+    doc.setFont('helvetica', 'bold');
+    doc.text(formatPrice(cgstAmount + sgstAmount), valueCol, yPos, { align: 'right' });
 
     yPos += 8;
 
@@ -443,16 +425,18 @@ export function generateInvoicePDF(order: Order): void {
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(255, 255, 255);
-    doc.text('GRAND TOTAL: ', labelCol, yPos - 2);
-    doc.text(formatPrice(order.total), valueCol, yPos, { align: 'right' });
+    const grandTotalLabel = 'GRAND TOTAL';
+    const grandTotalAmount = formatPrice(order.total);
+    doc.text(grandTotalLabel + ':', margin + 5, yPos);
+    doc.text(grandTotalAmount, valueCol, yPos, { align: 'right' });
 
-    yPos += 20;
+    yPos += 22;
 
     // ============================================
     // 8. PAYMENT DETAILS SECTION
     // ============================================
 
-    yPos = checkPageBreak(doc, yPos, 35, pageHeight, margin);
+    yPos = checkPageBreak(doc, yPos, 50, pageHeight, margin);
 
     yPos = drawSectionTitle(doc, 'PAYMENT DETAILS', yPos, margin, 60);
 
@@ -462,16 +446,35 @@ export function generateInvoicePDF(order: Order): void {
     const paymentLabelCol = margin + 5;
     const paymentValueCol = margin + 50;
 
-    if (order.payment_gateway === 'razorpay') {
-        doc.setTextColor(...colors.mutedText);
-        doc.text('Payment Gateway:', paymentLabelCol, yPos);
-        doc.setTextColor(...colors.darkText);
-        doc.setFont('helvetica', 'bold');
-        doc.text('Razorpay', paymentValueCol, yPos);
+    // Payment Method
+    doc.setTextColor(...colors.mutedText);
+    doc.text('Payment Method:', paymentLabelCol, yPos);
+    doc.setTextColor(...colors.darkText);
+    doc.setFont('helvetica', 'bold');
+    const paymentMethodText =
+        order.payment_gateway === 'razorpay' ? 'Online (Razorpay)' : 'Cash on Delivery';
+    doc.text(paymentMethodText, paymentValueCol, yPos);
 
-        yPos += 6;
+    yPos += 6;
+
+    // Payment Status
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...colors.mutedText);
+    doc.text('Payment Status:', paymentLabelCol, yPos);
+    const paymentStatusText = (order.payment_status || 'pending').toUpperCase();
+    const paymentStatusColorVal =
+        paymentStatusText === 'COMPLETED' ? colors.success : 
+        paymentStatusText === 'FAILED' ? colors.error : 
+        colors.warning;
+    doc.setTextColor(...paymentStatusColorVal);
+    doc.setFont('helvetica', 'bold');
+    doc.text(paymentStatusText, paymentValueCol, yPos);
+
+    yPos += 8;
+
+    if (order.payment_gateway === 'razorpay') {
+        doc.setFont('helvetica', 'normal');
         if (order.razorpay_order_id) {
-            doc.setFont('helvetica', 'normal');
             doc.setTextColor(...colors.mutedText);
             doc.text('Order ID:', paymentLabelCol, yPos);
             doc.setTextColor(...colors.darkText);
@@ -501,21 +504,16 @@ export function generateInvoicePDF(order: Order): void {
             doc.setTextColor(...colors.darkText);
             doc.setFont('helvetica', 'bold');
             doc.text(formatDate(order.paid_at), paymentValueCol, yPos);
+            yPos += 6;
         }
     } else {
-        doc.setTextColor(...colors.mutedText);
-        doc.text('Payment Method:', paymentLabelCol, yPos);
-        doc.setTextColor(...colors.darkText);
-        doc.setFont('helvetica', 'bold');
-        doc.text('Cash on Delivery', paymentValueCol, yPos);
-
-        yPos += 6;
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(...colors.warning);
-        doc.text('⚠ Payment pending at delivery', margin, yPos);
+        doc.text('⚠ Payment pending at delivery', paymentLabelCol, yPos);
+        yPos += 6;
     }
 
-    yPos += 12;
+    yPos += 8;
 
     // ============================================
     // 9. FOOTER SECTION
