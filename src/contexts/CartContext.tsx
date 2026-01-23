@@ -2,6 +2,7 @@ import React, { createContext, useContext, useReducer, useEffect, ReactNode, use
 import { useAuth } from './AuthContext';
 import { supabase, Tables } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
+import { checkPerUserOfferUsage, validateOfferAppliesToCart } from '@/hooks/useOffers';
 
 export interface CartItem {
   id: string; // This corresponds to product_id
@@ -529,10 +530,23 @@ export function CartProvider({ children }: { children: ReactNode }) {
         return false;
       }
 
-      // Validate usage limit
+      // Validate total usage limit
       if (offer.usage_limit && (offer.used_count || 0) >= offer.usage_limit) {
         toast({ title: 'Offer usage limit reached', variant: 'destructive' });
         return false;
+      }
+
+      // NEW: Validate per-user usage limit
+      if (user && offer.per_user_limit) {
+        const hasPerUserUsageAvailable = await checkPerUserOfferUsage(offer.id, user.id, offer.per_user_limit);
+        if (!hasPerUserUsageAvailable) {
+          toast({
+            title: 'User limit reached',
+            description: 'You have already used this offer the maximum number of times.',
+            variant: 'destructive'
+          });
+          return false;
+        }
       }
 
       // Validate minimum order: compare paise to paise
@@ -540,13 +554,47 @@ export function CartProvider({ children }: { children: ReactNode }) {
         const cartPaise = Math.round(cartTotal * 100);
         if (cartPaise < offer.min_order_value) {
           const needed = (offer.min_order_value - cartPaise) / 100;
+          toast({
+            title: 'Minimum order requirement not met',
+            description: `Add ₹${needed.toFixed(2)} more to apply this offer.`,
+            variant: 'destructive'
+          });
+          return false;
+        }
+      }
+
+      // NEW: Validate product/category restrictions
+      // Fetch product details for items in cart to get their categories
+      const productIds = state.items.map(item => item.id);
+      
+      let cartItemsForValidation = state.items.map(item => ({
+        id: item.id,
+        category: undefined
+      }));
+
+      if (productIds.length > 0) {
+        const { data: productDetails } = await supabase
+          .from('products')
+          .select('id, category')
+          .in('id', productIds);
+
+        if (productDetails) {
+          const productMap = new Map(productDetails.map((p: any) => [p.id, p.category]));
+          cartItemsForValidation = state.items.map(item => ({
+            id: item.id,
+            category: productMap.get(item.id)
+          }));
+        }
+      }
+
+      const isApplicable = await validateOfferAppliesToCart(offer.id, offer.applies_to, cartItemsForValidation);
+      if (!isApplicable) {
         toast({
-          title: 'Minimum order requirement not met',
-          description: `Add ₹${needed.toFixed(2)} more to apply this offer.`,
+          title: 'Offer not applicable',
+          description: 'This offer does not apply to items in your cart.',
           variant: 'destructive'
         });
         return false;
-        }
       }
 
       dispatch({ type: 'SET_OFFER', payload: offer });
@@ -558,6 +606,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     } catch (err) {
       console.error('Error applying offer:', err);
+      toast({
+        title: 'Error',
+        description: 'Failed to apply offer. Please try again.',
+        variant: 'destructive'
+      });
       return false;
     }
   };
