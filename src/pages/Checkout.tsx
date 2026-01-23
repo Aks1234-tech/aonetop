@@ -11,7 +11,7 @@ import { initiateRazorpayPayment, formatRazorpayError, PaymentMethodType } from 
 import { cn } from '@/lib/utils';
 
 const Checkout = () => {
-  const { items, cartTotal, clearCart, cartCount, appliedOffer, discount, finalTotal, removeOffer } = useCart();
+  const { items, cartTotal, clearCart, cartCount, appliedOffer, discount, discountPercentage, finalTotal, removeOffer } = useCart();
   const navigate = useNavigate();
   const { toast } = useToast();
   const createOrder = useCreateOrder();
@@ -562,9 +562,15 @@ const Checkout = () => {
                   </div>
 
                   {discount > 0 && (
-                    <div className="flex justify-between text-green-600 font-medium">
-                      <span>Discount {appliedOffer ? `(${appliedOffer.code})` : ''}</span>
-                      <span>-{formatPrice(discount)}</span>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-green-600 font-medium">
+                        <span>Discount {appliedOffer ? `(${appliedOffer.code})` : ''}</span>
+                        <span>-{formatPrice(discount)}</span>
+                      </div>
+                      <div className="flex justify-between text-sm text-green-600 bg-green-50 p-2 rounded">
+                        <span>You saved</span>
+                        <span className="font-semibold">{discountPercentage}% off</span>
+                      </div>
                     </div>
                   )}
 

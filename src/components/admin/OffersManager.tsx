@@ -85,7 +85,9 @@ export function OffersManager() {
                 name: offer.name,
                 code: offer.code || '',
                 type: offer.type,
-                value: offer.value?.toString() || '',
+                value: offer.type === 'fixed' && offer.value
+                    ? (offer.value / 100).toString()  // Convert paise back to ₹ for fixed discounts
+                    : offer.value?.toString() || '',  // Keep as-is for percentage
                 min_order_value: offer.min_order_value ? (offer.min_order_value / 100).toString() : '',
                 usage_limit: offer.usage_limit?.toString() || '',
                 per_user_limit: (offer as any).per_user_limit?.toString() || '',
@@ -123,7 +125,9 @@ export function OffersManager() {
             name: formData.name,
             code: formData.code.toUpperCase() || null,
             type: formData.type,
-            value: parseFloat(formData.value),
+            value: formData.type === 'fixed' && formData.value 
+                ? Math.round(parseFloat(formData.value) * 100)  // Convert ₹ to paise for fixed offers
+                : formData.value ? parseInt(formData.value) : null,  // Keep as-is for percentage
             min_order_value: formData.min_order_value ? parseFloat(formData.min_order_value) * 100 : null,
             usage_limit: formData.usage_limit ? parseInt(formData.usage_limit) : null,
             per_user_limit: formData.per_user_limit ? parseInt(formData.per_user_limit) : null,
@@ -232,7 +236,7 @@ export function OffersManager() {
                                     </td>
                                     <td className="py-3 px-4 text-sm capitalize">{offer.type.replace('_', ' ')}</td>
                                     <td className="py-3 px-4 font-medium">
-                                        {offer.type === 'percentage' ? `${offer.value}%` : formatPrice(offer.value || 0)}
+                                        {offer.type === 'percentage' ? `${offer.value}%` : offer.type === 'fixed' ? formatPrice((offer.value || 0) / 100) : '-'}
                                     </td>
                                     <td className="py-3 px-4 text-sm text-muted-foreground">
                                         {offer.min_order_value ? formatPrice(offer.min_order_value / 100) : '-'}

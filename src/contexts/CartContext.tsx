@@ -53,6 +53,7 @@ interface CartContextType {
   applyOffer: (code: string) => Promise<boolean>;
   removeOffer: () => void;
   discount: number;
+  discountPercentage: number;
   finalTotal: number;
 }
 
@@ -154,7 +155,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   let discount = 0;
   if (state.appliedOffer) {
     // Check if offer criteria still met
-    const meetsMinOrder = !state.appliedOffer.min_order_value || cartTotal >= state.appliedOffer.min_order_value;
+    const meetsMinOrder = !state.appliedOffer.min_order_value || cartTotal >= (state.appliedOffer.min_order_value / 100);
 
     if (meetsMinOrder) {
       if (state.appliedOffer.type === 'percentage') {
@@ -163,7 +164,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
           ? Math.min(calculatedDiscount, state.appliedOffer.max_discount)
           : calculatedDiscount;
       } else if (state.appliedOffer.type === 'fixed') {
-        discount = state.appliedOffer.value || 0;
+        // Fixed discount is stored in paise, convert to rupees
+        discount = (state.appliedOffer.value || 0) / 100;
       }
       // 'free_shipping' handled in Checkout or logic below? 
       // Usually free shipping doesn't affect item subtotal, but we expose 'discount' as item discount.
@@ -172,6 +174,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Ensure discount doesn't exceed total
   discount = Math.min(discount, cartTotal);
+
+  // Calculate discount percentage
+  const discountPercentage = cartTotal > 0 ? Math.round((discount / cartTotal) * 100) : 0;
 
   const finalTotal = Math.max(0, cartTotal - discount);
 
@@ -519,6 +524,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
         return false;
       }
 
+      // Check if offer has a discount value or is free_shipping
+      if (!offer.value && offer.type !== 'free_shipping') {
+        toast({
+          title: 'Invalid offer',
+          description: 'This offer does not have a valid discount value.',
+          variant: 'destructive'
+        });
+        return false;
+      }
+
       // Validate dates
       const now = new Date();
       if (offer.starts_at && new Date(offer.starts_at) > now) {
@@ -638,6 +653,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         applyOffer,
         removeOffer,
         discount,
+        discountPercentage,
         finalTotal
       }}
     >

@@ -17,6 +17,7 @@ const Cart = () => {
     removeOffer,
     appliedOffer,
     discount,
+    discountPercentage,
     finalTotal
   } = useCart();
 
@@ -114,7 +115,7 @@ const Cart = () => {
                         variant="ghost"
                         size="icon"
                         className="h-9 w-9"
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        onClick={() => updateQuantity(item.id, item.weightVariantId, item.quantity - 1)}
                       >
                         <Minus className="h-4 w-4" />
                       </Button>
@@ -123,7 +124,7 @@ const Cart = () => {
                         variant="ghost"
                         size="icon"
                         className="h-9 w-9"
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        onClick={() => updateQuantity(item.id, item.weightVariantId, item.quantity + 1)}
                       >
                         <Plus className="h-4 w-4" />
                       </Button>
@@ -178,10 +179,18 @@ const Cart = () => {
                     </Button>
                   </div>
                 ) : (
-                  <div className="flex justify-between items-center text-green-600 bg-green-50 p-2 rounded-lg">
+                  <div className="flex justify-between items-center text-green-600 bg-green-50 p-3 rounded-lg">
                     <div className="flex items-center gap-2">
                       <Tag className="h-4 w-4" />
-                      <span className="text-sm font-medium">{appliedOffer.code} applied</span>
+                      <div>
+                        <span className="text-sm font-medium">{appliedOffer.code} applied</span>
+                        {discount > 0 && (
+                          <p className="text-xs text-green-600 mt-0.5">Save {formatPrice(discount)} ({discountPercentage}%)</p>
+                        )}
+                        {appliedOffer.type === 'free_shipping' && (
+                          <p className="text-xs text-green-600 mt-0.5">Free shipping saved ₹{shippingCost}</p>
+                        )}
+                      </div>
                     </div>
                     <Button
                       variant="ghost"
@@ -194,10 +203,26 @@ const Cart = () => {
                   </div>
                 )}
 
-                {discount > 0 && (
-                  <div className="flex justify-between text-green-600 font-medium">
-                    <span>Discount</span>
-                    <span>-{formatPrice(discount)}</span>
+                {appliedOffer && (
+                  <div className="space-y-2">
+                    {discount > 0 && (
+                      <>
+                        <div className="flex justify-between text-green-600 font-medium">
+                          <span>Discount</span>
+                          <span>-{formatPrice(discount)}</span>
+                        </div>
+                        <div className="flex justify-between text-sm text-green-600 bg-green-50 p-2 rounded">
+                          <span>You saved</span>
+                          <span className="font-semibold">{discountPercentage}% off</span>
+                        </div>
+                      </>
+                    )}
+                    {appliedOffer.type === 'free_shipping' && (
+                      <div className="flex justify-between text-sm text-green-600 bg-green-50 p-2 rounded">
+                        <span>Free shipping applied</span>
+                        <span className="font-semibold">Save ₹{shippingCost}</span>
+                      </div>
+                    )}
                   </div>
                 )}
 
