@@ -35,19 +35,19 @@ export async function recordOfferUsageOnOrderCreation(
 export async function incrementOfferUsageCount(offerId: string): Promise<void> {
   try {
     // Get current count
-    const { data: offer, error: fetchError } = await supabase
-      .from('offers')
+    const { data: offer, error: fetchError } = await (supabase
+      .from('offers') as any)
       .select('used_count')
       .eq('id', offerId)
       .single();
 
-    if (fetchError) throw fetchError;
+    if (fetchError || !offer) throw fetchError;
 
-    const currentCount = (offer?.used_count as number) || 0;
+    const currentCount = ((offer as any)?.used_count as number) || 0;
 
     // Update count
-    const { error: updateError } = await supabase
-      .from('offers')
+    const { error: updateError } = await (supabase
+      .from('offers') as any)
       .update({ used_count: currentCount + 1 })
       .eq('id', offerId);
 
