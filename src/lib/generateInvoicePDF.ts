@@ -281,19 +281,28 @@ export function generateInvoicePDF(order: Order): void {
     doc.setFillColor(...colors.lightBg);
     doc.rect(margin, yPos - 5, contentWidth, 10, 'F');
 
+    // Column positions and widths (optimized for alignment)
+    const descCol = margin + 2;         // Item description
+    const descColWidth = 90;            // Width for description column
+    const qtyCol = margin + 95;         // Quantity column
+    const qtyColWidth = 15;             // Width for qty
+    const priceCol = margin + 115;      // Price column
+    const priceColWidth = 25;           // Width for price
+    const totalCol = pageWidth - margin - 2; // Total column (right-aligned)
+
     doc.setFontSize(9);
     doc.setTextColor(...colors.mutedText);
     doc.setFont('helvetica', 'bold');
 
-    const col1Width = 80;
-    const col2Width = 20;
-    const col3Width = 30;
-    const col4Width = 30;
+    doc.text('ITEM DESCRIPTION', descCol, yPos);
+    doc.text('QTY', qtyCol, yPos, { align: 'center' });
+    doc.text('PRICE', priceCol, yPos, { align: 'right' });
+    doc.text('TOTAL', totalCol, yPos, { align: 'right' });
 
-    doc.text('ITEM DESCRIPTION', margin + 2, yPos);
-    doc.text('QTY', margin + col1Width + 2, yPos, { align: 'center' });
-    doc.text('PRICE', margin + col1Width + col2Width + 2, yPos, { align: 'right' });
-    doc.text('TOTAL', margin + col1Width + col2Width + col3Width + 2, yPos, { align: 'right' });
+    // Divider line under header
+    doc.setDrawColor(...colors.borderLight);
+    doc.setLineWidth(0.5);
+    doc.line(margin, yPos + 6, pageWidth - margin, yPos + 6);
 
     yPos += 10;
 
@@ -302,7 +311,7 @@ export function generateInvoicePDF(order: Order): void {
     doc.setTextColor(...colors.darkText);
 
     order.items?.forEach((item) => {
-        yPos = checkPageBreak(doc, yPos, 12, pageHeight, margin);
+        yPos = checkPageBreak(doc, yPos, 10, pageHeight, margin);
 
         const itemTotal = item.price * item.quantity;
 
@@ -313,23 +322,23 @@ export function generateInvoicePDF(order: Order): void {
         }
 
         // Truncate if too long
-        if (itemDescription.length > 50) {
-            itemDescription = itemDescription.substring(0, 47) + '...';
+        if (itemDescription.length > 45) {
+            itemDescription = itemDescription.substring(0, 42) + '...';
         }
 
         doc.setFontSize(9);
-        doc.text(itemDescription, margin + 2, yPos);
+        doc.setFont('helvetica', 'normal');
+        doc.text(itemDescription, descCol, yPos);
 
-        doc.text(item.quantity.toString(), margin + col1Width + 2, yPos, { align: 'center' });
+        doc.text(item.quantity.toString(), qtyCol, yPos, { align: 'center' });
 
         doc.setFont('helvetica', 'normal');
-        doc.text(formatPrice(item.price), margin + col1Width + col2Width + 2, yPos, {
-            align: 'right',
-        });
+        doc.text(formatPrice(item.price), priceCol, yPos, { align: 'right' });
+        
         doc.setFont('helvetica', 'bold');
-        doc.text(formatPrice(itemTotal), pageWidth - margin - 2, yPos, { align: 'right' });
+        doc.text(formatPrice(itemTotal), totalCol, yPos, { align: 'right' });
 
-        yPos += 8;
+        yPos += 7;
     });
 
     yPos += 5;
@@ -345,30 +354,31 @@ export function generateInvoicePDF(order: Order): void {
     doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
 
-    const summaryLabelX = pageWidth / 2;
-    const summaryValueX = pageWidth - margin;
+    // Improved column positioning for summary sections
+    const labelCol = margin + 120;      // Where labels start
+    const valueCol = pageWidth - margin - 2; // Where values end (right-aligned)
 
     doc.setTextColor(...colors.mutedText);
-    doc.text('Taxable Amount:', summaryLabelX, yPos);
+    doc.text('Taxable Amount:', labelCol, yPos);
     doc.setTextColor(...colors.darkText);
     doc.setFont('helvetica', 'bold');
-    doc.text(formatPrice(baseAmount), summaryValueX, yPos, { align: 'right' });
-
-    yPos += 6;
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(...colors.mutedText);
-    doc.text('CGST (9%):', summaryLabelX, yPos);
-    doc.setTextColor(...colors.darkText);
-    doc.setFont('helvetica', 'bold');
-    doc.text(formatPrice(cgstAmount), summaryValueX, yPos, { align: 'right' });
+    doc.text(formatPrice(baseAmount), valueCol, yPos, { align: 'right' });
 
     yPos += 6;
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(...colors.mutedText);
-    doc.text('SGST (9%):', summaryLabelX, yPos);
+    doc.text('CGST (9%):', labelCol, yPos);
     doc.setTextColor(...colors.darkText);
     doc.setFont('helvetica', 'bold');
-    doc.text(formatPrice(sgstAmount), summaryValueX, yPos, { align: 'right' });
+    doc.text(formatPrice(cgstAmount), valueCol, yPos, { align: 'right' });
+
+    yPos += 6;
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...colors.mutedText);
+    doc.text('SGST (9%):', labelCol, yPos);
+    doc.setTextColor(...colors.darkText);
+    doc.setFont('helvetica', 'bold');
+    doc.text(formatPrice(sgstAmount), valueCol, yPos, { align: 'right' });
 
     yPos += 8;
 
@@ -382,8 +392,8 @@ export function generateInvoicePDF(order: Order): void {
         doc.setFontSize(9);
         doc.setTextColor(...colors.success);
         doc.setFont('helvetica', 'bold');
-        doc.text('Discount Amount:', pageWidth / 2, yPos);
-        doc.text(formatPrice(order.discount_amount), summaryValueX, yPos, { align: 'right' });
+        doc.text('Discount Amount:', labelCol, yPos);
+        doc.text(formatPrice(order.discount_amount), valueCol, yPos, { align: 'right' });
 
         yPos += 8;
     }
@@ -400,41 +410,41 @@ export function generateInvoicePDF(order: Order): void {
     doc.setFont('helvetica', 'normal');
 
     doc.setTextColor(...colors.mutedText);
-    doc.text('Subtotal (with GST):', pageWidth / 2, yPos);
+    doc.text('Subtotal (with GST):', labelCol, yPos);
     doc.setTextColor(...colors.darkText);
     doc.setFont('helvetica', 'bold');
-    doc.text(formatPrice(order.subtotal), summaryValueX, yPos, { align: 'right' });
+    doc.text(formatPrice(order.subtotal), valueCol, yPos, { align: 'right' });
 
     yPos += 6;
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(...colors.mutedText);
-    doc.text('Shipping Charges:', pageWidth / 2, yPos);
+    doc.text('Shipping Charges:', labelCol, yPos);
     doc.setTextColor(...colors.darkText);
     doc.setFont('helvetica', 'bold');
     const shippingText = order.shipping_cost === 0 ? 'FREE' : formatPrice(order.shipping_cost);
-    doc.text(shippingText, summaryValueX, yPos, { align: 'right' });
+    doc.text(shippingText, valueCol, yPos, { align: 'right' });
 
     if (order.discount_amount > 0) {
         yPos += 6;
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(...colors.success);
-        doc.text('Discount:', pageWidth / 2, yPos);
+        doc.text('Discount:', labelCol, yPos);
         doc.setTextColor(...colors.success);
         doc.setFont('helvetica', 'bold');
-        doc.text(`-${formatPrice(order.discount_amount)}`, summaryValueX, yPos, { align: 'right' });
+        doc.text(`-${formatPrice(order.discount_amount)}`, valueCol, yPos, { align: 'right' });
     }
 
     yPos += 10;
 
     // Grand Total Box
     doc.setFillColor(...colors.primary);
-    doc.rect(pageWidth / 2 - 5, yPos - 8, pageWidth / 2, 14, 'F');
+    doc.rect(margin, yPos - 8, contentWidth, 14, 'F');
 
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(255, 255, 255);
-    doc.text('GRAND TOTAL:', pageWidth / 2, yPos);
-    doc.text(formatPrice(order.total), summaryValueX - 2, yPos, { align: 'right' });
+    doc.text('GRAND TOTAL: ', labelCol, yPos - 2);
+    doc.text(formatPrice(order.total), valueCol, yPos, { align: 'right' });
 
     yPos += 20;
 
@@ -449,22 +459,25 @@ export function generateInvoicePDF(order: Order): void {
     doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
 
+    const paymentLabelCol = margin + 5;
+    const paymentValueCol = margin + 50;
+
     if (order.payment_gateway === 'razorpay') {
         doc.setTextColor(...colors.mutedText);
-        doc.text('Payment Gateway:', margin, yPos);
+        doc.text('Payment Gateway:', paymentLabelCol, yPos);
         doc.setTextColor(...colors.darkText);
         doc.setFont('helvetica', 'bold');
-        doc.text('Razorpay', margin + 50, yPos);
+        doc.text('Razorpay', paymentValueCol, yPos);
 
         yPos += 6;
         if (order.razorpay_order_id) {
             doc.setFont('helvetica', 'normal');
             doc.setTextColor(...colors.mutedText);
-            doc.text('Order ID:', margin, yPos);
+            doc.text('Order ID:', paymentLabelCol, yPos);
             doc.setTextColor(...colors.darkText);
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(8);
-            doc.text(order.razorpay_order_id, margin + 50, yPos);
+            doc.text(order.razorpay_order_id, paymentValueCol, yPos);
             yPos += 5;
         }
 
@@ -472,11 +485,11 @@ export function generateInvoicePDF(order: Order): void {
             doc.setFontSize(9);
             doc.setFont('helvetica', 'normal');
             doc.setTextColor(...colors.mutedText);
-            doc.text('Payment ID:', margin, yPos);
+            doc.text('Payment ID:', paymentLabelCol, yPos);
             doc.setTextColor(...colors.darkText);
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(8);
-            doc.text(order.razorpay_payment_id, margin + 50, yPos);
+            doc.text(order.razorpay_payment_id, paymentValueCol, yPos);
             yPos += 5;
         }
 
@@ -484,17 +497,17 @@ export function generateInvoicePDF(order: Order): void {
             doc.setFontSize(9);
             doc.setFont('helvetica', 'normal');
             doc.setTextColor(...colors.mutedText);
-            doc.text('Paid On:', margin, yPos);
+            doc.text('Paid On:', paymentLabelCol, yPos);
             doc.setTextColor(...colors.darkText);
             doc.setFont('helvetica', 'bold');
-            doc.text(formatDate(order.paid_at), margin + 50, yPos);
+            doc.text(formatDate(order.paid_at), paymentValueCol, yPos);
         }
     } else {
         doc.setTextColor(...colors.mutedText);
-        doc.text('Payment Method:', margin, yPos);
+        doc.text('Payment Method:', paymentLabelCol, yPos);
         doc.setTextColor(...colors.darkText);
         doc.setFont('helvetica', 'bold');
-        doc.text('Cash on Delivery', margin + 50, yPos);
+        doc.text('Cash on Delivery', paymentValueCol, yPos);
 
         yPos += 6;
         doc.setFont('helvetica', 'normal');
