@@ -20,7 +20,8 @@ import {
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { useAdminOffers, useCreateOffer, useUpdateOffer, useDeleteOffer } from '@/hooks/useOffers';
-import { Tables } from '@/lib/supabase';
+import { supabase, Tables } from '@/lib/supabase';
+import { OfferProductSelector } from './OfferProductSelector';
 
 // Helper for currency
 const formatPrice = (price: number) => {
@@ -50,10 +51,13 @@ export function OffersManager() {
         min_order_value: '',
         usage_limit: '',
         per_user_limit: '',
+        applies_to: 'all' as 'all' | 'products' | 'category',
         starts_at: '',
         ends_at: '',
         is_active: true,
     });
+    const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+    const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
     const resetForm = () => {
         setFormData({
@@ -64,10 +68,13 @@ export function OffersManager() {
             min_order_value: '',
             usage_limit: '',
             per_user_limit: '',
+            applies_to: 'all',
             starts_at: '',
             ends_at: '',
             is_active: true,
         });
+        setSelectedProducts([]);
+        setSelectedCategories([]);
         setEditingOffer(null);
     };
 
@@ -82,6 +89,7 @@ export function OffersManager() {
                 min_order_value: offer.min_order_value ? (offer.min_order_value / 100).toString() : '',
                 usage_limit: offer.usage_limit?.toString() || '',
                 per_user_limit: (offer as any).per_user_limit?.toString() || '',
+                applies_to: (offer.applies_to as any) || 'all',
                 starts_at: offer.starts_at ? new Date(offer.starts_at).toISOString().split('T')[0] : '',
                 ends_at: offer.ends_at ? new Date(offer.ends_at).toISOString().split('T')[0] : '',
                 is_active: offer.is_active,
@@ -101,28 +109,68 @@ export function OffersManager() {
             return;
         }
 
+        // Validate product/category selection if applies_to is not 'all'
+        if (formData.applies_to !== 'all' && selectedProducts.length === 0 && selectedCategories.length === 0) {
+            toast({
+                title: 'Selection required',
+                description: 'Please select at least one product or category',
+                variant: 'destructive'
+            });
+            return;
+        }
+
         const offerData = {
             name: formData.name,
             code: formData.code.toUpperCase() || null,
             type: formData.type,
             value: parseFloat(formData.value),
-            min_order_value: formData.min_order_value ? parseFloat(formData.min_order_value) * 100 : null, // Convert to paise
+            min_order_value: formData.min_order_value ? parseFloat(formData.min_order_value) * 100 : null,
             usage_limit: formData.usage_limit ? parseInt(formData.usage_limit) : null,
             per_user_limit: formData.per_user_limit ? parseInt(formData.per_user_limit) : null,
             starts_at: formData.starts_at ? new Date(formData.starts_at).toISOString() : null,
             ends_at: formData.ends_at ? new Date(formData.ends_at).toISOString() : null,
             is_active: formData.is_active,
-            applies_to: 'all', // Simplified for now
+            applies_to: formData.applies_to,
         };
 
         try {
+            let offerId = editingOffer?.id;
+
             if (editingOffer) {
                 await updateOffer.mutateAsync({ id: editingOffer.id, updates: offerData });
                 toast({ title: 'Offer updated successfully' });
             } else {
-                await createOffer.mutateAsync(offerData);
+                const result = await createOffer.mutateAsync(offerData);
+                offerId = (result as any).id;
                 toast({ title: 'Offer created successfully' });
             }
+
+            // Save product/category selections if applicable
+            if (offerId && formData.applies_to !== 'all') {
+                // Delete existing selections
+                await (supabase.from('offer_products') as any)
+                    .delete()
+                    .eq('offer_id', offerId);
+
+                // Insert new selections
+                const selections = [
+                    ...selectedProducts.map((productId) => ({
+                        offer_id: offerId,
+                        product_id: productId,
+                        category: null,
+                    })),
+                    ...selectedCategories.map((category) => ({
+                        offer_id: offerId,
+                        product_id: null,
+                        category,
+                    })),
+                ];
+
+                if (selections.length > 0) {
+                    await (supabase.from('offer_products') as any).insert(selections);
+                }
+            }
+
             setIsDialogOpen(false);
             resetForm();
         } catch (error) {
@@ -314,6 +362,42 @@ export function OffersManager() {
                             />
                             <p className="text-xs text-muted-foreground">Leave empty for unlimited per-user usage</p>
                         </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="applies_to">Offer Applies To</Label>
+                            <Select
+                                value={formData.applies_to}
+                                onValueChange={(value) => setFormData({ ...formData, applies_to: value as any })}
+                            >
+                                <SelectTrigger><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Products</SelectItem>
+                                    <SelectItem value="products">Specific Products</SelectItem>
+                                    <SelectItem value="category">Specific Categories</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <p className="text-xs text-muted-foreground">
+                                {formData.applies_to === 'all'
+                                    ? 'This offer will apply to all products in the store'
+                                    : formData.applies_to === 'products'
+                                    ? 'Select specific products below'
+                                    : 'Select specific categories below'}
+                            </p>
+                        </div>
+
+                        {formData.applies_to !== 'all' && (
+                            <div className="space-y-2 border rounded-lg p-4 bg-muted/30">
+                                <Label>Product & Category Selection</Label>
+                                <OfferProductSelector
+                                    offerId={editingOffer?.id}
+                                    appliesTo={formData.applies_to}
+                                    onSelectionChange={(selections) => {
+                                        setSelectedProducts(selections.productIds);
+                                        setSelectedCategories(selections.categories);
+                                    }}
+                                />
+                            </div>
+                        )}
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
