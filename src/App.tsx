@@ -19,6 +19,7 @@ import BulkOrders from "./pages/BulkOrders";
 import Admin from "./pages/Admin";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import ForgotPassword from "./pages/ForgotPassword";
 import Profile from "./pages/Profile";
 import OrderHistory from "./pages/OrderHistory";
 import OrderDetails from "./pages/OrderDetails";
@@ -38,6 +39,7 @@ const App = () => (
               {/* Auth routes (no layout) */}
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
 
               {/* Main routes (with layout) */}
               <Route element={<Layout />}>
@@ -47,17 +49,17 @@ const App = () => (
                 <Route
                   path="/cart"
                   element={
-                    <AdminProtectedRoute>
+                    <ProtectedRoute>
                       <Cart />
-                    </AdminProtectedRoute>
+                    </ProtectedRoute>
                   }
                 />
                 <Route
                   path="/checkout"
                   element={
-                    <AdminProtectedRoute>
+                    <ProtectedRoute>
                       <Checkout />
-                    </AdminProtectedRoute>
+                    </ProtectedRoute>
                   }
                 />
                 <Route path="/about" element={<About />} />
@@ -95,8 +97,10 @@ const App = () => (
                     </ProtectedRoute>
                   }
                 />
-                <Route path="*" element={<NotFound />} />
               </Route>
+
+              {/* 404 catch-all (outside layout) */}
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
         </TooltipProvider>
