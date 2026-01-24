@@ -8,11 +8,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { useOrders } from '@/hooks/useOrders';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/lib/supabase';
 
 const Profile = () => {
   const navigate = useNavigate();
   const { user, profile, isAdmin, signOut, updateProfile, isLoading } = useAuth();
   const { data: orders = [], isLoading: ordersLoading } = useOrders();
+  const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [fullName, setFullName] = useState(profile?.full_name || '');
   const [phone, setPhone] = useState(profile?.phone || '');
@@ -36,13 +39,64 @@ const Profile = () => {
   const handleSaveProfile = async () => {
     setIsSaving(true);
     try {
+      // Track changes
+      const changedFields = [];
+      
+      if (profile?.full_name !== fullName) {
+        changedFields.push({
+          field: 'Full Name',
+          oldValue: profile?.full_name,
+          newValue: fullName,
+        });
+      }
+
+      if (profile?.phone !== phone) {
+        changedFields.push({
+          field: 'Phone Number',
+          oldValue: profile?.phone,
+          newValue: phone,
+        });
+      }
+
+      // Update profile
       await updateProfile({
         full_name: fullName,
         phone: phone,
       });
+
+      // Send notification if changes were made
+      if (changedFields.length > 0 && user?.email) {
+        try {
+          await supabase.functions.invoke('send-profile-update-email', {
+            body: {
+              userId: user.id,
+              email: user.email,
+              fullName: fullName,
+              changedFields: changedFields,
+              ipAddress: 'localhost', // In production, get actual IP
+              timestamp: new Date().toISOString(),
+            },
+          });
+          console.log('✅ Profile update email sent');
+        } catch (emailError) {
+          console.error('⚠️ Profile update email failed:', emailError);
+          // Don't block the profile update if email fails
+        }
+      }
+
+      toast({
+        title: 'Profile updated',
+        description: 'Your profile has been updated successfully.',
+      });
+
       setIsEditing(false);
     } catch (error) {
       console.error('Error updating profile:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to update profile.',
+        variant: 'destructive',
+      });
     } finally {
       setIsSaving(false);
     }
