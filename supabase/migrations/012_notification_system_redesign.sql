@@ -165,7 +165,7 @@ CREATE TABLE IF NOT EXISTS public.notification_templates (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
   
-  CONSTRAINT unique_active_template UNIQUE (notification_type, channel, name) WHERE status IN ('active', 'draft'),
+  CONSTRAINT unique_active_template UNIQUE (notification_type, channel, name), -- WHERE status IN ('active', 'draft'),
   CONSTRAINT valid_channel CHECK (channel IN ('email', 'sms', 'whatsapp'))
 );
 
@@ -289,7 +289,7 @@ COMMENT ON COLUMN public.notification_rate_limits.blocked_until IS 'Timestamp un
 CREATE INDEX IF NOT EXISTS idx_notification_rate_limits_user_type ON public.notification_rate_limits(user_id, notification_type);
 CREATE INDEX IF NOT EXISTS idx_notification_rate_limits_period_start ON public.notification_rate_limits(period_start DESC);
 CREATE INDEX IF NOT EXISTS idx_notification_rate_limits_blocked ON public.notification_rate_limits(user_id) 
-WHERE blocked_until IS NOT NULL AND blocked_until > NOW();
+WHERE blocked_until IS NOT NULL; --AND blocked_until > NOW();
 
 -- ============================================================================
 -- 7. CREATE notification_analytics TABLE (Enhanced)
