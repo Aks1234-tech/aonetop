@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/lib/supabase';
 
 const Signup = () => {
     const navigate = useNavigate();
@@ -61,9 +62,27 @@ const Signup = () => {
             return;
         }
 
+        // Send welcome email notification via Supabase Edge Function
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session?.user?.id) {
+                await supabase.functions.invoke('send-signup-email', {
+                    body: {
+                        userId: session.user.id,
+                        email: email,
+                        fullName: fullName,
+                    },
+                });
+                console.log('✅ Welcome email sent successfully');
+            }
+        } catch (emailError) {
+            console.error('⚠️ Welcome email failed:', emailError);
+            // Don't block signup if email fails
+        }
+
         toast({
             title: 'Account created!',
-            description: 'Please check your email to verify your account.',
+            description: 'Please check your email to verify your account and welcome email.',
         });
 
         navigate('/login');
