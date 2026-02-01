@@ -362,7 +362,7 @@ const ProductDetails = () => {
                   </Button>
                 </div>
                 <Button
-                  variant="gold"
+                  variant="default"
                   size="lg"
                   className="flex-1"
                   onClick={handleAddToCart}

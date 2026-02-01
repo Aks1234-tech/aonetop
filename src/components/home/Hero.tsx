@@ -31,7 +31,7 @@ export function Hero() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start animate-fade-up" style={{ animationDelay: '0.3s' }}>
-              <Button variant="gold" size="xl" asChild>
+              <Button variant="default" size="xl" asChild>
                 <Link to="/shop" className="group">
                   Explore Collection
                   <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />

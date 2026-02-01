@@ -368,13 +368,13 @@ const Shop = () => {
                         {!isAdmin && (
                           hasWeightVariants(product.weight_variants) ? (
                             <Link to={`/products/${product.slug}`}>
-                              <Button variant="gold" size="sm">
+                              <Button variant="default" size="sm">
                                 View Options
                               </Button>
                             </Link>
                           ) : (
                             <Button
-                              variant="gold"
+                              variant="default"
                               size="sm"
                               disabled={!isProductAvailable(product)}
                               onClick={() =>

@@ -35,17 +35,17 @@ const features = [
 
 export function WhyChoose() {
   return (
-    <section className="py-20 bg-primary text-primary-foreground">
+    <section className="py-20 bg-background text-foreground">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <span className="text-gold font-medium tracking-widest uppercase text-sm">
+          <span className="text-primary font-medium tracking-widest uppercase text-sm">
             The 9 Planet Promise
           </span>
           <h2 className="font-display text-3xl sm:text-4xl font-semibold mt-2 mb-4">
             Why Choose Us
           </h2>
-          <p className="text-primary-foreground/80 leading-relaxed">
+          <p className="text-muted-foreground leading-relaxed">
             We're committed to bringing you the finest teas while supporting sustainable 
             practices and the communities that grow them.
           </p>
@@ -56,16 +56,16 @@ export function WhyChoose() {
           {features.map((feature, index) => (
             <div
               key={feature.title}
-              className="group p-8 rounded-2xl bg-primary-foreground/5 border border-primary-foreground/10 hover:bg-primary-foreground/10 transition-all duration-300 animate-fade-up"
+              className="group p-8 rounded-2xl bg-card border border-border hover:bg-muted transition-all duration-300 animate-fade-up"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
-              <div className="w-14 h-14 rounded-2xl bg-gold/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                <feature.icon className="h-7 w-7 text-gold" />
+              <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <feature.icon className="h-7 w-7 text-primary" />
               </div>
               <h3 className="font-display text-xl font-semibold mb-3">
                 {feature.title}
               </h3>
-              <p className="text-primary-foreground/70 leading-relaxed">
+              <p className="text-muted-foreground leading-relaxed">
                 {feature.description}
               </p>
             </div>

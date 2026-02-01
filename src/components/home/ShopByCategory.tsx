@@ -63,7 +63,7 @@ export function ShopByCategory() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="text-accent font-medium tracking-widest uppercase text-sm">
+          <span className="text-primary font-medium tracking-widest uppercase text-sm">
             Browse Our Selection
           </span>
           <h2 className="font-display text-3xl sm:text-4xl font-semibold text-foreground mt-2 mb-4">
@@ -87,7 +87,7 @@ export function ShopByCategory() {
               <Link
                 to={`/shop?category=${category.id}`}
                 onClick={(e) => handleCategoryClick(category, e)}
-                className="group relative overflow-hidden rounded-2xl aspect-[4/3] block"
+                className="group relative overflow-hidden rounded-2xl aspect-[4/3] block ring-1 ring-border hover:ring-2 hover:ring-primary transition"
               >
                 <img
                   src={category.image}
@@ -98,7 +98,7 @@ export function ShopByCategory() {
                 <div className="absolute inset-0 flex flex-col justify-end p-5 lg:p-6">
                   <div className="flex items-start justify-between">
                     <div>
-                      <h3 className="font-display text-xl lg:text-2xl font-semibold text-card group-hover:text-gold transition-colors">
+                      <h3 className="font-display text-xl lg:text-2xl font-semibold text-card group-hover:text-primary transition-colors">
                         {category.name}
                       </h3>
                       <p className="text-sm text-card/70 mt-1">

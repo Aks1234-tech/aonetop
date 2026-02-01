@@ -45,7 +45,7 @@ export function Header() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-cream/95 backdrop-blur-md border-b border-border/50">
+    <header className="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-200">
       <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-20 items-center justify-between">
           {/* Logo */}
@@ -54,10 +54,10 @@ export function Header() {
               <span className="text-primary-foreground font-display text-xl font-bold">9</span>
             </div>
             <div className="hidden sm:block">
-              <h1 className="font-display text-xl font-semibold text-primary tracking-tight">
+              <h1 className="font-display text-xl font-semibold text-gray-900 tracking-tight">
                 9 Planet Impex
               </h1>
-              <p className="text-xs text-muted-foreground tracking-widest uppercase">
+              <p className="text-xs text-gray-500 tracking-widest uppercase">
                 Premium Teas
               </p>
             </div>
@@ -72,13 +72,13 @@ export function Header() {
                 className={cn(
                   "text-sm font-medium transition-colors duration-200 relative py-2",
                   location.pathname === item.href
-                    ? "text-primary"
-                    : "text-muted-foreground hover:text-primary"
+                    ? "text-primary font-semibold"
+                    : "text-gray-700 hover:text-primary"
                 )}
               >
                 {item.name}
                 {location.pathname === item.href && (
-                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent rounded-full" />
+                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />
                 )}
               </Link>
             ))}
@@ -145,7 +145,7 @@ export function Header() {
               >
                 <ShoppingBag className="h-5 w-5" />
                 {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-accent text-accent-foreground text-xs font-bold flex items-center justify-center animate-scale-in">
+                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center animate-scale-in">
                     {cartCount}
                   </span>
                 )}
