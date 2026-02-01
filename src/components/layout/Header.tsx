@@ -57,7 +57,7 @@ export function Header() {
               <h1 className="font-display text-xl font-semibold text-gray-900 tracking-tight">
                 9 Planet Impex
               </h1>
-              <p className="text-xs text-gray-500 tracking-widest uppercase">
+              <p className="text-x text-gray-500 tracking-widest uppercase">
                 Premium Teas
               </p>
             </div>
@@ -70,7 +70,7 @@ export function Header() {
                 key={item.name}
                 to={item.href}
                 className={cn(
-                  "text-sm font-medium transition-colors duration-200 relative py-2",
+                  "text-xl font-medium transition-colors duration-200 relative py-2",
                   location.pathname === item.href
                     ? "text-primary font-semibold"
                     : "text-gray-700 hover:text-primary"
