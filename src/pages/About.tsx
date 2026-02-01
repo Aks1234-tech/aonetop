@@ -1,8 +1,39 @@
+// import { Slider } from '@radix-ui/react-slider';
 import { Leaf, Mountain, Users, Shield, ChevronLeft, ChevronRight, Award, Heart, Globe, } from 'lucide-react';
 import { motion } from 'motion/react';
-// import Slider from 'react-slick';
-// import 'slick-carousel/slick/slick.css';
-// import 'slick-carousel/slick/slick-theme.css';
+import { useState } from 'react';
+import Slider from 'react-slick';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
+
+
+interface ArrowProps {
+  onClick?: () => void;
+}
+
+function NextArrow({ onClick }: ArrowProps) {
+  return (
+    <button
+      onClick={onClick}
+      className="absolute right-[-10px] top-1/2 -translate-y-1/2 z-10 bg-white hover:bg-gray-50 rounded-full p-2 shadow-lg border border-gray-100 transition-all"
+      aria-label="Next slide"
+    >
+      <ChevronRight className="w-6 h-6 text-[#D32F2F]" />
+    </button>
+  );
+}
+
+function PrevArrow({ onClick }: ArrowProps) {
+  return (
+    <button
+      onClick={onClick}
+      className="absolute left-[-10px] top-1/2 -translate-y-1/2 z-10 bg-white hover:bg-gray-50 rounded-full p-2 shadow-lg border border-gray-100 transition-all"
+      aria-label="Previous slide"
+    >
+      <ChevronLeft className="w-6 h-6 text-[#D32F2F]" />
+    </button>
+  );
+}
 
 // Office collage images
 const officeImages = [
@@ -14,14 +45,75 @@ const officeImages = [
 
 // Brand images (placeholder - replace with actual brand images)
 const brandImages = [
-  '/home/hackycoder/.gemini/antigravity/brain/5d1acf63-0fbf-45d1-84a7-e0b48f84fd70/tea_brand_logo_1769931536447.png',
-  '/home/hackycoder/.gemini/antigravity/brain/5d1acf63-0fbf-45d1-84a7-e0b48f84fd70/honey_brand_logo_1769931551996.png',
-  '/home/hackycoder/.gemini/antigravity/brain/5d1acf63-0fbf-45d1-84a7-e0b48f84fd70/ghee_brand_logo_1769931568502.png',
-  '/home/hackycoder/.gemini/antigravity/brain/5d1acf63-0fbf-45d1-84a7-e0b48f84fd70/organic_tea_brand_1769931587533.png',
-  '/home/hackycoder/.gemini/antigravity/brain/5d1acf63-0fbf-45d1-84a7-e0b48f84fd70/premium_spice_brand_1769931601706.png',
+    'https://images.unsplash.com/photo-1641997825978-5f8d5da5a4a1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxvcmdhbmljJTIwdGVhJTIwbGVhdmVzfGVufDF8fHx8MTc2OTg4MDkzNnww&ixlib=rb-4.1.0&q=80&w=1080',
+    'https://images.unsplash.com/photo-1691480208637-6ed63aac6694?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwdXJlJTIwaG9uZXklMjBqYXJ8ZW58MXx8fHwxNzY5ODgwOTM2fDA&ixlib=rb-4.1.0&q=80&w=1080',
+    'https://images.unsplash.com/photo-1573812461383-e5f8b759d12e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxnaGVlJTIwY2xhcmlmaWVkJTIwYnV0dGVyfGVufDF8fHx8MTc2OTg4MDkzN3ww&ixlib=rb-4.1.0&q=80&w=1080',
+    'https://images.unsplash.com/photo-1765809255360-6ed6240bd10f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxoZXJiYWwlMjB0ZWElMjBjb2xsZWN0aW9ufGVufDF8fHx8MTc2OTg4MDkzN3ww&ixlib=rb-4.1.0&q=80&w=1080',
+    'https://images.unsplash.com/photo-1730190168042-3bef4553a8f4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxvcmdhbmljJTIwYmVla2VlcGluZyUyMGhvbmV5fGVufDF8fHx8MTc2OTg4MDkzOHww&ixlib=rb-4.1.0&q=80&w=1080',
 ];
 
 const About = () => {
+  const [currentBrandIndex, setCurrentBrandIndex] = useState(0);
+
+  const brandSliderSettings = {
+    dots: true,
+    infinite: true,
+    speed: 800,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 5000,
+    cssEase: 'ease',
+    pauseOnHover: true,
+    nextArrow: <NextArrow />,
+    prevArrow: <PrevArrow />,
+    dotsClass: "slick-dots !bottom-[-30px]",
+    appendDots: (dots: React.ReactNode) => (
+      <div>
+        <ul className="flex items-center justify-center gap-2">
+          {dots}
+        </ul>
+      </div>
+    ),
+    customPaging: () => (
+      <button className="w-3 h-3 rounded-full bg-gray-300 hover:bg-[#D32F2F] transition-all" />
+    ),
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          infinite: true,
+          dots: true
+        }
+      },
+      {
+        breakpoint: 600,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          initialSlide: 1
+        }
+      },
+      {
+        breakpoint: 480,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1
+        }
+      }
+    ]
+  };
+
+  const nextBrand = () => {
+    setCurrentBrandIndex((prev) => (prev + 1) % brandImages.length);
+  };
+
+  const prevBrand = () => {
+    setCurrentBrandIndex((prev) => (prev - 1 + brandImages.length) % brandImages.length);
+  };
+
   return (
 
     <div className="min-h-[screen] bg-background">
@@ -110,6 +202,35 @@ const About = () => {
                 <p className="text-sm">Years of Excellence</p>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Our Brands Carousel */}
+      <section className="py-16 sm:py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="font-display text-3xl sm:text-4xl font-semibold text-foreground mb-4">
+              Our Brands
+            </h2>
+            <p className="text-muted-foreground max-w-xl mx-auto">
+              Trusted brands delivering premium quality products
+            </p>
+          </div>
+          <div className="brand-slider pb-8 max-w-4xl mx-auto">
+            <Slider {...brandSliderSettings}>
+              {brandImages.map((brand, index) => (
+                <div key={index} className="px-0">
+                  <div className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300">
+                    <img
+                      src={brand}
+                      alt={`Brand ${index + 1}`}
+                      className="w-full h-[400px] object-cover"
+                    />
+                  </div>
+                </div>
+              ))}
+            </Slider>
           </div>
         </div>
       </section>
