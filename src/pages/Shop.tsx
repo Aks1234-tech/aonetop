@@ -14,7 +14,7 @@ const Shop = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
   const [loadTimeout, setLoadTimeout] = useState(false);
   const { addToCart } = useCart();
   const { isAdmin } = useAuth();
@@ -42,6 +42,14 @@ const Shop = () => {
     }
     setLoadTimeout(false);
   }, [isLoading]);
+
+  // Sync search query from URL
+  useEffect(() => {
+    const query = searchParams.get('search');
+    if (query !== null) {
+      setSearchQuery(query);
+    }
+  }, [searchParams]);
 
   const formatPrice = (price: number) => {
     // Prices are stored in paise, convert to rupees
