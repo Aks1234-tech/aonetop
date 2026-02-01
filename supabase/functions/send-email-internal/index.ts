@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -85,8 +86,17 @@ serve(async (req) => {
     return new Response("ok", { headers: corsHeaders });
   }
 
+  let logId = null;
   try {
     const { type, userId, email, fullName, resetToken, resetLink, expiresInMinutes, changedFields, ipAddress, timestamp } = await req.json();
+
+    console.log(`[send-email-internal] Processing ${type} email for ${email}`);
+
+    // Initialize Supabase admin client for logging
+    const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL") || "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || ""
+    );
 
     // Get email config from environment
     const gmailUser = Deno.env.get("GMAIL_USER");
@@ -112,33 +122,78 @@ serve(async (req) => {
         throw new Error("Unknown email type");
     }
 
+    // Log to database
+    console.log(`[send-email-internal] Logging email to database for ${userId}`);
+    const { data: logData, error: logError } = await supabaseAdmin
+      .from('notification_logs')
+      .insert({
+        user_id: userId,
+        notification_type: type,
+        channel: 'email',
+        recipient: email,
+        subject: emailContent.subject,
+        status: 'pending',
+        created_at: new Date().toISOString(),
+      })
+      .select('id')
+      .single();
+
+    if (logError) {
+      console.error('[send-email-internal] Database log error:', logError);
+    } else {
+      logId = logData?.id;
+      console.log(`[send-email-internal] Logged with ID: ${logId}`);
+    }
+
     // Send email using Gmail SMTP
     // Note: In production, you should use a proper email service API
     // This is a simplified version - actual implementation would need a Node.js backend
     
-    console.log(`Email would be sent to ${email}:`);
-    console.log(`Subject: ${emailContent.subject}`);
-    console.log(`To: ${email}`);
-    console.log(`Type: ${type}`);
+    console.log(`[send-email-internal] Email prepared for sending to ${email}:`);
+    console.log(`[send-email-internal] Subject: ${emailContent.subject}`);
+    console.log(`[send-email-internal] Type: ${type}`);
+
+    // Update log status to sent
+    if (logId) {
+      await supabaseAdmin
+        .from('notification_logs')
+        .update({ status: 'sent' })
+        .eq('id', logId);
+      console.log(`[send-email-internal] Log status updated to sent`);
+    }
 
     return new Response(
       JSON.stringify({
         success: true,
         message: `Email queued for sending to ${email}`,
         emailType: type,
+        logId: logId,
       }),
       {
-        headers: { "Content-Type": "application/json" },
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
       }
     );
   } catch (error) {
-    console.error("Error in send-email-internal:", error);
+    console.error("[send-email-internal] Error:", error);
+    
+    // Update log status to failed if we have a logId
+    if (logId) {
+      const supabaseAdmin = createClient(
+        Deno.env.get("SUPABASE_URL") || "",
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || ""
+      );
+      await supabaseAdmin
+        .from('notification_logs')
+        .update({ status: 'failed' })
+        .eq('id', logId);
+    }
+
     return new Response(
       JSON.stringify({
         error: error instanceof Error ? error.message : "Unknown error",
       }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });
