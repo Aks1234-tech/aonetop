@@ -12,6 +12,7 @@ import {
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
+import { SearchDialog } from '@/components/SearchDialog';
 
 const navigation = [
   { name: 'Home', href: '/' },
@@ -23,6 +24,7 @@ const navigation = [
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const { cartCount, toggleCart } = useCart();
   const { user, profile, isAdmin, signOut } = useAuth();
   const location = useLocation();
@@ -87,7 +89,12 @@ export function Header() {
 
           {/* Actions */}
           <div className="flex items-center gap-2 sm:gap-4">
-            <Button variant="ghost" size="icon" className="hidden sm:flex">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="hidden sm:flex"
+              onClick={() => setSearchOpen(true)}
+            >
               <Search className="h-5 w-5" />
             </Button>
 
@@ -226,6 +233,9 @@ export function Header() {
           </div>
         )}
       </nav>
+
+      {/* Search Dialog */}
+      <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
     </header>
   );
 }
