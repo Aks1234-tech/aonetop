@@ -227,7 +227,7 @@ const Shop = () => {
                 </div>
 
                 {/* View Mode */}
-                <div className="hidden sm:flex items-center gap-1 bg-muted rounded-lg p-1">
+                <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
                   <Button
                     variant={viewMode === 'grid' ? 'default' : 'ghost'}
                     size="icon"
