@@ -207,7 +207,7 @@ const About = () => {
       </section>
 
       {/* Our Brands Carousel */}
-      <section className="py-16 sm:py-20">
+      <section className="py-16 sm:py-20 bg-muted/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="font-display text-3xl sm:text-4xl font-semibold text-foreground mb-4">
@@ -329,87 +329,55 @@ const About = () => {
         </div>
       </section>
 
-      {/* Team */}
-      <section className="py-20">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Certifications Section */}
+      <div className="bg-gray-50 py-16 sm:py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="font-display text-3xl sm:text-4xl font-semibold text-foreground mb-4">
-              The People Behind the Cup
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+              Our Certifications
             </h2>
-            <p className="text-muted-foreground max-w-xl mx-auto">
-              Meet the passionate team that brings you the finest teas from India.
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Trusted certifications that validate our commitment to quality
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            <div className="text-center">
-              <div className="w-32 h-32 rounded-full bg-muted mx-auto mb-4 overflow-hidden">
-                <img
-                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80"
-                  alt="Rajesh Sharma"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <h3 className="font-display text-lg font-semibold text-foreground">
-                Rajesh Sharma
-              </h3>
-              <p className="text-muted-foreground">Founder & CEO</p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-32 h-32 rounded-full bg-muted mx-auto mb-4 overflow-hidden">
-                <img
-                  src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&q=80"
-                  alt="Priya Sharma"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <h3 className="font-display text-lg font-semibold text-foreground">
-                Priya Sharma
-              </h3>
-              <p className="text-muted-foreground">Head of Curation</p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-32 h-32 rounded-full bg-muted mx-auto mb-4 overflow-hidden">
-                <img
-                  src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&q=80"
-                  alt="Amit Patel"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <h3 className="font-display text-lg font-semibold text-foreground">
-                Amit Patel
-              </h3>
-              <p className="text-muted-foreground">Master Tea Sommelier</p>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              viewport={{ once: true }}
+              className="bg-white p-8 rounded-xl shadow-md text-center hover:shadow-xl transition-shadow duration-300"
+            >
+              <Shield className="w-16 h-16 text-[#D32F2F] mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-gray-900 mb-2">USDA Organic</h3>
+              <p className="text-gray-600">Certified organic by the United States Department of Agriculture</p>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              viewport={{ once: true }}
+              className="bg-white p-8 rounded-xl shadow-md text-center hover:shadow-xl transition-shadow duration-300"
+            >
+              <Leaf className="w-16 h-16 text-green-600 mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Fair Trade</h3>
+              <p className="text-gray-600">Supporting fair wages and ethical treatment of farmers</p>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="bg-white p-8 rounded-xl shadow-md text-center hover:shadow-xl transition-shadow duration-300"
+            >
+              <Award className="w-16 h-16 text-amber-600 mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-gray-900 mb-2">ISO Certified</h3>
+              <p className="text-gray-600">International standards for quality management systems</p>
+            </motion.div>
           </div>
         </div>
-      </section>
-
-      {/* Stats */}
-      <section className="py-20 bg-primary text-primary-foreground">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            <div>
-              <p className="font-display text-4xl sm:text-5xl font-bold text-gold">25+</p>
-              <p className="text-primary-foreground/80 mt-2">Years of Excellence</p>
-            </div>
-            <div>
-              <p className="font-display text-4xl sm:text-5xl font-bold text-gold">50+</p>
-              <p className="text-primary-foreground/80 mt-2">Partner Estates</p>
-            </div>
-            <div>
-              <p className="font-display text-4xl sm:text-5xl font-bold text-gold">10K+</p>
-              <p className="text-primary-foreground/80 mt-2">Happy Customers</p>
-            </div>
-            <div>
-              <p className="font-display text-4xl sm:text-5xl font-bold text-gold">50+</p>
-              <p className="text-primary-foreground/80 mt-2">Tea Varieties</p>
-            </div>
-          </div>
-        </div>
-      </section>
+      </div>
     </div>
   );
 };
