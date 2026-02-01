@@ -17,6 +17,12 @@ interface Category {
 
 const categories: Category[] = [
   {
+    id: 'all',
+    name: 'All Products',
+    description: 'Browse our complete collection',
+    image: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=600&q=80',
+  },
+  {
     id: 'tea',
     name: 'Tea',
     description: 'Premium tea collection',
@@ -70,13 +76,13 @@ export function ShopByCategory() {
             Shop by Category
           </h2>
           <p className="text-muted-foreground leading-relaxed">
-            Explore our premium collection of Tea, Honey, and Ghee - carefully
+            Explore our premium collection of organic products - carefully
             sourced for the finest quality.
           </p>
         </div>
 
-        {/* Categories Grid - 3 main categories */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+        {/* Categories Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
           {categories.map((category, index) => (
             <div
               key={category.id}

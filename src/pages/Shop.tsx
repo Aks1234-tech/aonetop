@@ -140,6 +140,21 @@ const Shop = () => {
               <div className="mb-6">
                 <h4 className="font-medium text-foreground mb-3">Categories</h4>
                 <div className="space-y-2">
+                  {/* All Products Button */}
+                  <button
+                    onClick={() => {
+                      searchParams.delete('category');
+                      setSearchParams(searchParams);
+                    }}
+                    className={cn(
+                      "w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors",
+                      !selectedCategory
+                        ? "bg-primary text-primary-foreground"
+                        : "hover:bg-muted text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <span className="font-medium">All</span>
+                  </button>
                   {/* Show only main categories: Tea, Honey, Ghee */}
                   {categories
                     .filter((cat) => !cat.parent_id)
