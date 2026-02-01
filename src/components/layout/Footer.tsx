@@ -4,10 +4,8 @@ import { Mail, Phone, MapPin, Instagram, Facebook, Twitter } from 'lucide-react'
 const footerLinks = {
   shop: [
     { name: 'All Teas', href: '/shop' },
-    { name: 'Black Tea', href: '/shop?category=black-tea' },
-    { name: 'Green Tea', href: '/shop?category=green-tea' },
-    { name: 'Chai Blends', href: '/shop?category=chai-blends' },
-    { name: 'Gift Sets', href: '/shop?category=gifts' },
+    { name: 'Honey', href: '/shop?category=honey' },
+    { name: 'Ghee', href: '/shop?category=ghee' },
   ],
   company: [
     { name: 'Our Story', href: '/about' },
@@ -45,8 +43,8 @@ export function Footer() {
               </div>
             </Link>
             <p className="text-gray-400 leading-relaxed mb-6 max-w-md">
-              Sourcing the finest teas from India's legendary gardens. 
-              Each cup tells a story of tradition, craftsmanship, and 
+              Sourcing the finest teas from India's legendary gardens.
+              Each cup tells a story of tradition, craftsmanship, and
               the pure essence of nature.
             </p>
             <div className="flex gap-4">
