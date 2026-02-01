@@ -12,8 +12,8 @@ const Index = () => {
   return (
     <>
       <Hero />
-      <Bestsellers />
       <ShopByCategory />
+      <Bestsellers />
       <FeaturedProducts />
       <AboutPreview />
       <WhyChoose />

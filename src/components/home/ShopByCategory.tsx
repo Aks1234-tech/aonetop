@@ -59,7 +59,7 @@ export function ShopByCategory() {
   };
 
   return (
-    <section className="py-20 bg-background">
+    <section className="py-12 bg-background">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-12">
@@ -70,7 +70,7 @@ export function ShopByCategory() {
             Shop by Category
           </h2>
           <p className="text-muted-foreground leading-relaxed">
-            Explore our premium collection of Tea, Honey, and Ghee - carefully 
+            Explore our premium collection of Tea, Honey, and Ghee - carefully
             sourced for the finest quality.
           </p>
         </div>
