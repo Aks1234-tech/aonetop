@@ -144,98 +144,160 @@ const Contact = () => {
 
       {/* Contact Form */}
       <section className="py-16 sm:py-18 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-card rounded-2xl p-8 shadow-soft">
-            <h2 className="font-display text-3xl font-semibold text-foreground mb-2 text-center">
-              Send Us a Message
-            </h2>
-            <p className="text-muted-foreground text-xl text-center mb-8">
-              Have a question or feedback? Fill out the form below and we'll get back to you soon.
-            </p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-8">
+            {/* Left: Contact Form */}
+            <div className="bg-card rounded-2xl p-8 shadow-soft">
+              <h2 className="font-display text-3xl font-semibold text-foreground mb-2">
+                Send Us a Message
+              </h2>
+              <p className="text-muted-foreground text-base mb-6">
+                Fill out the form below and we'll get back to you as soon as possible
+              </p>
 
-            <form onSubmit={handleSubmit} className="space-y-6 text-xl">
-              <div className="grid sm:grid-cols-2 gap-6">
+              <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <Label htmlFor="name">Name *</Label>
+                  <Label htmlFor="name">Full Name *</Label>
                   <Input
                     id="name"
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    placeholder="Your name"
+                    placeholder="John Doe"
                     required
                   />
                 </div>
-                <div>
-                  <Label htmlFor="email">Email *</Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="your@email.com"
-                    required
-                  />
-                </div>
-              </div>
 
-              <div className="grid sm:grid-cols-2 gap-6">
-                <div>
-                  <Label htmlFor="phone">Phone</Label>
-                  <Input
-                    id="phone"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    placeholder="+91 98765 43210"
-                  />
+                <div className="grid sm:grid-cols-2 gap-6">
+                  <div>
+                    <Label htmlFor="email">Email Address *</Label>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      placeholder="john@example.com"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="phone">Phone Number</Label>
+                    <Input
+                      id="phone"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      placeholder="+1 (555) 123-4567"
+                    />
+                  </div>
                 </div>
+
                 <div>
-                  <Label htmlFor="subject">Subject</Label>
+                  <Label htmlFor="subject">Subject *</Label>
                   <Input
                     id="subject"
                     name="subject"
                     value={formData.subject}
                     onChange={handleChange}
-                    placeholder="How can we help?"
+                    placeholder="Select a subject"
+                    required
                   />
+                </div>
+
+                <div>
+                  <Label htmlFor="message">Message *</Label>
+                  <Textarea
+                    id="message"
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
+                    placeholder="Tell us how we can help you..."
+                    rows={6}
+                    required
+                  />
+                </div>
+
+                <Button
+                  type="submit"
+                  variant="default"
+                  size="lg"
+                  className="w-full bg-red-600 hover:bg-red-700"
+                  disabled={submitForm.isPending}
+                >
+                  {submitForm.isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="mr-2 h-5 w-5" />
+                      Send Message
+                    </>
+                  )}
+                </Button>
+              </form>
+            </div>
+
+            {/* Right: Map and Quick Support */}
+            <div className="space-y-8">
+              {/* Map Placeholder */}
+              <div className="bg-gray-200 rounded-2xl h-64 flex items-center justify-center">
+                <div className="text-center">
+                  <MapPin className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-700 font-semibold">123 Organic Lane</p>
+                  <p className="text-gray-600">Nature City, NC 12345</p>
                 </div>
               </div>
 
-              <div>
-                <Label htmlFor="message">Message *</Label>
-                <Textarea
-                  id="message"
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  placeholder="Tell us more about your inquiry..."
-                  rows={6}
-                  required
-                />
-              </div>
+              {/* Quick Support */}
+              <div className="bg-white rounded-2xl p-8 shadow-soft">
+                <h3 className="font-display text-2xl font-semibold text-foreground mb-6">
+                  Quick Support
+                </h3>
+                <div className="space-y-6">
+                  {/* Live Chat */}
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-lg bg-red-600 flex items-center justify-center shrink-0">
+                      <MessageSquare className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-foreground mb-1">Live Chat</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Chat with our support team for instant help during business hours
+                      </p>
+                    </div>
+                  </div>
 
-              <Button
-                type="submit"
-                variant="gold"
-                size="lg"
-                className="w-full"
-                disabled={submitForm.isPending}
-              >
-                {submitForm.isPending ? (
-                  <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Sending...
-                  </>
-                ) : (
-                  <>
-                    <Send className="mr-2 h-5 w-5" />
-                    Send Message
-                  </>
-                )}
-              </Button>
-            </form>
+                  {/* Email Response */}
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-lg bg-red-600 flex items-center justify-center shrink-0">
+                      <Mail className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-foreground mb-1">Email Response</h4>
+                      <p className="text-sm text-muted-foreground">
+                        We typically respond to emails within 24 hours on business days
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Phone Support */}
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-lg bg-red-600 flex items-center justify-center shrink-0">
+                      <Phone className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-foreground mb-1">Phone Support</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Call us Monday through Saturday, 9am-6pm IST for immediate assistance
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
