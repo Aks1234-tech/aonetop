@@ -29,7 +29,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
           {/* Brand Section */}
           <div className="lg:col-span-2">
-            <Link to="/" className="flex items-center gap-3 mb-6">
+            <Link to="/" className="flex items-center gap-3 mb-6" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
               <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center">
                 <span className="text-primary-foreground font-display text-xl font-bold">9</span>
               </div>
@@ -83,6 +83,7 @@ export function Footer() {
                 <li key={link.name}>
                   <Link
                     to={link.href}
+                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                     className="text-gray-400 hover:text-white transition-colors duration-200"
                   >
                     {link.name}
@@ -100,6 +101,7 @@ export function Footer() {
                 <li key={link.name}>
                   <Link
                     to={link.href}
+                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                     className="text-gray-400 hover:text-white transition-colors duration-200"
                   >
                     {link.name}
@@ -140,7 +142,7 @@ export function Footer() {
                 </a>
               </li>
             </ul>
-            
+
           </div>
         </div>
       </div>
@@ -155,12 +157,14 @@ export function Footer() {
             <div className="flex gap-6 text-sm">
               <Link
                 to="/privacy"
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                 className="text-gray-400 hover:text-white transition-colors duration-200"
               >
                 Privacy Policy
               </Link>
               <Link
                 to="/terms"
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                 className="text-gray-400 hover:text-white transition-colors duration-200"
               >
                 Terms of Service

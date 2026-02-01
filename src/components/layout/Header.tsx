@@ -49,7 +49,7 @@ export function Header() {
       <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-20 items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 group">
+          <Link to="/" className="flex items-center gap-3 group" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
             <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
               <span className="text-primary-foreground font-display text-xl font-bold">9</span>
             </div>
@@ -69,6 +69,7 @@ export function Header() {
               <Link
                 key={item.name}
                 to={item.href}
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                 className={cn(
                   "text-xl font-medium transition-colors duration-200 relative py-2",
                   location.pathname === item.href
@@ -176,7 +177,10 @@ export function Header() {
                 <Link
                   key={item.name}
                   to={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
+                  onClick={() => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    setMobileMenuOpen(false);
+                  }}
                   className={cn(
                     "px-4 py-3 rounded-lg text-base font-medium transition-colors duration-200",
                     location.pathname === item.href
