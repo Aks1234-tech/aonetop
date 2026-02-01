@@ -26,36 +26,34 @@ const About = () => {
 
     <div className="min-h-[screen] bg-background">
       {/* Hero */}
-      <section className="relative py-20 overflow-hidden">
+      <section className="relative h-[300px] overflow-hidden">
         {/* Background Image */}
         <div className="absolute inset-0">
           <img
             src="https://images.unsplash.com/photo-1690986375486-460dc48dd499?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxvcmdhbmljJTIwdGVhJTIwbGVhdmVzfGVufDF8fHx8MTc2OTg3ODU3NXww&ixlib=rb-4.1.0&q=80&w=1080"
             alt="Tractor in field"
-            className="relative w-full h-full object-cover"
+            className="w-full h-full object-cover"
           />
           {/* Dark Overlay */}
           <div className="absolute inset-0 bg-black/50" />
         </div>
 
         {/* Content */}
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40 flex items-center">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4">
-                About 9 Planet Impex
-              </h1>
-              <p className="text-xl text-white/90 max-w-2xl">
-                Bringing nature's finest organic products to your doorstep since 2015
-              </p>
-            </div>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4">
+              About 9 Planet Impex
+            </h1>
+            <p className="text-xl text-white/90 max-w-2xl mx-auto">
+              Bringing nature's finest organic products to your doorstep since 2015
+            </p>
           </div>
         </div>
       </section>
 
       {/* Our Story */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-16 sm:py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-start">
             {/* Left: Story Text */}
             <div>
