@@ -69,25 +69,25 @@ export function Hero() {
         <CarouselContent className="ml-0">
           {heroSlides.map((slide) => (
             <CarouselItem key={slide.id} className="pl-0">
-              <div className="relative h-screen flex items-center">
+              <div className="relative min-h-[500px] sm:min-h-[600px] md:min-h-[700px] lg:min-h-screen flex items-center">
                 {/* Background Image with Overlay */}
-                <div className="absolute inset-0">
+                <div className="absolute inset-0 overflow-hidden">
                   <img
                     src={slide.backgroundImage}
                     alt={slide.title}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover object-center"
                   />
                   <div className="absolute inset-0 bg-black/40" />
                 </div>
 
                 {/* Content */}
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                  <div className="max-w-2xl">
-                    <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-white leading-tight mb-4 sm:mb-6 animate-fade-up">
+                <div className="container mx-auto px-6 sm:px-8 lg:px-12 relative z-10 py-12 sm:py-16">
+                  <div className="max-w-xl lg:max-w-2xl">
+                    <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-semibold text-white leading-tight mb-4 sm:mb-6 animate-fade-up">
                       {slide.title}
                     </h1>
 
-                    <p className="text-lg sm:text-xl lg:text-2xl text-white/90 mb-6 sm:mb-8 leading-relaxed animate-fade-up" style={{ animationDelay: '0.1s' }}>
+                    <p className="text-base sm:text-lg lg:text-xl text-white/90 mb-6 sm:mb-8 leading-relaxed animate-fade-up" style={{ animationDelay: '0.1s' }}>
                       {slide.subtitle}
                     </p>
 
@@ -96,7 +96,7 @@ export function Hero() {
                         variant="default"
                         size="xl"
                         asChild
-                        className="bg-red-600 hover:bg-red-700 text-white font-medium px-6 py-3 rounded text-base"
+                        className="bg-red-600 hover:bg-red-700 text-white font-medium px-6 py-3 rounded text-sm sm:text-base"
                       >
                         <Link to={slide.buttonLink}>
                           {slide.buttonText}
