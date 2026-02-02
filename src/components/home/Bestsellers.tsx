@@ -34,7 +34,7 @@ export function Bestsellers() {
         </div>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 lg:gap-8">
           {bestsellers.map((product, index) => (
             <div
               key={product.id}
@@ -46,7 +46,7 @@ export function Bestsellers() {
                 <img
                   src={product.image}
                   alt={product.name}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-130"
                 />
                 {/* Badges */}
                 <div className="absolute top-4 left-4 flex flex-col gap-2">
@@ -89,14 +89,14 @@ export function Bestsellers() {
                   <span className="text-sm text-muted-foreground">({product.reviews})</span>
                 </div>
                 <Link to={`/products/${product.id}`}>
-                  <h3 className="font-display text-lg font-medium text-foreground group-hover:text-primary transition-colors">
+                  <h3 className="font-display text-md font-medium text-foreground group-hover:text-primary transition-colors">
                     {product.name}
                   </h3>
                 </Link>
-                <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                {/* <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
                   {product.description}
-                </p>
-                <div className="flex items-center gap-3 mt-4">
+                </p> */}
+                <div className="flex items-center gap-3 mt-2">
                   <span className="font-display text-xl font-semibold text-primary">
                     {formatPrice(product.price)}
                   </span>
@@ -112,7 +112,7 @@ export function Bestsellers() {
         </div>
 
         {/* CTA */}
-        <div className="text-center mt-12">
+        <div className="text-center mt-10">
           <Button variant="outline" size="lg" asChild>
             <Link to="/shop" className="group">
               View All Bestsellers
