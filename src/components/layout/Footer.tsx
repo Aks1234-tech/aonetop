@@ -25,10 +25,10 @@ export function Footer() {
   return (
     <footer className="bg-gray-900 text-white">
       {/* Main Footer */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-7">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
+      <div className="container mx-auto pl-[10%] pr-4 sm:px-6 lg:px-8 py-7">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
           {/* Brand Section */}
-          <div className="lg:col-span-2">
+          <div className="col-span-2 lg:col-span-2">
             <Link to="/" className="flex items-center gap-3 mb-6" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
               <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center">
                 <span className="text-primary-foreground font-display text-xl font-bold">9</span>
@@ -112,7 +112,7 @@ export function Footer() {
           </div>
 
           {/* Contact Info */}
-          <div>
+          <div className="col-span-2 md:col-span-1 lg:col-span-1">
             <h3 className="font-display text-lg font-semibold mb-4">Contact</h3>
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
