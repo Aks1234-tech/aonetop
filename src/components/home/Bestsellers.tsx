@@ -17,7 +17,7 @@ export function Bestsellers() {
   };
 
   return (
-    <section className="py-20 bg-muted/100">
+    <section className="py-16 sm:py-20 bg-muted/100">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-12">
@@ -25,7 +25,7 @@ export function Bestsellers() {
             Customer Favorites
           </span>
           <h2 className="font-display text-3xl sm:text-4xl font-semibold text-foreground mt-2 mb-4">
-            Bestselling Teas
+            Bestselling Products
           </h2>
           <p className="text-muted-foreground leading-relaxed">
             Discover our most loved teas, handpicked by tea enthusiasts and

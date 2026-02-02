@@ -65,8 +65,8 @@ export function ShopByCategory() {
   };
 
   return (
-    <section className="py-8 sm:py-12 px-8 bg-background">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="pt-5 pb-16 md:pt-8 md:pb-24 bg-background">
+      <div className="container mx-auto px-4 sm:px-4 lg:px-8">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-12">
           <span className="text-primary font-medium tracking-widest uppercase text-sm">
