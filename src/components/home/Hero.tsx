@@ -12,7 +12,7 @@ const heroSlides = [
     subtitle: 'Handpicked from the finest plantations',
     buttonText: 'Explore Tea Collection',
     buttonLink: '/shop?category=tea',
-    backgroundImage: 'https://images.unsplash.com/photo-1564890369478-c89ca6d9cde9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0OTExMzJ8MHwxfHNlYXJjaHwxfHx0ZWElMjBwbGFudGF0aW9uJTIwZ3JlZW4lMjBsZWF2ZXN8ZW58MHx8fHwxNzM4Mzk4NDU5fDA&ixlib=rb-4.0.3&q=80&w=1920',
+    backgroundImage: '/src/images/home page/Tea_1C.png',
   },
   {
     id: 2,
@@ -20,7 +20,7 @@ const heroSlides = [
     subtitle: 'Traditional purity in every jar',
     buttonText: 'Discover Ghee',
     buttonLink: '/shop?category=ghee',
-    backgroundImage: 'https://images.unsplash.com/photo-1736752346246-61f4daedfde0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhcnRpc2FuJTIwZ2hlZSUyMGJ1dHRlcnxlbnwxfHx8fDE3Njk3OTMxNTJ8MA&ixlib=rb-4.1.0&q=80&w=1080',
+    backgroundImage: '/src/images/home page/Ghee_2C.png',
   },
   {
     id: 3,
@@ -28,7 +28,7 @@ const heroSlides = [
     subtitle: 'Sweet essence from nature',
     buttonText: 'Shop Honey',
     buttonLink: '/shop?category=honey',
-    backgroundImage: 'https://images.unsplash.com/photo-1760447528604-7878bb0940eb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxob25leSUyMGphciUyMHdvb2RlbiUyMGJhY2tncm91bmR8ZW58MXx8fHwxNzY5NjcyNjk2fDA&ixlib=rb-4.1.0&q=80&w=1080',
+    backgroundImage: '/src/images/home page/Honey_3C.png',
   },
 ];
 
@@ -69,7 +69,7 @@ export function Hero() {
         <CarouselContent className="ml-0">
           {heroSlides.map((slide) => (
             <CarouselItem key={slide.id} className="pl-0">
-              <div className="relative min-h-[500px] sm:min-h-[600px] md:min-h-[700px] lg:min-h-screen flex items-center">
+              <div className="relative min-h-[425px] sm:min-h-[600px] md:min-h-[700px] lg:min-h-screen flex items-center">
                 {/* Background Image with Overlay */}
                 <div className="absolute inset-0 overflow-hidden">
                   <img
@@ -77,12 +77,12 @@ export function Hero() {
                     alt={slide.title}
                     className="w-full h-full object-cover object-center"
                   />
-                  <div className="absolute inset-0 bg-black/40" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent sm:bg-black/40" />
                 </div>
 
                 {/* Content */}
-                <div className="container mx-auto px-6 sm:px-8 lg:px-12 relative z-10 py-12 sm:py-16">
-                  <div className="max-w-xl lg:max-w-2xl">
+                <div className="container mx-auto px-6 sm:px-8 lg:px-12 relative z-10 py-8 sm:py-16">
+                  <div className="max-w-full sm:max-w-xl lg:max-w-2xl">
                     <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-semibold text-white leading-tight mb-4 sm:mb-6 animate-fade-up">
                       {slide.title}
                     </h1>
@@ -113,7 +113,7 @@ export function Hero() {
         {/* Navigation Arrows */}
         <button
           onClick={() => api?.scrollPrev()}
-          className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-all group"
+          className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm hidden sm:flex items-center justify-center transition-all group"
           aria-label="Previous slide"
         >
           <ChevronLeft className="w-6 h-6 sm:w-7 sm:h-7 text-white group-hover:scale-110 transition-transform" />
@@ -121,7 +121,7 @@ export function Hero() {
 
         <button
           onClick={() => api?.scrollNext()}
-          className="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-all group"
+          className="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm hidden sm:flex items-center justify-center transition-all group"
           aria-label="Next slide"
         >
           <ChevronRight className="w-6 h-6 sm:w-7 sm:h-7 text-white group-hover:scale-110 transition-transform" />

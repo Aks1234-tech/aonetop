@@ -67,11 +67,11 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-200">
       <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex h-20 items-center justify-between">
+        <div className="flex h-16 sm:h-20 items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-            <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
-              <span className="text-primary-foreground font-display text-xl font-bold">9</span>
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+              <span className="text-primary-foreground font-display text-lg sm:text-xl font-bold">9</span>
             </div>
             <div className="hidden sm:block">
               <h1 className="font-display text-xl font-semibold text-gray-900 tracking-tight">
