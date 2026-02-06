@@ -5,36 +5,15 @@ import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@/com
 import Autoplay from 'embla-carousel-autoplay';
 import { useEffect, useState } from 'react';
 
-const heroSlides = [
-  {
-    id: 1,
-    title: 'Premium Organic Tea',
-    subtitle: 'Handpicked from the finest plantations',
-    buttonText: 'Explore Tea Collection',
-    buttonLink: '/shop?category=tea',
-    backgroundImage: '/src/images/home page/Tea_1C.png',
-  },
-  {
-    id: 2,
-    title: 'Pure Golden Ghee',
-    subtitle: 'Traditional purity in every jar',
-    buttonText: 'Discover Ghee',
-    buttonLink: '/shop?category=ghee',
-    backgroundImage: '/src/images/home page/Ghee_2C.png',
-  },
-  {
-    id: 3,
-    title: '100% Raw Natural Honey',
-    subtitle: 'Sweet essence from nature',
-    buttonText: 'Shop Honey',
-    buttonLink: '/shop?category=honey',
-    backgroundImage: '/src/images/home page/Honey_3C.png',
-  },
-];
+import { useSiteContent } from '@/hooks/useSiteContent';
 
 export function Hero() {
+  const { data: content, isLoading } = useSiteContent();
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
+
+  const heroSlides = content?.heroSlides || [];
+
 
   useEffect(() => {
     if (!api) {
@@ -52,9 +31,16 @@ export function Hero() {
     api?.scrollTo(index);
   };
 
+  /* DEBUG LOG */
+  console.log('[Hero] Render. Content loaded:', !!content, 'Slides:', heroSlides.length);
+  useEffect(() => {
+    console.log('[Hero] Slides data:', heroSlides);
+  }, [heroSlides]);
+
   return (
     <section className="relative min-h-[425px] sm:min-h-screen flex items-center overflow-hidden">
       <Carousel
+        key={heroSlides.map(s => s.backgroundImage).join('-')} /* Force re-init on image change */
         setApi={setApi}
         className="w-full h-[425px] sm:h-screen"
         opts={{
