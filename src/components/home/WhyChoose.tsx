@@ -35,10 +35,10 @@ const features = [
 
 export function WhyChoose() {
   return (
-    <section className="py-20 bg-background text-foreground">
+    <section className="py-12 bg-background text-foreground">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center max-w-2xl mx-auto mb-16">
+        <div className="text-center max-w-2xl mx-auto mb-12">
           <span className="text-primary font-medium tracking-widest uppercase text-sm">
             The 9 Planet Promise
           </span>
@@ -46,7 +46,7 @@ export function WhyChoose() {
             Why Choose Us
           </h2>
           <p className="text-muted-foreground leading-relaxed">
-            We're committed to bringing you the finest teas while supporting sustainable 
+            We're committed to bringing you the finest teas while supporting sustainable
             practices and the communities that grow them.
           </p>
         </div>
