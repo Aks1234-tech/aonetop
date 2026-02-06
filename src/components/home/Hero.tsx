@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+// import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@/components/ui/carousel';
 import Autoplay from 'embla-carousel-autoplay';
@@ -66,9 +66,9 @@ export function Hero() {
                   <div className="relative inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent sm:bg-black/40" />
                 </div>
 
-                {/* Content */}
-                <div className="container mx-auto px-6 sm:px-8 lg:px-12 relative z-10 py-8 sm:py-16">
-                  <div className="max-w-full sm:max-w-xl lg:max-w-2xl">
+                {/* Content Overlay - Centered over the image */}
+                <div className="absolute inset-0 flex items-center justify-start container mx-auto px-6 sm:px-8 lg:px-12 z-10 pointer-events-none">
+                  <div className="max-w-full sm:max-w-xl lg:max-w-2xl text-left w-full pointer-events-auto">
                     <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-semibold text-white leading-tight mb-4 sm:mb-6 animate-fade-up">
                       {slide.title}
                     </h1>
@@ -82,7 +82,7 @@ export function Hero() {
                         variant="default"
                         size="xl"
                         asChild
-                        className="bg-red-600 hover:bg-red-700 text-white font-medium px-6 py-3 rounded text-sm sm:text-base"
+                        className="bg-red-600 hover:bg-red-700 text-white font-medium px-6 py-3 rounded text-sm sm:text-base pointer-events-auto"
                       >
                         <Link to={slide.buttonLink}>
                           {slide.buttonText}
@@ -96,7 +96,7 @@ export function Hero() {
           ))}
         </CarouselContent>
 
-        {/* Navigation Arrows */}
+        {/* Navigation Arrows
         <button
           onClick={() => api?.scrollPrev()}
           className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm hidden sm:flex items-center justify-center transition-all group"
@@ -111,7 +111,7 @@ export function Hero() {
           aria-label="Next slide"
         >
           <ChevronRight className="w-6 h-6 sm:w-7 sm:h-7 text-white group-hover:scale-110 transition-transform" />
-        </button>
+        </button> */}
 
         {/* Indicator Dots */}
         {/* <div className="absolute bottom-16 sm:bottom-12 left-1/2 -translate-x-1/2 z-20 flex gap-2">
@@ -130,7 +130,7 @@ export function Hero() {
       </Carousel>
 
       {/* Bottom Wave */}
-      <div className="absolute -bottom-1 -left-4 right-0 pointer-events-none z-10">
+      <div className="absolute -bottom-4 -left-20 right-0 pointer-events-none z-10">
         <svg viewBox="0 0 1440 150" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-[50px] sm:h-[120px] lg:h-[150px]" preserveAspectRatio="none">
           <path
             d="M0 150L60 130C120 110 240 70 360 50C480 30 600 30 720 40C840 50 960 70 1080 80C1200 90 1320 90 1380 90L1440 90V150H1380C1320 150 1200 150 1080 150C960 150 840 150 720 150C600 150 480 150 360 150C240 150 120 150 60 150H0Z"

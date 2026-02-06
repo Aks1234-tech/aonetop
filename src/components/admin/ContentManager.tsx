@@ -36,20 +36,33 @@ export function ContentManager() {
         }
     };
 
-    /* Updated to support deleting previous image */
+    /* Updated to support deleting previous image and reading dimensions */
     const handleImageUpload = async (
         e: React.ChangeEvent<HTMLInputElement>,
         folder: 'home-slider' | 'about-slider' | 'logo',
-        onSuccess: (url: string) => void,
+        onSuccess: (url: string, dimensions?: { width: number; height: number }) => void,
         previousUrl?: string
     ) => {
         if (!e.target.files || e.target.files.length === 0) return;
         const file = e.target.files[0];
 
+        // Read dimensions
+        let dimensions: { width: number; height: number } | undefined;
+        try {
+            const img = new Image();
+            img.src = URL.createObjectURL(file);
+            await img.decode();
+            dimensions = { width: img.naturalWidth, height: img.naturalHeight };
+            URL.revokeObjectURL(img.src);
+            console.log('[ContentManager] Image dimensions:', dimensions);
+        } catch (err) {
+            console.warn('[ContentManager] Failed to read dimensions:', err);
+        }
+
         setIsUploading(true);
         try {
             const url = await uploadImage.mutateAsync({ file, folder, previousUrl });
-            onSuccess(url);
+            onSuccess(url, dimensions);
             toast({ title: 'Image uploaded successfully' });
         } catch (error: any) {
             console.error(error);
@@ -105,7 +118,7 @@ export function ContentManager() {
                         </CardHeader>
                         <CardContent className="space-y-6">
                             <div className="space-y-2">
-                                <Label>Site Logo</Label>
+                                <Label>Site Logo <span className="text-xs text-muted-foreground ml-2">(Recommended: Square or Wide PNG)</span></Label>
                                 <div className="flex items-start gap-6">
                                     <div className="border rounded-lg p-4 bg-muted/20 w-32 h-32 flex items-center justify-center overflow-hidden">
                                         {localContent.logo.url ? (
@@ -192,7 +205,7 @@ export function ContentManager() {
                                     <div className="grid md:grid-cols-[200px_1fr] gap-6">
                                         {/* Image */}
                                         <div className="space-y-2">
-                                            <Label>Background Image</Label>
+                                            <Label>Background Image <span className="text-xs text-muted-foreground ml-2">(Recommended: 1920x600px)</span></Label>
                                             <div className="rounded-lg border bg-muted/20 h-32 flex items-center justify-center overflow-hidden relative">
                                                 <img src={slide.backgroundImage} alt={slide.title} className="w-full h-full object-cover" />
                                                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
@@ -202,15 +215,26 @@ export function ContentManager() {
                                                             type="file"
                                                             className="absolute inset-0 opacity-0 cursor-pointer"
                                                             accept="image/*"
-                                                            onChange={(e) => handleImageUpload(e, 'home-slider', (url) => {
+                                                            onChange={(e) => handleImageUpload(e, 'home-slider', (url, dims) => {
                                                                 const newSlides = [...localContent.heroSlides];
-                                                                newSlides[index] = { ...slide, backgroundImage: url };
+                                                                newSlides[index] = {
+                                                                    ...slide,
+                                                                    backgroundImage: url,
+                                                                    width: dims?.width,
+                                                                    height: dims?.height
+                                                                };
                                                                 setLocalContent({ ...localContent, heroSlides: newSlides });
                                                             }, slide.backgroundImage)}
                                                         />
                                                     </Button>
                                                 </div>
                                             </div>
+                                            {/* Show Dimensions if available */}
+                                            {slide.width && slide.height && (
+                                                <p className="text-xs text-muted-foreground text-center">
+                                                    Dim: {slide.width}x{slide.height}
+                                                </p>
+                                            )}
                                         </div>
 
                                         {/* Content */}
@@ -328,6 +352,7 @@ export function ContentManager() {
                                             <Plus className="mx-auto h-6 w-6 text-muted-foreground mb-2" />
                                         )}
                                         <span className="text-sm text-muted-foreground">Add Image</span>
+                                        <div className="text-[10px] text-muted-foreground mt-1">Rec: Square/Logo</div>
                                     </div>
                                     <input
                                         type="file"

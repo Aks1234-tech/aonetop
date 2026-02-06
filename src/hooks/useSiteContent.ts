@@ -10,6 +10,8 @@ export interface HeroSlide {
     buttonText: string;
     buttonLink: string;
     backgroundImage: string;
+    width?: number;
+    height?: number;
 }
 
 export interface SiteLogo {
