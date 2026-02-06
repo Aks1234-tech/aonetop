@@ -45,11 +45,11 @@ const officeImages = [
 
 // Brand images (placeholder - replace with actual brand images)
 const brandImages = [
-    'https://images.unsplash.com/photo-1641997825978-5f8d5da5a4a1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxvcmdhbmljJTIwdGVhJTIwbGVhdmVzfGVufDF8fHx8MTc2OTg4MDkzNnww&ixlib=rb-4.1.0&q=80&w=1080',
-    'https://images.unsplash.com/photo-1691480208637-6ed63aac6694?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwdXJlJTIwaG9uZXklMjBqYXJ8ZW58MXx8fHwxNzY5ODgwOTM2fDA&ixlib=rb-4.1.0&q=80&w=1080',
-    'https://images.unsplash.com/photo-1573812461383-e5f8b759d12e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxnaGVlJTIwY2xhcmlmaWVkJTIwYnV0dGVyfGVufDF8fHx8MTc2OTg4MDkzN3ww&ixlib=rb-4.1.0&q=80&w=1080',
-    'https://images.unsplash.com/photo-1765809255360-6ed6240bd10f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxoZXJiYWwlMjB0ZWElMjBjb2xsZWN0aW9ufGVufDF8fHx8MTc2OTg4MDkzN3ww&ixlib=rb-4.1.0&q=80&w=1080',
-    'https://images.unsplash.com/photo-1730190168042-3bef4553a8f4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxvcmdhbmljJTIwYmVla2VlcGluZyUyMGhvbmV5fGVufDF8fHx8MTc2OTg4MDkzOHww&ixlib=rb-4.1.0&q=80&w=1080',
+  'https://images.unsplash.com/photo-1641997825978-5f8d5da5a4a1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxvcmdhbmljJTIwdGVhJTIwbGVhdmVzfGVufDF8fHx8MTc2OTg4MDkzNnww&ixlib=rb-4.1.0&q=80&w=1080',
+  'https://images.unsplash.com/photo-1691480208637-6ed63aac6694?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwdXJlJTIwaG9uZXklMjBqYXJ8ZW58MXx8fHwxNzY5ODgwOTM2fDA&ixlib=rb-4.1.0&q=80&w=1080',
+  'https://images.unsplash.com/photo-1573812461383-e5f8b759d12e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxnaGVlJTIwY2xhcmlmaWVkJTIwYnV0dGVyfGVufDF8fHx8MTc2OTg4MDkzN3ww&ixlib=rb-4.1.0&q=80&w=1080',
+  'https://images.unsplash.com/photo-1765809255360-6ed6240bd10f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxoZXJiYWwlMjB0ZWElMjBjb2xsZWN0aW9ufGVufDF8fHx8MTc2OTg4MDkzN3ww&ixlib=rb-4.1.0&q=80&w=1080',
+  'https://images.unsplash.com/photo-1730190168042-3bef4553a8f4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxvcmdhbmljJTIwYmVla2VlcGluZyUyMGhvbmV5fGVufDF8fHx8MTc2OTg4MDkzOHww&ixlib=rb-4.1.0&q=80&w=1080',
 ];
 
 const About = () => {
@@ -177,7 +177,7 @@ const About = () => {
               </div>
             </div>
             {/* Animated Collage */}
-            <div className="relative h-[500px] w-[500px]">
+            <div className="relative w-full max-w-[500px] aspect-square mx-auto lg:mx-0">
               <div className="grid grid-cols-2 gap-4 h-full">
                 {officeImages.map((img, index) => (
                   <motion.div
@@ -197,9 +197,9 @@ const About = () => {
                   </motion.div>
                 ))}
               </div>
-              <div className="absolute -bottom-6 -right-6 bg-[#D32F2F] text-white p-6 rounded-xl shadow-xl hidden sm:block">
-                <p className="text-4xl font-bold mb-1">10+</p>
-                <p className="text-sm">Years of Excellence</p>
+              <div className="absolute -bottom-4 -right-4 sm:-bottom-6 sm:-right-6 bg-[#D32F2F] text-white p-4 sm:p-6 rounded-xl shadow-xl z-20">
+                <p className="text-3xl sm:text-4xl font-bold mb-1">10+</p>
+                <p className="text-xs sm:text-sm">Years of Excellence</p>
               </div>
             </div>
           </div>
@@ -207,7 +207,7 @@ const About = () => {
       </section>
 
       {/* Our Brands Carousel */}
-      <section className="py-16 sm:py-20 bg-muted/80">
+      <section className="py-14 sm:py-18 bg-muted/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="font-display text-3xl sm:text-4xl font-semibold text-foreground mb-4">
@@ -330,7 +330,7 @@ const About = () => {
       </section>
 
       {/* Certifications Section */}
-      <div className="bg-gray-50 py-16 sm:py-20">
+      <div className="bg-gray-50 py-16 sm:py-18">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
