@@ -38,11 +38,11 @@ export function Hero() {
   }, [heroSlides]);
 
   return (
-    <section className="relative min-h-[425px] sm:min-h-screen flex items-center overflow-hidden">
+    <section className="relative min-h-[400px] sm:min-h-[500px] lg:min-h-[600px] flex items-center overflow-hidden">
       <Carousel
         key={heroSlides.map(s => s.backgroundImage).join('-')} /* Force re-init on image change */
         setApi={setApi}
-        className="w-full h-[425px] sm:h-screen"
+        className="w-full h-[400px] sm:h-[500px] lg:h-[600px]"
         opts={{
           loop: true,
         }}
@@ -55,7 +55,7 @@ export function Hero() {
         <CarouselContent className="ml-0">
           {heroSlides.map((slide) => (
             <CarouselItem key={slide.id} className="pl-0">
-              <div className="relative min-h-[425px] sm:min-h-[600px] md:min-h-[700px] lg:min-h-screen flex items-center">
+              <div className="relative h-[400px] sm:h-[500px] lg:h-[600px] flex items-center">
                 {/* Background Image with Overlay */}
                 <div className="absolute inset-0 overflow-hidden">
                   <img
@@ -63,7 +63,7 @@ export function Hero() {
                     alt={slide.title}
                     className="w-full h-full object-cover object-center"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent sm:bg-black/40" />
+                  <div className="relative inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent sm:bg-black/40" />
                 </div>
 
                 {/* Content */}
