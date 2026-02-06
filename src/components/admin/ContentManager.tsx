@@ -303,8 +303,8 @@ export function ContentManager() {
                         <CardContent>
                             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
                                 {localContent.brandImages.map((img, index) => (
-                                    <div key={index} className="relative group aspect-video rounded-lg overflow-hidden border bg-muted/20">
-                                        <img src={img} alt={`Brand ${index + 1}`} className="w-full h-full object-cover" />
+                                    <div key={index} className="relative group aspect-video rounded-lg overflow-hidden border bg-muted/20 flex items-center justify-center p-2">
+                                        <img src={img} alt={`Brand ${index + 1}`} className="w-full h-full object-contain" />
                                         <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                             <Button
                                                 variant="destructive"
