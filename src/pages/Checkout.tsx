@@ -1,14 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, CreditCard, Truck, CheckCircle, AlertCircle, Loader2, Shield } from 'lucide-react';
+import { ArrowLeft, CreditCard, Truck, CheckCircle, AlertCircle, Loader2, Shield, MapPin, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
 import { useCreateOrder, useCreateRazorpayOrder, useVerifyPayment, useUpdatePaymentStatus } from '@/hooks/useOrders';
 import { initiateRazorpayPayment, formatRazorpayError, PaymentMethodType } from '@/lib/razorpay';
 import { cn } from '@/lib/utils';
+import { useAddresses, Address } from '@/hooks/useAddresses';
 
 const Checkout = () => {
   const { items, cartTotal, clearCart, cartCount, appliedOffer, discount, discountPercentage, finalTotal, removeOffer } = useCart();
@@ -18,11 +20,13 @@ const Checkout = () => {
   const createRazorpayOrder = useCreateRazorpayOrder();
   const verifyPayment = useVerifyPayment();
   const updatePaymentStatus = useUpdatePaymentStatus();
+  const { addresses, isLoading: isLoadingAddresses } = useAddresses();
   
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [orderNumber, setOrderNumber] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethodType>('cod');
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [billingSameAsShipping, setBillingSameAsShipping] = useState(true);
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -36,7 +40,34 @@ const Checkout = () => {
     notes: '',
   });
 
+  const [billingFormData, setBillingFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    address: '',
+    city: '',
+    state: '',
+    pincode: '',
+  });
+
+  const [selectedShippingAddressId, setSelectedShippingAddressId] = useState<string | null>(null);
+  const [selectedBillingAddressId, setSelectedBillingAddressId] = useState<string | null>(null);
+
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const shippingAddresses = addresses?.filter(addr => addr.type === 'shipping') || [];
+  const billingAddresses = addresses?.filter(addr => addr.type === 'billing') || [];
+
+  // Initialize form with default address if available
+  useEffect(() => {
+    if (shippingAddresses.length > 0 && !formData.address) {
+        const defaultShipping = shippingAddresses.find(a => a.is_default) || shippingAddresses[0];
+        if (defaultShipping) {
+            handleAddressSelect(defaultShipping, 'shipping');
+        }
+    }
+  }, [addresses]); // Run when addresses are loaded
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -50,19 +81,74 @@ const Checkout = () => {
   const isFreeShipping = appliedOffer?.type === 'free_shipping' || cartTotal >= 999;
   const shippingCost = isFreeShipping ? 0 : 99;
 
-  // orderTotal logic replaced by render-time calculation
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    // If we're typing, we're likely deviating from a saved address, so deselect it
+    // primarily for address-specific fields
+    if (['address', 'city', 'state', 'pincode'].includes(name)) {
+        setSelectedShippingAddressId(null);
+    }
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  const handleBillingChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setBillingFormData((prev) => ({ ...prev, [name]: value }));
+     if (['address', 'city', 'state', 'pincode'].includes(name)) {
+        setSelectedBillingAddressId(null);
+    }
+    if (errors[`billing_${name}`]) {
+      setErrors((prev) => ({ ...prev, [`billing_${name}`]: '' }));
+    }
+  };
+
+  const handleAddressSelect = (address: Address, type: 'shipping' | 'billing') => {
+    const nameParts = address.name.split(' ');
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || '';
+
+    const newBuffer = {
+        firstName,
+        lastName,
+        email: '', // Address doesn't store email usually, keep existing or empty
+        phone: address.phone,
+        address: address.street,
+        city: address.city,
+        state: address.state,
+        pincode: address.pincode,
+    };
+
+    if (type === 'shipping') {
+        setFormData(prev => ({
+            ...prev,
+            ...newBuffer,
+            email: prev.email, // Preserve email as it's not in address
+        }));
+        setSelectedShippingAddressId(address.id);
+        setErrors({}); // Clear errors
+    } else {
+        setBillingFormData(prev => ({
+            ...prev,
+            ...newBuffer,
+             email: prev.email,
+        }));
+        setSelectedBillingAddressId(address.id);
+        // Clear related billing errors
+        const newErrors = { ...errors };
+        Object.keys(newErrors).forEach(key => {
+            if (key.startsWith('billing_')) delete newErrors[key];
+        });
+        setErrors(newErrors);
     }
   };
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
+    // Validate Shipping
     if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
     if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
     if (!formData.email.trim()) newErrors.email = 'Email is required';
@@ -74,6 +160,17 @@ const Checkout = () => {
     if (!formData.state.trim()) newErrors.state = 'State is required';
     if (!formData.pincode.trim()) newErrors.pincode = 'PIN code is required';
     if (!/^\d{6}$/.test(formData.pincode)) newErrors.pincode = 'Invalid PIN code';
+
+    // Validate Billing if different
+    if (!billingSameAsShipping) {
+        if (!billingFormData.firstName.trim()) newErrors.billing_firstName = 'First name is required';
+        if (!billingFormData.lastName.trim()) newErrors.billing_lastName = 'Last name is required';
+        if (!billingFormData.phone.trim()) newErrors.billing_phone = 'Phone is required';
+        if (!billingFormData.address.trim()) newErrors.billing_address = 'Address is required';
+        if (!billingFormData.city.trim()) newErrors.billing_city = 'City is required';
+        if (!billingFormData.state.trim()) newErrors.billing_state = 'State is required';
+        if (!billingFormData.pincode.trim()) newErrors.billing_pincode = 'PIN code is required';
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -92,6 +189,19 @@ const Checkout = () => {
     }
 
     const orderTotal = (finalTotal + shippingCost) * 100; // Convert to paise
+    
+    // Construct final notes with billing info if different
+    let finalNotes = formData.notes;
+    if (!billingSameAsShipping) {
+        const billingInfo = `
+[Billing Address]
+Name: ${billingFormData.firstName} ${billingFormData.lastName}
+Phone: ${billingFormData.phone}
+Address: ${billingFormData.address}
+City: ${billingFormData.city}, ${billingFormData.state} - ${billingFormData.pincode}
+`;
+        finalNotes = finalNotes ? `${finalNotes}\n${billingInfo}` : billingInfo;
+    }
 
     try {
       // Step 1: Create order in database
@@ -116,7 +226,7 @@ const Checkout = () => {
         },
         paymentMethod: paymentMethod === 'online' ? 'razorpay' : 'cod',
         paymentGateway: paymentMethod === 'online' ? 'razorpay' : 'cod',
-        notes: formData.notes || undefined,
+        notes: finalNotes || undefined,
         offerId: appliedOffer?.id,
         discountAmount: discount * 100, // Convert to paise for DB
         shippingCost: shippingCost * 100, // Convert to paise
@@ -182,6 +292,7 @@ const Checkout = () => {
                   title: 'Payment verification failed',
                   description: 'Please contact support with your order number.',
                   variant: 'destructive',
+                  duration: 6000,
                 });
               } finally {
                 setIsProcessingPayment(false);
@@ -246,6 +357,7 @@ const Checkout = () => {
   };
 
   if (items.length === 0 && !orderPlaced) {
+    // ... existing empty cart render ...
     return (
       <div className="min-h-screen bg-background flex items-center justify-center py-20">
         <div className="text-center">
@@ -264,6 +376,7 @@ const Checkout = () => {
   }
 
   if (orderPlaced) {
+    // ... existing order placed render ...
     return (
       <div className="min-h-screen bg-background flex items-center justify-center py-20">
         <div className="text-center max-w-md">
@@ -304,12 +417,61 @@ const Checkout = () => {
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Form */}
             <div className="lg:col-span-2 space-y-8">
-              {/* Contact Information */}
+              
+              {/* Shipping Address Selection */}
+              {shippingAddresses.length > 0 && (
+                <div className="space-y-4">
+                     <h2 className="font-display text-xl font-semibold text-foreground">
+                        Saved Locations
+                    </h2>
+                    <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+                        {shippingAddresses.map((addr) => (
+                            <div 
+                                key={addr.id}
+                                onClick={() => handleAddressSelect(addr, 'shipping')}
+                                className={cn(
+                                    "min-w-[280px] p-4 rounded-xl border-2 cursor-pointer transition-all relative",
+                                    selectedShippingAddressId === addr.id
+                                      ? "border-primary bg-primary/5"
+                                      : "border-border hover:border-primary/50 bg-card"
+                                )}
+                            >
+                                {selectedShippingAddressId === addr.id && (
+                                    <div className="absolute top-3 right-3 text-primary">
+                                        <CheckCircle className="h-5 w-5 fill-primary/10" />
+                                    </div>
+                                )}
+                                <div className="flex items-center gap-2 mb-2">
+                                    <MapPin className="h-4 w-4 text-muted-foreground" />
+                                    <span className="font-medium text-foreground">{addr.name.split(' ')[0]}'s Location</span>
+                                    {addr.is_default && (
+                                        <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">Default</span>
+                                    )}
+                                </div>
+                                <p className="text-sm text-foreground mb-1 font-medium">{addr.name}</p>
+                                <p className="text-xs text-muted-foreground line-clamp-2">
+                                    {addr.street}, {addr.city}
+                                </p>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                    {addr.state}, {addr.pincode}
+                                </p>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                    {addr.phone}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+              )}
+
+              {/* Contact Information & Shipping Address Form */}
               <div className="bg-card rounded-2xl p-6 shadow-soft">
                 <h2 className="font-display text-xl font-semibold text-foreground mb-6">
-                  Contact Information
+                  Contact & Shipping Information
                 </h2>
-                <div className="grid sm:grid-cols-2 gap-4">
+                
+                {/* Contact Info */}
+                <div className="grid sm:grid-cols-2 gap-4 mb-6">
                   <div>
                     <Label htmlFor="firstName">First Name *</Label>
                     <Input
@@ -365,13 +527,10 @@ const Checkout = () => {
                     )}
                   </div>
                 </div>
-              </div>
 
-              {/* Shipping Address */}
-              <div className="bg-card rounded-2xl p-6 shadow-soft">
-                <h2 className="font-display text-xl font-semibold text-foreground mb-6">
-                  Shipping Address
-                </h2>
+                <div className="border-t border-border my-6"></div>
+
+                {/* Address Info */}
                 <div className="space-y-4">
                   <div>
                     <Label htmlFor="address">Address *</Label>
@@ -431,6 +590,174 @@ const Checkout = () => {
                   </div>
                 </div>
               </div>
+
+               {/* Billing Address Toggle */}
+               <div className="bg-card rounded-2xl p-6 shadow-soft space-y-4">
+                   <div className="flex items-center space-x-2">
+                        <Checkbox 
+                            id="billingSame" 
+                            checked={billingSameAsShipping} 
+                            onCheckedChange={(checked) => setBillingSameAsShipping(checked as boolean)}
+                        />
+                        <Label htmlFor="billingSame" className="font-medium cursor-pointer">
+                            Billing address is same as shipping address
+                        </Label>
+                   </div>
+               </div>
+
+                {/* Billing Address Form (Conditional) */}
+               {!billingSameAsShipping && (
+                <div className="space-y-4">
+                    {/* Saved Billing Addresses */}
+                    {billingAddresses.length > 0 && (
+                         <div className="space-y-4">
+                             <h2 className="font-display text-xl font-semibold text-foreground">
+                                Saved Billing Addresses
+                            </h2>
+                            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+                                {billingAddresses.map((addr) => (
+                                    <div 
+                                        key={addr.id}
+                                        onClick={() => handleAddressSelect(addr, 'billing')}
+                                        className={cn(
+                                            "min-w-[280px] p-4 rounded-xl border-2 cursor-pointer transition-all relative",
+                                            selectedBillingAddressId === addr.id
+                                              ? "border-primary bg-primary/5"
+                                              : "border-border hover:border-primary/50 bg-card"
+                                        )}
+                                    >
+                                        {selectedBillingAddressId === addr.id && (
+                                            <div className="absolute top-3 right-3 text-primary">
+                                                <CheckCircle className="h-5 w-5 fill-primary/10" />
+                                            </div>
+                                        )}
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <MapPin className="h-4 w-4 text-muted-foreground" />
+                                            <span className="font-medium text-foreground">{addr.name}</span>
+                                        </div>
+                                        <p className="text-xs text-muted-foreground line-clamp-2">
+                                            {addr.street}, {addr.city}
+                                        </p>
+                                        <p className="text-xs text-muted-foreground mt-1">
+                                            {addr.state}, {addr.pincode}
+                                        </p>
+                                        <p className="text-xs text-muted-foreground mt-1">
+                                            {addr.phone}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                         </div>
+                    )}
+
+                   <div className="bg-card rounded-2xl p-6 shadow-soft">
+                        <h2 className="font-display text-xl font-semibold text-foreground mb-6">
+                        Billing Address
+                        </h2>
+                        <div className="grid sm:grid-cols-2 gap-4 mb-6">
+                             <div>
+                                <Label htmlFor="billing_firstName">First Name *</Label>
+                                <Input
+                                id="billing_firstName"
+                                name="firstName"
+                                value={billingFormData.firstName}
+                                onChange={handleBillingChange}
+                                className={errors.billing_firstName ? 'border-destructive' : ''}
+                                />
+                                {errors.billing_firstName && (
+                                <p className="text-sm text-destructive mt-1">{errors.billing_firstName}</p>
+                                )}
+                            </div>
+                            <div>
+                                <Label htmlFor="billing_lastName">Last Name *</Label>
+                                <Input
+                                id="billing_lastName"
+                                name="lastName"
+                                value={billingFormData.lastName}
+                                onChange={handleBillingChange}
+                                className={errors.billing_lastName ? 'border-destructive' : ''}
+                                />
+                                {errors.billing_lastName && (
+                                <p className="text-sm text-destructive mt-1">{errors.billing_lastName}</p>
+                                )}
+                            </div>
+                              <div>
+                                <Label htmlFor="billing_phone">Phone *</Label>
+                                <Input
+                                id="billing_phone"
+                                name="phone"
+                                value={billingFormData.phone}
+                                onChange={handleBillingChange}
+                                placeholder="9876543210"
+                                className={errors.billing_phone ? 'border-destructive' : ''}
+                                />
+                                {errors.billing_phone && (
+                                <p className="text-sm text-destructive mt-1">{errors.billing_phone}</p>
+                                )}
+                            </div>
+                        </div>
+
+                         <div className="space-y-4">
+                            <div>
+                                <Label htmlFor="billing_address">Address *</Label>
+                                <Input
+                                id="billing_address"
+                                name="address"
+                                value={billingFormData.address}
+                                onChange={handleBillingChange}
+                                placeholder="House no, Building, Street, Area"
+                                className={errors.billing_address ? 'border-destructive' : ''}
+                                />
+                                {errors.billing_address && (
+                                <p className="text-sm text-destructive mt-1">{errors.billing_address}</p>
+                                )}
+                            </div>
+                             <div className="grid sm:grid-cols-3 gap-4">
+                                <div>
+                                <Label htmlFor="billing_city">City *</Label>
+                                <Input
+                                    id="billing_city"
+                                    name="city"
+                                    value={billingFormData.city}
+                                    onChange={handleBillingChange}
+                                    className={errors.billing_city ? 'border-destructive' : ''}
+                                />
+                                {errors.billing_city && (
+                                    <p className="text-sm text-destructive mt-1">{errors.billing_city}</p>
+                                )}
+                                </div>
+                                <div>
+                                <Label htmlFor="billing_state">State *</Label>
+                                <Input
+                                    id="billing_state"
+                                    name="state"
+                                    value={billingFormData.state}
+                                    onChange={handleBillingChange}
+                                    className={errors.billing_state ? 'border-destructive' : ''}
+                                />
+                                {errors.billing_state && (
+                                    <p className="text-sm text-destructive mt-1">{errors.billing_state}</p>
+                                )}
+                                </div>
+                                <div>
+                                <Label htmlFor="billing_pincode">PIN Code *</Label>
+                                <Input
+                                    id="billing_pincode"
+                                    name="pincode"
+                                    value={billingFormData.pincode}
+                                    onChange={handleBillingChange}
+                                    placeholder="123456"
+                                    className={errors.billing_pincode ? 'border-destructive' : ''}
+                                />
+                                {errors.billing_pincode && (
+                                    <p className="text-sm text-destructive mt-1">{errors.billing_pincode}</p>
+                                )}
+                                </div>
+                            </div>
+                         </div>
+                   </div>
+                </div>
+               )}
 
               {/* Payment Method */}
               <div className="bg-card rounded-2xl p-6 shadow-soft">
