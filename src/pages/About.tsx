@@ -214,15 +214,15 @@ const About = () => {
               Trusted brands delivering premium quality products
             </p>
           </div>
-          <div className="brand-slider pb-8 max-w-4xl mx-auto">
+          <div className="brand-slider pb-8 max-w-5xl mx-auto">
             <Slider {...brandSliderSettings}>
               {brandImages.map((brand, index) => (
                 <div key={index} className="px-0">
-                  <div className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300">
+                  <div className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 h-[350px] w-full flex items-center justify-center p-8">
                     <img
                       src={brand}
                       alt={`Brand ${index + 1}`}
-                      className="w-full h-[400px] object-cover"
+                      className="w-full h-full object-contain hover:scale-105 transition-transform duration-500"
                     />
                   </div>
                 </div>
