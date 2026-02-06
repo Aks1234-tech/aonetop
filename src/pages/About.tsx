@@ -43,16 +43,13 @@ const officeImages = [
   'https://images.unsplash.com/photo-1748346918817-0b1b6b2f9bab?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBvZmZpY2UlMjBlbnZpcm9ubWVudHxlbnwxfHx8fDE3Njk5MjYwNjB8MA&ixlib=rb-4.1.0&q=80&w=1080',
 ];
 
-// Brand images (placeholder - replace with actual brand images)
-const brandImages = [
-  'https://images.unsplash.com/photo-1641997825978-5f8d5da5a4a1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxvcmdhbmljJTIwdGVhJTIwbGVhdmVzfGVufDF8fHx8MTc2OTg4MDkzNnww&ixlib=rb-4.1.0&q=80&w=1080',
-  'https://images.unsplash.com/photo-1691480208637-6ed63aac6694?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwdXJlJTIwaG9uZXklMjBqYXJ8ZW58MXx8fHwxNzY5ODgwOTM2fDA&ixlib=rb-4.1.0&q=80&w=1080',
-  'https://images.unsplash.com/photo-1573812461383-e5f8b759d12e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxnaGVlJTIwY2xhcmlmaWVkJTIwYnV0dGVyfGVufDF8fHx8MTc2OTg4MDkzN3ww&ixlib=rb-4.1.0&q=80&w=1080',
-  'https://images.unsplash.com/photo-1765809255360-6ed6240bd10f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxoZXJiYWwlMjB0ZWElMjBjb2xsZWN0aW9ufGVufDF8fHx8MTc2OTg4MDkzN3ww&ixlib=rb-4.1.0&q=80&w=1080',
-  'https://images.unsplash.com/photo-1730190168042-3bef4553a8f4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxvcmdhbmljJTIwYmVla2VlcGluZyUyMGhvbmV5fGVufDF8fHx8MTc2OTg4MDkzOHww&ixlib=rb-4.1.0&q=80&w=1080',
-];
+import { useSiteContent } from '@/hooks/useSiteContent';
 
 const About = () => {
+  const { data: content } = useSiteContent();
+  console.log('[AboutPage] Received content:', content);
+  const brandImages = content?.brandImages || [];
+
   const [currentBrandIndex, setCurrentBrandIndex] = useState(0);
 
   const brandSliderSettings = {
