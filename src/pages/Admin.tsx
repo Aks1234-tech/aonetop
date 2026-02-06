@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { ShoppingBag, Users, Eye, Tag, MessageSquare, FolderTree } from 'lucide-react';
+import { ShoppingBag, Users, Eye, Tag, MessageSquare, FolderTree, Layers } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ContentManager } from '@/components/admin/ContentManager';
 import { OffersManager } from '@/components/admin/OffersManager';
 import { ProductsManager } from '@/components/admin/ProductsManager';
 import { OrdersManager } from '@/components/admin/OrdersManager';
@@ -9,7 +10,7 @@ import { ContactMessagesManager } from '@/components/admin/ContactMessagesManage
 import { CategoryManager } from '@/components/admin/CategoryManager';
 
 const Admin = () => {
-  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'inquiries' | 'offers' | 'contact' | 'categories'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'inquiries' | 'offers' | 'contact' | 'categories' | 'content'>('products');
 
   return (
     <div className="min-h-screen bg-background">
@@ -58,6 +59,13 @@ const Admin = () => {
               <MessageSquare className="mr-2 h-4 w-4" />
               Contact Messages
             </Button>
+            <Button
+              variant={activeTab === 'content' ? 'default' : 'ghost'}
+              onClick={() => setActiveTab('content')}
+            >
+              <Layers className="mr-2 h-4 w-4" />
+              Site Content
+            </Button>
           </div>
         </div>
 
@@ -73,6 +81,8 @@ const Admin = () => {
           {activeTab === 'offers' && <OffersManager />}
 
           {activeTab === 'contact' && <ContactMessagesManager />}
+
+          {activeTab === 'content' && <ContentManager />}
         </div>
       </div>
     </div>
