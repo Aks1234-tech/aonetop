@@ -17,8 +17,8 @@ export function Bestsellers() {
   };
 
   return (
-    <section className="py-16 sm:py-20 bg-muted/100">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-16 sm:py-16 bg-muted/100">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-4">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-12">
           <span className="text-accent font-medium tracking-widest uppercase text-sm">
