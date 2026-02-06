@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Mail, Phone, MapPin, Instagram, Facebook, Twitter } from 'lucide-react';
+import { useSiteContent } from '@/hooks/useSiteContent';
 
 const footerLinks = {
   shop: [
@@ -22,6 +23,7 @@ const footerLinks = {
 };
 
 export function Footer() {
+  const { data: content } = useSiteContent();
   return (
     <footer className="bg-gray-900 text-white">
       {/* Main Footer */}
@@ -30,9 +32,13 @@ export function Footer() {
           {/* Brand Section */}
           <div className="col-span-2 lg:col-span-2">
             <Link to="/" className="flex items-center gap-3 mb-6" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-              <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground font-display text-xl font-bold">9</span>
-              </div>
+              {content?.logo?.url ? (
+                <img src={content.logo.url} alt={content?.logo?.alt || "9 Planet Impex"} className="h-10 sm:h-12 w-auto object-contain" />
+              ) : (
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+                  <span className="text-primary-foreground font-display text-lg sm:text-xl font-bold">9</span>
+                </div>
+              )}
               <div>
                 <h2 className="font-display text-xl font-semibold tracking-tight">
                   9 Planet Impex
