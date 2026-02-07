@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { useAdminOrders, useUpdateOrderStatus, Order } from '@/hooks/useOrders';
+import { useAdminOrders, useUpdateOrderStatus, useUpdatePaymentStatus, Order } from '@/hooks/useOrders';
 
 // Order status options
 const ORDER_STATUSES = [
@@ -39,6 +39,13 @@ const PAYMENT_STATUSES: Record<string, { label: string; icon: typeof Clock; colo
     failed: { label: 'Failed', icon: AlertTriangle, color: 'bg-red-100 text-red-700' },
     refunded: { label: 'Refunded', icon: RefreshCw, color: 'bg-gray-100 text-gray-700' },
 };
+
+const PAYMENT_STATUS_OPTIONS = [
+    { value: 'pending', label: 'Pending' },
+    { value: 'completed', label: 'Paid' },
+    { value: 'failed', label: 'Failed' },
+    { value: 'refunded', label: 'Refunded' },
+];
 
 // Payment gateway display
 const PAYMENT_GATEWAYS: Record<string, { label: string; icon: typeof CreditCard }> = {
@@ -69,6 +76,7 @@ const formatDate = (dateString: string) => {
 export function OrdersManager() {
     const { data: orders, isLoading } = useAdminOrders();
     const updateStatus = useUpdateOrderStatus();
+    const updatePaymentStatus = useUpdatePaymentStatus();
     const { toast } = useToast();
 
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
@@ -84,6 +92,18 @@ export function OrdersManager() {
             toast({ title: `Order status updated to ${newStatus}` });
         } catch (error) {
             toast({ title: 'Failed to update order status', variant: 'destructive' });
+        }
+    };
+
+    const handlePaymentStatusChange = async (orderId: string, newStatus: string) => {
+        try {
+            await updatePaymentStatus.mutateAsync({
+                orderId,
+                paymentStatus: newStatus
+            });
+            toast({ title: `Payment status updated to ${PAYMENT_STATUSES[newStatus]?.label || newStatus}` });
+        } catch (error) {
+            toast({ title: 'Failed to update payment status', variant: 'destructive' });
         }
     };
 
@@ -155,12 +175,35 @@ export function OrdersManager() {
                                                 const PaymentIcon = paymentStatus.icon;
                                                 const GatewayIcon = paymentGateway.icon;
                                                 return (
-                                                    <div className="flex flex-col gap-1">
-                                                        <span className={`text-xs px-2 py-0.5 rounded-full inline-flex items-center gap-1 w-fit ${paymentStatus.color}`}>
-                                                            <PaymentIcon className="h-3 w-3" />
-                                                            {paymentStatus.label}
-                                                        </span>
-                                                        <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                                    <div className="flex flex-col gap-2">
+                                                        {paymentGateway.label === 'COD' ? (
+                                                            <Select
+                                                                value={(order as any).payment_status}
+                                                                onValueChange={(value) => handlePaymentStatusChange(order.id, value)}
+                                                            >
+                                                                <SelectTrigger className={`h-7 text-xs ${paymentStatus.color} border-0`}>
+                                                                    <SelectValue>
+                                                                        <div className="flex items-center gap-1">
+                                                                            <PaymentIcon className="h-3 w-3" />
+                                                                            {paymentStatus.label}
+                                                                        </div>
+                                                                    </SelectValue>
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    {PAYMENT_STATUS_OPTIONS.map((status) => (
+                                                                        <SelectItem key={status.value} value={status.value}>
+                                                                            {status.label}
+                                                                        </SelectItem>
+                                                                    ))}
+                                                                </SelectContent>
+                                                            </Select>
+                                                        ) : (
+                                                            <span className={`text-xs px-2 py-0.5 rounded-full inline-flex items-center gap-1 w-fit ${paymentStatus.color}`}>
+                                                                <PaymentIcon className="h-3 w-3" />
+                                                                {paymentStatus.label}
+                                                            </span>
+                                                        )}
+                                                        <span className="text-xs text-muted-foreground flex items-center gap-1 px-1">
                                                             <GatewayIcon className="h-3 w-3" />
                                                             {paymentGateway.label}
                                                         </span>
@@ -241,11 +284,40 @@ export function OrdersManager() {
                                     <Label className="text-muted-foreground">Payment Status</Label>
                                     {(() => {
                                         const paymentStatus = PAYMENT_STATUSES[(selectedOrder as any).payment_status] || PAYMENT_STATUSES.pending;
+                                        const paymentGateway = PAYMENT_GATEWAYS[(selectedOrder as any).payment_gateway] || PAYMENT_GATEWAYS.cod;
                                         const PaymentIcon = paymentStatus.icon;
                                         return (
-                                            <div className={`mt-1 px-3 py-1 rounded-full text-sm font-medium inline-flex items-center gap-1 ${paymentStatus.color}`}>
-                                                <PaymentIcon className="h-3 w-3" />
-                                                {paymentStatus.label}
+                                            <div className="mt-1">
+                                                {paymentGateway.label === 'COD' ? (
+                                                    <Select
+                                                        value={(selectedOrder as any).payment_status}
+                                                        onValueChange={(value) => {
+                                                            handlePaymentStatusChange(selectedOrder.id, value);
+                                                            setSelectedOrder({ ...selectedOrder, payment_status: value } as any);
+                                                        }}
+                                                    >
+                                                        <SelectTrigger className={`h-8 text-xs ${paymentStatus.color} border-0 w-fit`}>
+                                                            <SelectValue>
+                                                                <div className="flex items-center gap-1">
+                                                                    <PaymentIcon className="h-3 w-3" />
+                                                                    {paymentStatus.label}
+                                                                </div>
+                                                            </SelectValue>
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {PAYMENT_STATUS_OPTIONS.map((status) => (
+                                                                <SelectItem key={status.value} value={status.value}>
+                                                                    {status.label}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                ) : (
+                                                    <div className={`px-3 py-1 rounded-full text-sm font-medium inline-flex items-center gap-1 ${paymentStatus.color}`}>
+                                                        <PaymentIcon className="h-3 w-3" />
+                                                        {paymentStatus.label}
+                                                    </div>
+                                                )}
                                             </div>
                                         );
                                     })()}

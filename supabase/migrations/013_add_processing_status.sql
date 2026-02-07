@@ -12,4 +12,4 @@ END $$;
 -- Add the new constraint with 'processing' included
 ALTER TABLE orders 
 ADD CONSTRAINT orders_status_check 
-CHECK (status IN ('pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'));
+CHECK (status IN ('pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'returned'));
