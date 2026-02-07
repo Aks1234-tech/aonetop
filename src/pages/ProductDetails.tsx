@@ -126,7 +126,7 @@ const ProductDetails = () => {
   const handleAddToCart = () => {
     const price = getCurrentPrice();
     const weight = getCurrentWeight();
-    
+
     addToCart({
       id: product.id,
       name: product.name,
@@ -136,7 +136,7 @@ const ProductDetails = () => {
       weightVariantId: selectedVariant?.id,
       quantity,
     });
-    
+
     toast({
       title: 'Added to cart',
       description: `${quantity} × ${product.name}${weight ? ` (${weight})` : ''} added to your cart`,
