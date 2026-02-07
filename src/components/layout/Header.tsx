@@ -74,12 +74,13 @@ export function Header() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
             {content?.logo?.url ? (
-              <img src={content.logo.url} alt={content?.logo?.alt || "9 Planet Impex"} className="h-10 sm:h-12 w-auto object-contain" />
+              <img src={content.logo.url} alt={content?.logo?.alt || "9 Planet Impex"} className="h-16 sm:h-19 w-auto object-contain" />
             ) : (
               <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
                 <span className="text-primary-foreground font-display text-lg sm:text-xl font-bold">9</span>
               </div>
             )}
+            {/* have to eplace with hologram logo */}
             <div className="hidden sm:block">
               <h1 className="font-display text-xl font-semibold text-gray-900 tracking-tight">
                 9 Planet Impex

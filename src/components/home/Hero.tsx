@@ -63,12 +63,12 @@ export function Hero() {
                     alt={slide.title}
                     className="w-full h-full object-cover object-center"
                   />
-                  <div className="relative inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent sm:bg-black/40" />
+                  {/* <div className="relative inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent sm:bg-black/40" /> */}
                 </div>
 
                 {/* Content Overlay - Centered over the image */}
                 <div className="absolute inset-0 flex items-center justify-start container mx-auto px-6 sm:px-8 lg:px-12 z-10 pointer-events-none">
-                  <div className="max-w-full sm:max-w-xl lg:max-w-2xl text-left w-full pointer-events-auto">
+                  <div className="max-w-[40%] sm:max-w-[60%] lg:max-w-[50%] text-left w-full pointer-events-auto">
                     <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-semibold text-white leading-tight mb-4 sm:mb-6 animate-fade-up">
                       {slide.title}
                     </h1>
@@ -82,7 +82,7 @@ export function Hero() {
                         variant="default"
                         size="xl"
                         asChild
-                        className="bg-red-600 hover:bg-red-700 text-white font-medium px-6 py-3 rounded text-sm sm:text-base pointer-events-auto"
+                        className="bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-3 rounded text-sm sm:text-base pointer-events-auto"
                       >
                         <Link to={slide.buttonLink}>
                           {slide.buttonText}
@@ -130,7 +130,7 @@ export function Hero() {
       </Carousel>
 
       {/* Bottom Wave */}
-      <div className="absolute -bottom-4 -left-20 right-0 pointer-events-none z-10">
+      <div className="absolute -bottom-5 -left-20 right-0 pointer-events-none z-10">
         <svg viewBox="0 0 1440 150" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-[50px] sm:h-[120px] lg:h-[150px]" preserveAspectRatio="none">
           <path
             d="M0 150L60 130C120 110 240 70 360 50C480 30 600 30 720 40C840 50 960 70 1080 80C1200 90 1320 90 1380 90L1440 90V150H1380C1320 150 1200 150 1080 150C960 150 840 150 720 150C600 150 480 150 360 150C240 150 120 150 60 150H0Z"
