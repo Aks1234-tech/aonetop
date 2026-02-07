@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Mail, Phone, MapPin, Instagram, Facebook, Twitter } from 'lucide-react';
 import { useSiteContent } from '@/hooks/useSiteContent';
 
+
 const footerLinks = {
   shop: [
     { name: 'All Teas', href: '/shop' },
@@ -55,28 +56,40 @@ export function Footer() {
             </p>
             <div className="flex gap-4">
               <a
-                href="https://instagram.com"
+                href="https://indiamart.in/X93gbPll"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary hover:text-white transition-colors duration-300"
+                className="w-10 h-10 rounded-full bg-white-800 flex items-center justify-center hover:bg-white hover:text-white transition-colors duration-300"
               >
-                <Instagram className="h-5 w-5" />
+                <img
+                  src="https://zhwwybsuomutemjojcht.supabase.co/storage/v1/object/public/content-images/INDIAMART.NS.png"
+                  alt="IndiaMart"
+                  className="w-8 h-8 object-contain"
+                />
               </a>
               <a
-                href="https://facebook.com"
+                href="https://www.instagram.com/9planetimpex?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary hover:text-white transition-colors duration-300"
+                className="w-10 h-10 rounded-full bg-white-800 flex items-center justify-center hover:bg-white hover:text-white transition-colors duration-300"
               >
-                <Facebook className="h-5 w-5" />
+                <img
+                  src="https://zhwwybsuomutemjojcht.supabase.co/storage/v1/object/public/content-images/v982-d3-04-removebg-preview.png"
+                  alt="Instagram"
+                  className="w-8 h-8 object-contain"
+                />
               </a>
               <a
-                href="https://twitter.com"
+                href="https://www.facebook.com/share/1CXdLtosMJ/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary hover:text-white transition-colors duration-300"
+                className="w-10 h-10 rounded-full bg-white-800 flex items-center justify-center hover:bg-white hover:text-white transition-colors duration-300"
               >
-                <Twitter className="h-5 w-5" />
+                <img
+                  src="https://zhwwybsuomutemjojcht.supabase.co/storage/v1/object/public/content-images/fb.png"
+                  alt="Facebook"
+                  className="w-8 h-8 object-contain"
+                />
               </a>
             </div>
           </div>
@@ -124,27 +137,28 @@ export function Footer() {
               <li className="flex items-start gap-3">
                 <MapPin className="h-5 w-5 text-primary mt-0.5 shrink-0" />
                 <span className="text-gray-400 text-sm">
-                  123 Tea Garden Road,<br />
-                  Darjeeling, West Bengal,<br />
-                  India - 734101
+                  Maratha Building,<br />
+                  Mandi Prangan,<br />
+                  Pratap Chowk, Chotisadri, Pratapgarh, Rajasthan,<br />
+                  India - 312604
                 </span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="h-5 w-5 text-primary shrink-0" />
                 <a
-                  href="tel:+919876543210"
+                  href="tel:+917503517503"
                   className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
-                  +91 98765 43210
+                  +91 75035 17503
                 </a>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="h-5 w-5 text-primary shrink-0" />
                 <a
-                  href="mailto:hello@9planetimpex.com"
+                  href="mailto:9planetimpax@gmail.com"
                   className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
-                  hello@9planetimpex.com
+                  9planetimpax@gmail.com
                 </a>
               </li>
             </ul>
