@@ -82,12 +82,12 @@ export function Header() {
             )}
             {/* have to eplace with hologram logo */}
             <div className="hidden sm:block">
-              <h1 className="font-display text-xl font-semibold text-gray-900 tracking-tight">
+              <h1 className="font-display text-2xl font-bold text-gray-900 tracking-tight">
                 9 Planet Impex
               </h1>
-              <p className="text-x text-gray-500 tracking-widest uppercase">
+              {/* <p className="text-x text-gray-500 tracking-widest uppercase">
                 Premium Teas
-              </p>
+              </p> */}
             </div>
           </Link>
 
