@@ -27,6 +27,7 @@ const ORDER_STATUSES = [
     { value: 'shipped', label: 'Shipped', icon: Truck, color: 'bg-purple-100 text-purple-700' },
     { value: 'delivered', label: 'Delivered', icon: CheckCircle, color: 'bg-green-100 text-green-700' },
     { value: 'cancelled', label: 'Cancelled', icon: XCircle, color: 'bg-red-100 text-red-700' },
+    { value: 'returned', label: 'Returned', icon: XCircle, color: 'bg-red-100 text-red-700' },
 ];
 
 // Payment status options
