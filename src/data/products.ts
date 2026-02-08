@@ -27,12 +27,12 @@ export interface Product {
 export const products: Product[] = [
   {
     id: "darjeeling-first-flush",
-    name: "Darjeeling First Flush",
+    name: "Masala Chai",
     description: "The champagne of teas, harvested in early spring with delicate muscatel notes",
     longDescription: "Our Darjeeling First Flush is sourced from the pristine gardens of the Himalayan foothills. This exquisite tea is harvested during the first plucking season, producing leaves that yield a light, floral cup with distinctive muscatel characteristics. The pale golden liquor offers a refined complexity that tea connoisseurs treasure.",
-    price: 2499,
-    originalPrice: 2999,
-    image: "https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=800&q=80",
+    price: 125,
+    originalPrice: 135,
+    image: "D:\aonetop\src\images\home page\Masala_Chai.png",
     images: [
       "https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=800&q=80",
       "https://images.unsplash.com/photo-1564890369478-c89ca6d9cde9?w=800&q=80",
