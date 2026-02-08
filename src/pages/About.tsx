@@ -5,6 +5,14 @@ import { useState } from 'react';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+import Autoplay from "embla-carousel-autoplay";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 
 interface ArrowProps {
@@ -37,10 +45,12 @@ function PrevArrow({ onClick }: ArrowProps) {
 
 // Office collage images
 const officeImages = [
-  'https://images.unsplash.com/photo-1748346918817-0b1b6b2f9bab?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBvZmZpY2UlMjB3b3Jrc3BhY2UlMjB0ZWFtfGVufDF8fHx8MTc2OTgzNDUwNXww&ixlib=rb-4.1.0&q=80&w=1080',
-  'https://images.unsplash.com/photo-1686100508812-c38b3593b301?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb3Jwb3JhdGUlMjBvZmZpY2UlMjBpbnRlcmlvcnxlbnwxfHx8fDE3Njk5MjYwNTl8MA&ixlib=rb-4.1.0&q=80&w=1080',
-  'https://images.unsplash.com/photo-1603201667141-5a2d4c673378?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxidXNpbmVzcyUyMHRlYW0lMjBtZWV0aW5nfGVufDF8fHx8MTc2OTg0OTA5NXww&ixlib=rb-4.1.0&q=80&w=1080',
-  'https://images.unsplash.com/photo-1748346918817-0b1b6b2f9bab?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBvZmZpY2UlMjBlbnZpcm9ubWVudHxlbnwxfHx8fDE3Njk5MjYwNjB8MA&ixlib=rb-4.1.0&q=80&w=1080',
+  'https://zhwwybsuomutemjojcht.supabase.co/storage/v1/object/public/office-images/business_Office_1.png  ',
+  'https://zhwwybsuomutemjojcht.supabase.co/storage/v1/object/public/office-images/business_Office_2.png',
+  'https://zhwwybsuomutemjojcht.supabase.co/storage/v1/object/public/office-images/Office_1.jpeg',
+  'https://zhwwybsuomutemjojcht.supabase.co/storage/v1/object/public/office-images/Office_2.jpeg',
+  'https://zhwwybsuomutemjojcht.supabase.co/storage/v1/object/public/office-images/Office_3.jpeg',
+  'https://zhwwybsuomutemjojcht.supabase.co/storage/v1/object/public/office-images/Office_4.jpeg',
 ];
 
 import { useSiteContent } from '@/hooks/useSiteContent';
@@ -173,31 +183,42 @@ const About = () => {
                 </p>
               </div>
             </div>
-            {/* Animated Collage */}
+            {/* Animated Carousel */}
             <div className="relative w-full max-w-[500px] aspect-square mx-auto lg:mx-0">
-              <div className="grid grid-cols-2 gap-4 h-full">
-                {officeImages.map((img, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.5, delay: index * 0.2 }}
-                    viewport={{ once: true }}
-                    className={`relative rounded-xl overflow-hidden shadow-lg ${index === 0 ? 'col-span-2' : ''
-                      } ${index === 3 ? 'col-span-2' : ''}`}
-                  >
-                    <img
-                      src={img}
-                      alt={`Office ${index + 1}`}
-                      className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
-                    />
-                  </motion.div>
-                ))}
-              </div>
-              <div className="absolute -bottom-4 -right-4 sm:-bottom-6 sm:-right-6 bg-[#D32F2F] text-white p-4 sm:p-6 rounded-xl shadow-xl z-20">
+              <Carousel
+                opts={{
+                  loop: true,
+                }}
+                plugins={[
+                  Autoplay({
+                    delay: 2000,
+                  }),
+                ]}
+                className="w-full h-full"
+              >
+                <CarouselContent className="h-full">
+                  {officeImages.map((img, index) => (
+                    <CarouselItem key={index} className="h-full">
+                      <div className="p-1 h-full">
+                        <div className="overflow-hidden rounded-xl h-full shadow-lg relative aspect-square">
+                          <img
+                            src={img}
+                            alt={`Office ${index + 1}`}
+                            className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                          />
+                        </div>
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious className="left-2" />
+                <CarouselNext className="right-2" />
+              </Carousel>
+
+              {/* <div className="absolute -bottom-4 -right-4 sm:-bottom-6 sm:-right-6 bg-[#D32F2F] text-white p-4 sm:p-6 rounded-xl shadow-xl z-20">
                 <p className="text-3xl sm:text-4xl font-bold mb-1">10+</p>
                 <p className="text-xs sm:text-sm">Years of Excellence</p>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
