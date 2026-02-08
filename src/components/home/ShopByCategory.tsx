@@ -22,7 +22,7 @@ const categories: Category[] = [
     name: 'Tea',
     description: 'Premium tea collection',
     // image: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=600&q=80',
-    video: 'https://cdn.pixabay.com/video/2019/05/25/23955-338863711_large.mp4',
+    video: 'https://zhwwybsuomutemjojcht.supabase.co/storage/v1/object/sign/cate_videos/tea.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9lN2YwNGMxMC1mZmQyLTQ3MDgtOWMwMi1lODY4Y2VlYzY0YjEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjYXRlX3ZpZGVvcy90ZWEubXA0IiwiaWF0IjoxNzcwNTQ4NTE2LCJleHAiOjE4MDIwODQ1MTZ9.eisFuddifueFC6bwPF38MIdObKwx8Whq76q5v8ebd6E',
     subcategories: [
       {
         id: 'tea-domestic',
@@ -41,14 +41,14 @@ const categories: Category[] = [
     name: 'Honey',
     description: 'Pure & natural honey',
     // image: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=600&q=80',
-    video: 'https://cdn.pixabay.com/video/2020/02/22/32712-393990225_large.mp4',
+    video: 'https://zhwwybsuomutemjojcht.supabase.co/storage/v1/object/sign/cate_videos/honey.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9lN2YwNGMxMC1mZmQyLTQ3MDgtOWMwMi1lODY4Y2VlYzY0YjEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjYXRlX3ZpZGVvcy9ob25leS5tcDQiLCJpYXQiOjE3NzA1NDg0NzAsImV4cCI6MTgwMjA4NDQ3MH0.rx8NRSKXaWjHiLbVZwS9BZ9YTyfvlDlc6Mac8B5amAU',
   },
   {
     id: 'ghee',
     name: 'Ghee',
     description: 'Premium clarified butter',
     // image: 'https://images.unsplash.com/photo-1631963416786-c715c7b358dd?w=600&q=80',
-    video: 'https://cdn.pixabay.com/video/2026/01/10/326914_medium.mp4',
+    video: 'https://zhwwybsuomutemjojcht.supabase.co/storage/v1/object/sign/cate_videos/ghee.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9lN2YwNGMxMC1mZmQyLTQ3MDgtOWMwMi1lODY4Y2VlYzY0YjEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjYXRlX3ZpZGVvcy9naGVlLm1wNCIsImlhdCI6MTc3MDU0ODQ0NiwiZXhwIjoxODAyMDg0NDQ2fQ.mSk0K8hl8ZMtbT7TzY4tg5smCDPbdWhuN7uz3RZjfTc',
   },
 ];
 
