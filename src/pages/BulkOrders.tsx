@@ -240,7 +240,7 @@ const BulkOrders = () => {
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      placeholder="+91 98765 43210"
+                      placeholder="+91 7503517503"
                       required
                     />
                   </div>
@@ -291,7 +291,7 @@ const BulkOrders = () => {
                     name="productsInterested"
                     value={formData.productsInterested}
                     onChange={handleChange}
-                    placeholder="e.g., Darjeeling, Assam, Chai Blends"
+                    placeholder="e.g., Jaggery Cardamom Chai, Tulsi Adrak Chai, Elaichi Chai, Masala Chai"
                   />
                 </div>
 
