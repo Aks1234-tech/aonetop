@@ -7,7 +7,8 @@ interface Category {
   id: string;
   name: string;
   description: string;
-  image: string;
+  // image: string;
+  video: string;
   subcategories?: {
     id: string;
     name: string;
@@ -16,11 +17,12 @@ interface Category {
 }
 
 const categories: Category[] = [
- {
+  {
     id: 'tea',
     name: 'Tea',
     description: 'Premium tea collection',
-    image: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=600&q=80',
+    // image: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=600&q=80',
+    video: 'https://cdn.pixabay.com/video/2019/05/25/23955-338863711_large.mp4',
     subcategories: [
       {
         id: 'tea-domestic',
@@ -38,13 +40,15 @@ const categories: Category[] = [
     id: 'honey',
     name: 'Honey',
     description: 'Pure & natural honey',
-    image: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=600&q=80',
+    // image: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=600&q=80',
+    video: 'https://cdn.pixabay.com/video/2020/02/22/32712-393990225_large.mp4',
   },
   {
     id: 'ghee',
     name: 'Ghee',
     description: 'Premium clarified butter',
-    image: 'https://images.unsplash.com/photo-1631963416786-c715c7b358dd?w=600&q=80',
+    // image: 'https://images.unsplash.com/photo-1631963416786-c715c7b358dd?w=600&q=80',
+    video: 'https://cdn.pixabay.com/video/2026/01/10/326914_medium.mp4',
   },
 ];
 
@@ -89,11 +93,16 @@ export function ShopByCategory() {
                 onClick={(e) => handleCategoryClick(category, e)}
                 className="group relative overflow-hidden rounded-2xl aspect-[4/3] block ring-1 ring-border hover:ring-2 hover:ring-primary transition"
               >
-                <img
-                  src={category.image}
-                  alt={category.name}
+                <video
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  poster={category.video}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                />
+                >
+                  <source src={category.video} type="video/mp4" />
+                </video>
                 <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/30 to-transparent" />
                 <div className="absolute inset-0 flex flex-col justify-end p-5 lg:p-6">
                   <div className="flex items-start justify-between">
