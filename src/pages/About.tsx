@@ -347,7 +347,7 @@ const About = () => {
               className="bg-white p-8 rounded-xl shadow-md text-center hover:shadow-xl transition-shadow duration-300"
             >
               <Shield className="w-16 h-16 text-[#D32F2F] mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-gray-900 mb-2">USDA Organic</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">IEC Certified</h3>
               <p className="text-gray-600">Certified organic by the United States Department of Agriculture</p>
             </motion.div>
             <motion.div
@@ -358,7 +358,7 @@ const About = () => {
               className="bg-white p-8 rounded-xl shadow-md text-center hover:shadow-xl transition-shadow duration-300"
             >
               <Leaf className="w-16 h-16 text-green-600 mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Fair Trade</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">FSSAI Certified</h3>
               <p className="text-gray-600">Supporting fair wages and ethical treatment of farmers</p>
             </motion.div>
             <motion.div

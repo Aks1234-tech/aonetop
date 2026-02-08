@@ -122,8 +122,9 @@ const Contact = () => {
               </div>
               <h3 className="font-bold text-lg text-gray-900 mb-3">Address</h3>
               <div className="text-gray-600 text-sm space-y-1">
-                <p>123 Organic Lane</p>
-                <p>Nature City, NC 12345</p>
+                <p>SH-15, Maratha Building,</p>
+                <p>Mandi Prangan, Pratap Chowk, Chotisadri,
+                  Pratapgarh, Rajasthan, India - 312604</p>
               </div>
             </div>
 
