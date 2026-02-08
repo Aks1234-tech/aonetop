@@ -163,7 +163,7 @@ const Contact = () => {
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    placeholder="John Doe"
+                    placeholder="name"
                     required
                   />
                 </div>
@@ -177,7 +177,7 @@ const Contact = () => {
                       type="email"
                       value={formData.email}
                       onChange={handleChange}
-                      placeholder="john@example.com"
+                      placeholder="abc@example.com"
                       required
                     />
                   </div>
@@ -188,7 +188,7 @@ const Contact = () => {
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      placeholder="+1 (555) 123-4567"
+                      placeholder="+91 7503517503"
                     />
                   </div>
                 </div>
@@ -246,8 +246,8 @@ const Contact = () => {
               <div className="bg-gray-200 rounded-2xl h-64 flex items-center justify-center">
                 <div className="text-center">
                   <MapPin className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-700 font-semibold">123 Organic Lane</p>
-                  <p className="text-gray-600">Nature City, NC 12345</p>
+                  <p className="text-gray-700 font-semibold">SH-15</p>
+                  <p className="text-gray-600">Pratap Chowk, Chhoti Sadri(Raj.) -312604</p>
                 </div>
               </div>
 
