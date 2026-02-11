@@ -30,12 +30,12 @@ const categories: Category[] = [
         description: 'Traditional domestic tea varieties',
       },
       {
-        id: 'tea-masala',
-        name: 'Masala Tea',
-        description: 'Spiced masala tea blends',
+        id: 'flavoured-tea',
+        name: 'Flavoured Tea',
+        description: 'Flavoured tea blends',
       },
     ],
-  },
+  },  
   {
     id: 'honey',
     name: 'Honey',
