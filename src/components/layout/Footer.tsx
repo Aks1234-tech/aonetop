@@ -34,7 +34,7 @@ export function Footer() {
           <div className="col-span-2 lg:col-span-2">
             <Link to="/" className="flex items-center gap-3 mb-6" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
               {content?.logo?.url ? (
-                <img src={content.logo.url} alt={content?.logo?.alt || "9 Planet Impex"} className="h-10 sm:h-12 w-auto object-contain" />
+                <img src={content.logo.url} alt={content?.logo?.alt || "9 Planet Impex"} className="h-16 sm:h-18 w-auto object-contain" />
               ) : (
                 <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
                   <span className="text-primary-foreground font-display text-lg sm:text-xl font-bold">9</span>
@@ -44,9 +44,6 @@ export function Footer() {
                 <h2 className="font-display text-xl font-semibold tracking-tight">
                   9 Planet Impex
                 </h2>
-                <p className="text-xs text-gray-400 tracking-widest uppercase">
-                  Premium Teas
-                </p>
               </div>
             </Link>
             <p className="text-gray-400 leading-relaxed mb-6 max-w-md">
