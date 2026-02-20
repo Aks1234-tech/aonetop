@@ -33,12 +33,12 @@ export function AboutPreview() {
               </div>
             </div>
             {/* Floating Badge */}
-            {/* <div className="absolute -bottom-6 -right-6 bg-primary rounded-2xl p-5 shadow-elevated animate-float hidden sm:block">
+            <div className="absolute -bottom-6 -right-6 bg-primary rounded-2xl p-5 shadow-elevated animate-float hidden sm:block">
               <div className="text-center text-primary-foreground">
                 <p className="font-display text-3xl font-bold">25+</p>
                 <p className="text-sm text-primary-foreground/80">Years of<br />Excellence</p>
               </div>
-            </div> */}
+            </div>
           </div>
 
           {/* Content */}

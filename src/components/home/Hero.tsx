@@ -1,26 +1,15 @@
 import { Link } from 'react-router-dom';
-// import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight, Leaf } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@/components/ui/carousel';
-import Autoplay from 'embla-carousel-autoplay';
-import { useEffect, useState } from 'react';
-
-import { useSiteContent } from '@/hooks/useSiteContent';
 
 export function Hero() {
-  const { data: content, isLoading } = useSiteContent();
-  const [api, setApi] = useState<CarouselApi>();
-  const [current, setCurrent] = useState(0);
-
-  const heroSlides = content?.heroSlides || [];
-
-
-  useEffect(() => {
-    if (!api) {
-      return;
-    }
-
-    setCurrent(api.selectedScrollSnap());
+  return (
+    <section className="relative min-h-screen flex items-center bg-gradient-hero overflow-visible pb-24 pt-20 lg:pt-24">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-10 overflow-hidden">
+        <div className="absolute top-20 left-10 w-64 h-64 rounded-full bg-gold/30 blur-3xl animate-float" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full bg-emerald-light/20 blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+      </div>
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
@@ -36,47 +25,22 @@ export function Hero() {
               <span className="block text-gold">Art of Tea</span>
             </h1>
 
-  /* DEBUG LOG */
-  console.log('[Hero] Render. Content loaded:', !!content, 'Slides:', heroSlides.length);
-  useEffect(() => {
-    console.log('[Hero] Slides data:', heroSlides);
-  }, [heroSlides]);
+            <p className="text-base sm:text-lg lg:text-xl text-primary-foreground/80 max-w-xl mx-auto lg:mx-0 mb-6 sm:mb-8 leading-relaxed animate-fade-up" style={{ animationDelay: '0.2s' }}>
+              Handpicked from India's finest tea gardens, our premium collection brings you
+              the authentic taste of tradition in every cup.
+            </p>
 
-  return (
-    <section className="relative min-h-[400px] sm:min-h-[500px] lg:min-h-[600px] flex items-center overflow-hidden">
-      <Carousel
-        key={heroSlides.map(s => s.backgroundImage).join('-')} /* Force re-init on image change */
-        setApi={setApi}
-        className="w-full h-[400px] sm:h-[500px] lg:h-[600px]"
-        opts={{
-          loop: true,
-        }}
-        plugins={[
-          Autoplay({
-            delay: 5000,
-          }),
-        ]}
-      >
-        <CarouselContent className="ml-0">
-          {heroSlides.map((slide) => (
-            <CarouselItem key={slide.id} className="pl-0">
-              <div className="relative h-[400px] sm:h-[500px] lg:h-[600px] flex items-center">
-                {/* Background Image with Overlay */}
-                <div className="absolute inset-0 overflow-hidden">
-                  <img
-                    src={slide.backgroundImage}
-                    alt={slide.title}
-                    className="w-full h-full object-cover object-center"
-                  />
-                  {/* <div className="relative inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent sm:bg-black/40" /> */}
-                </div>
-
-                {/* Content Overlay - Centered over the image */}
-                <div className="absolute inset-0 flex items-center justify-start container mx-auto px-6 sm:px-8 lg:px-12 z-10 pointer-events-none">
-                  <div className="max-w-[40%] sm:max-w-[60%] lg:max-w-[50%] text-left w-full pointer-events-auto">
-                    <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-semibold text-white leading-tight mb-4 sm:mb-6 animate-fade-up">
-                      {slide.title}
-                    </h1>
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start animate-fade-up" style={{ animationDelay: '0.3s' }}>
+              <Button variant="gold" size="xl" asChild>
+                <Link to="/shop" className="group">
+                  Explore Collection
+                  <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                </Link>
+              </Button>
+              <Button variant="hero-outline" size="xl" asChild>
+                <Link to="/about">Our Story</Link>
+              </Button>
+            </div>
 
             {/* Stats */}
             <div className="grid grid-cols-3 gap-4 sm:gap-8 mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-primary-foreground/20 animate-fade-up" style={{ animationDelay: '0.4s' }}>
@@ -95,61 +59,35 @@ export function Hero() {
             </div>
           </div>
 
-                    <div className="animate-fade-up" style={{ animationDelay: '0.2s' }}>
-                      <Button
-                        variant="default"
-                        size="xl"
-                        asChild
-                        className="bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-3 rounded text-sm sm:text-base pointer-events-auto"
-                      >
-                        <Link to={slide.buttonLink}>
-                          {slide.buttonText}
-                        </Link>
-                      </Button>
-                    </div>
+          {/* Hero Image */}
+          <div className="relative hidden lg:block animate-fade-up" style={{ animationDelay: '0.2s' }}>
+            <div className="relative w-full aspect-square max-w-lg mx-auto pb-8 pl-8">
+              <div className="absolute inset-0 rounded-full bg-gold/20 blur-3xl" />
+              <img
+                src="https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=800&q=80"
+                alt="Premium tea leaves"
+                className="relative z-10 w-full h-full object-cover rounded-3xl shadow-2xl"
+              />
+              {/* Floating Badge */}
+              <div className="absolute bottom-0 left-0 bg-card rounded-2xl p-3 lg:p-4 shadow-elevated z-20 animate-float">
+                <div className="flex items-center gap-2 lg:gap-3">
+                  <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-emerald flex items-center justify-center flex-shrink-0">
+                    <Leaf className="h-5 w-5 lg:h-6 lg:w-6 text-primary-foreground" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-foreground text-sm lg:text-base">Certified Organic</p>
+                    <p className="text-xs lg:text-sm text-muted-foreground">100% Natural</p>
                   </div>
                 </div>
               </div>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-
-        {/* Navigation Arrows
-        <button
-          onClick={() => api?.scrollPrev()}
-          className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm hidden sm:flex items-center justify-center transition-all group"
-          aria-label="Previous slide"
-        >
-          <ChevronLeft className="w-6 h-6 sm:w-7 sm:h-7 text-white group-hover:scale-110 transition-transform" />
-        </button>
-
-        <button
-          onClick={() => api?.scrollNext()}
-          className="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm hidden sm:flex items-center justify-center transition-all group"
-          aria-label="Next slide"
-        >
-          <ChevronRight className="w-6 h-6 sm:w-7 sm:h-7 text-white group-hover:scale-110 transition-transform" />
-        </button> */}
-
-        {/* Indicator Dots */}
-        {/* <div className="absolute bottom-16 sm:bottom-12 left-1/2 -translate-x-1/2 z-20 flex gap-2">
-          {heroSlides.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => scrollTo(index)}
-              className={`transition-all ${current === index
-                ? 'w-8 h-2 bg-white'
-                : 'w-2 h-2 bg-white/50 hover:bg-white/70'
-                } rounded-full`}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
-        </div> */}
-      </Carousel>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Bottom Wave */}
-      <div className="absolute -bottom-5 -left-20 right-0 pointer-events-none z-10">
-        <svg viewBox="0 0 1440 150" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-[50px] sm:h-[120px] lg:h-[150px]" preserveAspectRatio="none">
+      <div className="absolute -bottom-1 left-0 right-0 pointer-events-none">
+        <svg viewBox="0 0 1440 150" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-[100px] sm:h-[120px] lg:h-[150px]" preserveAspectRatio="none">
           <path
             d="M0 150L60 130C120 110 240 70 360 50C480 30 600 30 720 40C840 50 960 70 1080 80C1200 90 1320 90 1380 90L1440 90V150H1380C1320 150 1200 150 1080 150C960 150 840 150 720 150C600 150 480 150 360 150C240 150 120 150 60 150H0Z"
             fill="hsl(var(--background))"

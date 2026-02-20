@@ -1,74 +1,12 @@
-import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Star, ShoppingBag, Loader2 } from 'lucide-react';
+import { ArrowRight, Star, ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { getBestsellers } from '@/data/products';
 import { useCart } from '@/contexts/CartContext';
-import { supabase } from '@/lib/supabase';
-import type { Database } from '@/lib/database.types';
-
-type Product = Database['public']['Tables']['products']['Row'] & {
-  product_images: Database['public']['Tables']['product_images']['Row'][];
-};
-
-interface BestsellerProduct {
-  id: string;
-  name: string;
-  price: number;
-  originalPrice?: number | null;
-  image: string;
-  rating: number;
-  reviews: number;
-  weight: string;
-  isBestseller: boolean;
-}
 
 export function Bestsellers() {
-  const [bestsellers, setBestsellers] = useState<BestsellerProduct[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const bestsellers = getBestsellers().slice(0, 4);
   const { addToCart } = useCart();
-
-  useEffect(() => {
-    async function fetchBestsellers() {
-      try {
-        const { data, error } = await supabase
-          .from('products')
-          .select('*, product_images(*)')
-          .eq('is_bestseller', true)
-          .limit(4);
-
-        if (error) {
-          throw error;
-        }
-
-        if (data) {
-          const formattedProducts: BestsellerProduct[] = data.map((product: any) => {
-            // Find primary image or use first available, or fallback
-            const primaryImage = product.product_images?.find((img: any) => img.is_primary)
-              || product.product_images?.[0];
-
-            return {
-              id: product.id,
-              name: product.name,
-              price: product.price,
-              originalPrice: product.original_price,
-              image: primaryImage?.url || 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=800&q=80', // Fallback image
-              rating: product.rating || 0,
-              reviews: product.reviews_count || 0,
-              weight: product.weight || '100g', // Default weight if missing
-              isBestseller: product.is_bestseller,
-            };
-          });
-          setBestsellers(formattedProducts);
-        }
-      } catch (error) {
-        console.error('Error fetching bestsellers:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    fetchBestsellers();
-  }, []);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -78,26 +16,16 @@ export function Bestsellers() {
     }).format(price);
   };
 
-  if (isLoading) {
-    return (
-      <section className="py-16 sm:py-16 bg-muted/100">
-        <div className="container mx-auto px-4 flex justify-center items-center min-h-[400px]">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-      </section>
-    );
-  }
-
   return (
-    <section className="py-16 sm:py-16 bg-muted/100">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-4">
+    <section className="py-20 bg-background">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-12">
           <span className="text-accent font-medium tracking-widest uppercase text-sm">
             Customer Favorites
           </span>
           <h2 className="font-display text-3xl sm:text-4xl font-semibold text-foreground mt-2 mb-4">
-            Bestselling Products
+            Bestselling Teas
           </h2>
           <p className="text-muted-foreground leading-relaxed">
             Discover our most loved teas, handpicked by tea enthusiasts and 
@@ -106,7 +34,7 @@ export function Bestsellers() {
         </div>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
           {bestsellers.map((product, index) => (
             <div
               key={product.id}
@@ -118,7 +46,7 @@ export function Bestsellers() {
                 <img
                   src={product.image}
                   alt={product.name}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-130"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
                 {/* Badges */}
                 <div className="absolute top-4 left-4 flex flex-col gap-2">
@@ -127,7 +55,7 @@ export function Bestsellers() {
                       Bestseller
                     </span>
                   )}
-                  {product.originalPrice && product.originalPrice > product.price && (
+                  {product.originalPrice && (
                     <span className="px-3 py-1 bg-destructive text-destructive-foreground text-xs font-semibold rounded-full">
                       Sale
                     </span>
@@ -161,15 +89,18 @@ export function Bestsellers() {
                   <span className="text-sm text-muted-foreground">({product.reviews})</span>
                 </div>
                 <Link to={`/products/${product.id}`}>
-                  <h3 className="font-display text-md font-medium text-foreground group-hover:text-primary transition-colors">
+                  <h3 className="font-display text-lg font-medium text-foreground group-hover:text-primary transition-colors">
                     {product.name}
                   </h3>
                 </Link>
-                <div className="flex items-center gap-3 mt-2">
+                <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                  {product.description}
+                </p>
+                <div className="flex items-center gap-3 mt-4">
                   <span className="font-display text-xl font-semibold text-primary">
                     {formatPrice(product.price)}
                   </span>
-                  {product.originalPrice && product.originalPrice > product.price && (
+                  {product.originalPrice && (
                     <span className="text-sm text-muted-foreground line-through">
                       {formatPrice(product.originalPrice)}
                     </span>
@@ -181,7 +112,7 @@ export function Bestsellers() {
         </div>
 
         {/* CTA */}
-        <div className="text-center mt-10">
+        <div className="text-center mt-12">
           <Button variant="outline" size="lg" asChild>
             <Link to="/shop" className="group">
               View All Bestsellers

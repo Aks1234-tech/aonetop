@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Package, MapPin, LogOut, Settings, Shield, Plus } from 'lucide-react';
+import { User, Package, MapPin, LogOut, Settings, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,40 +8,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { useOrders } from '@/hooks/useOrders';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/lib/supabase';
-import { useAddresses, Address, AddressInsert } from '@/hooks/useAddresses';
-import { AddressCard } from '@/components/ui/AddressCard';
-import { AddressForm } from '@/components/ui/AddressForm';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 
 const Profile = () => {
   const navigate = useNavigate();
   const { user, profile, isAdmin, signOut, updateProfile, isLoading } = useAuth();
   const { data: orders = [], isLoading: ordersLoading } = useOrders();
-  const {
-    addresses,
-    isLoading: addressesLoading,
-    addAddress,
-    updateAddress,
-    deleteAddress,
-    setDefaultAddress
-  } = useAddresses();
-  const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [fullName, setFullName] = useState(profile?.full_name || '');
   const [phone, setPhone] = useState(profile?.phone || '');
   const [isSaving, setIsSaving] = useState(false);
-
-  // Address form state
-  const [isAddressDialogOpen, setIsAddressDialogOpen] = useState(false);
-  const [editingAddress, setEditingAddress] = useState<Address | undefined>(undefined);
 
   // Redirect to home if user logs out
   useEffect(() => {
@@ -61,26 +36,6 @@ const Profile = () => {
   const handleSaveProfile = async () => {
     setIsSaving(true);
     try {
-      // Track changes
-      const changedFields = [];
-
-      if (profile?.full_name !== fullName) {
-        changedFields.push({
-          field: 'Full Name',
-          oldValue: profile?.full_name,
-          newValue: fullName,
-        });
-      }
-
-      if (profile?.phone !== phone) {
-        changedFields.push({
-          field: 'Phone Number',
-          oldValue: profile?.phone,
-          newValue: phone,
-        });
-      }
-
-      // Update profile
       await updateProfile({
         full_name: fullName,
         phone: phone,
@@ -96,30 +51,6 @@ const Profile = () => {
   const handleSignOut = async () => {
     await signOut();
     navigate('/');
-  };
-
-  // Address Handlers
-  const handleAddNewAddress = () => {
-    setEditingAddress(undefined);
-    setIsAddressDialogOpen(true);
-  };
-
-  const handleEditAddress = (address: Address) => {
-    setEditingAddress(address);
-    setIsAddressDialogOpen(true);
-  };
-
-  const handleAddressSubmit = async (data: Omit<AddressInsert, 'user_id'>) => {
-    try {
-      if (editingAddress) {
-        await updateAddress.mutateAsync({ id: editingAddress.id, updates: data });
-      } else {
-        await addAddress.mutateAsync(data);
-      }
-      setIsAddressDialogOpen(false);
-    } catch (error) {
-      // Error handling is done in useAddresses hook
-    }
   };
 
   if (isLoading) {
@@ -158,10 +89,6 @@ const Profile = () => {
                 </Button>
               </Link>
             )}
-            <Button variant="outline" size="sm" onClick={handleSignOut}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Sign Out
-            </Button>
           </div>
         </div>
 
@@ -360,69 +287,21 @@ const Profile = () => {
           {!isAdmin && <TabsContent value="addresses">
             <Card>
               <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle>Saved Addresses</CardTitle>
-                    <CardDescription>Manage your billing and shipping addresses</CardDescription>
-                  </div>
-                  <Button size="sm" onClick={handleAddNewAddress}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Address
-                  </Button>
-                </div>
+                <CardTitle>Saved Addresses</CardTitle>
+                <CardDescription>Manage your delivery addresses</CardDescription>
               </CardHeader>
               <CardContent>
-                {addressesLoading ? (
-                  <div className="text-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
-                    <p className="text-muted-foreground text-sm">Loading addresses...</p>
-                  </div>
-                ) : addresses.length === 0 ? (
-                  <div className="text-center py-8">
-                    <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">No saved addresses</p>
-                    <Button variant="outline" className="mt-4" onClick={handleAddNewAddress}>
-                      Add Your First Address
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {addresses.map((address) => (
-                      <AddressCard
-                        key={address.id}
-                        address={address}
-                        onEdit={handleEditAddress}
-                        onDelete={(id) => deleteAddress.mutate(id)}
-                        onSetDefault={(id, type) => setDefaultAddress.mutate({ id, type })}
-                        isDeleting={deleteAddress.isPending}
-                        isSettingDefault={setDefaultAddress.isPending}
-                      />
-                    ))}
-                  </div>
-                )}
+                <div className="text-center py-8">
+                  <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground">No saved addresses</p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Addresses will be saved when you place an order
+                  </p>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>}
         </Tabs>
-
-        <Dialog open={isAddressDialogOpen} onOpenChange={setIsAddressDialogOpen}>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>{editingAddress ? 'Edit Address' : 'Add New Address'}</DialogTitle>
-              <DialogDescription>
-                {editingAddress
-                  ? 'Update your address details below.'
-                  : 'Enter your new address details below.'}
-              </DialogDescription>
-            </DialogHeader>
-            <AddressForm
-              initialData={editingAddress}
-              onSubmit={handleAddressSubmit}
-              isLoading={addAddress.isPending || updateAddress.isPending}
-              onCancel={() => setIsAddressDialogOpen(false)}
-            />
-          </DialogContent>
-        </Dialog>
       </div>
     </div>
   );

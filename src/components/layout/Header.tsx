@@ -21,10 +21,7 @@ const navigation = [
   { name: 'Contact', href: '/contact' },
 ];
 
-import { useSiteContent } from '@/hooks/useSiteContent';
-
 export function Header() {
-  const { data: content } = useSiteContent();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { cartCount, toggleCart } = useCart();
   const { user, profile, isAdmin, signOut } = useAuth();
@@ -50,24 +47,19 @@ export function Header() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-cream/95 backdrop-blur-md border-b border-border/50">
       <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 sm:h-20 items-center justify-between">
+        <div className="flex h-20 items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 group" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-            {content?.logo?.url ? (
-              <img src={content.logo.url} alt={content?.logo?.alt || "9 Planet Impex"} className="h-16 sm:h-19 w-auto object-contain" />
-            ) : (
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
-                <span className="text-primary-foreground font-display text-lg sm:text-xl font-bold">9</span>
-              </div>
-            )}
-            {/* have to eplace with hologram logo */}
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+              <span className="text-primary-foreground font-display text-xl font-bold">9</span>
+            </div>
             <div className="hidden sm:block">
-              <h1 className="font-display text-2xl font-bold text-gray-900 tracking-tight">
+              <h1 className="font-display text-xl font-semibold text-primary tracking-tight">
                 9 Planet Impex
               </h1>
-              {/* <p className="text-x text-gray-500 tracking-widest uppercase">
+              <p className="text-xs text-muted-foreground tracking-widest uppercase">
                 Premium Teas
-              </p> */}
+              </p>
             </div>
           </Link>
 
