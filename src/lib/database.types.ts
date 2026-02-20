@@ -35,54 +35,6 @@ export interface Database {
                     created_at?: string;
                 };
             };
-            addresses: {
-                Row: {
-                    id: string;
-                    user_id: string;
-                    type: 'billing' | 'shipping';
-                    is_default: boolean;
-                    name: string;
-                    phone: string;
-                    street: string;
-                    city: string;
-                    state: string;
-                    pincode: string;
-                    country: string;
-                    created_at: string;
-                    updated_at: string;
-                };
-                Insert: {
-                    id?: string;
-                    user_id: string;
-                    type: 'billing' | 'shipping';
-                    is_default?: boolean;
-                    name: string;
-                    phone: string;
-                    street: string;
-                    city: string;
-                    state: string;
-                    pincode: string;
-                    country?: string;
-                    created_at?: string;
-                    updated_at?: string;
-                };
-                Update: {
-                    id?: string;
-                    user_id?: string;
-                    type?: 'billing' | 'shipping';
-                    is_default?: boolean;
-                    name?: string;
-                    phone?: string;
-                    street?: string;
-                    city?: string;
-                    state?: string;
-                    pincode?: string;
-                    country?: string;
-                    created_at?: string;
-                    updated_at?: string;
-                };
-                Relationships: [];
-            };
             products: {
                 Row: {
                     id: string;

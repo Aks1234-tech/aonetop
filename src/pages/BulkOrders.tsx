@@ -240,7 +240,7 @@ const BulkOrders = () => {
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      placeholder="+91 7503517503"
+                      placeholder="+91 98765 43210"
                       required
                     />
                   </div>
@@ -291,7 +291,7 @@ const BulkOrders = () => {
                     name="productsInterested"
                     value={formData.productsInterested}
                     onChange={handleChange}
-                    placeholder="e.g., Jaggery Cardamom Chai, Tulsi Adrak Chai, Elaichi Chai, Masala Chai"
+                    placeholder="e.g., Darjeeling, Assam, Chai Blends"
                   />
                 </div>
 
@@ -372,10 +372,10 @@ const BulkOrders = () => {
             </p>
             <div className="flex flex-col md:flex-row gap-4 justify-center">
               <Button variant="default" size="lg" asChild>
-                <a href="tel:+919876543210">Call : +91 7503517503</a>
+                <a href="tel:+919876543210">Call +91 98765 43210</a>
               </Button>
               <Button variant="outline" size="lg" asChild>
-                <a href="mailto:b2b@9planetimpex.com">Email Us : 9planetimpex@gmail.com</a>
+                <a href="mailto:b2b@9planetimpex.com">Email b2b@9planetimpex.com</a>
               </Button>
             </div>
           </div>

@@ -370,17 +370,17 @@ const Shop = () => {
                         {product.description}
                       </p>
                       <div className="flex items-center justify-between mt-4">
-                        <div className="flex items-center gap-1.5 flex-wrap">
+                        <div className="flex items-center gap-2">
                           {(() => {
                             const { price, isFromPrice } = getDisplayPrice(product);
                             return (
                               <>
-                                <span className="font-display text-lg sm:text-xl font-semibold text-primary">
+                                <span className="font-display text-xl font-semibold text-primary">
                                   {isFromPrice && 'From '}
                                   {formatPrice(price)}
                                 </span>
                                 {!isFromPrice && product.original_price && (
-                                  <span className="text-xs sm:text-sm text-muted-foreground line-through">
+                                  <span className="text-sm text-muted-foreground line-through">
                                     {formatPrice(product.original_price)}
                                   </span>
                                 )}
@@ -391,15 +391,14 @@ const Shop = () => {
                         {!isAdmin && (
                           hasWeightVariants(product.weight_variants) ? (
                             <Link to={`/products/${product.slug}`}>
-                              <Button variant="default" size="sm">
-                                Options
+                              <Button variant="gold" size="sm">
+                                View Options
                               </Button>
                             </Link>
                           ) : (
                             <Button
-                              variant="default"
-                              size="icon"
-                              className="shrink-0"
+                              variant="gold"
+                              size="sm"
                               disabled={!isProductAvailable(product)}
                               onClick={() =>
                                 addToCart({
