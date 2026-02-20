@@ -7,7 +7,8 @@ interface Category {
   id: string;
   name: string;
   description: string;
-  image: string;
+  // image: string;
+  video: string;
   subcategories?: {
     id: string;
     name: string;
@@ -20,7 +21,8 @@ const categories: Category[] = [
     id: 'tea',
     name: 'Tea',
     description: 'Premium tea collection',
-    image: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=600&q=80',
+    // image: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=600&q=80',
+    video: 'https://zhwwybsuomutemjojcht.supabase.co/storage/v1/object/sign/cate_videos/tea.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9lN2YwNGMxMC1mZmQyLTQ3MDgtOWMwMi1lODY4Y2VlYzY0YjEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjYXRlX3ZpZGVvcy90ZWEubXA0IiwiaWF0IjoxNzcwNTQ4NTE2LCJleHAiOjE4MDIwODQ1MTZ9.eisFuddifueFC6bwPF38MIdObKwx8Whq76q5v8ebd6E',
     subcategories: [
       {
         id: 'tea-domestic',
@@ -28,23 +30,25 @@ const categories: Category[] = [
         description: 'Traditional domestic tea varieties',
       },
       {
-        id: 'tea-masala',
-        name: 'Masala Tea',
-        description: 'Spiced masala tea blends',
+        id: 'flavoured-tea',
+        name: 'Flavoured Tea',
+        description: 'Flavoured tea blends',
       },
     ],
-  },
+  },  
   {
     id: 'honey',
     name: 'Honey',
     description: 'Pure & natural honey',
-    image: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=600&q=80',
+    // image: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=600&q=80',
+    video: 'https://zhwwybsuomutemjojcht.supabase.co/storage/v1/object/sign/cate_videos/honey.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9lN2YwNGMxMC1mZmQyLTQ3MDgtOWMwMi1lODY4Y2VlYzY0YjEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjYXRlX3ZpZGVvcy9ob25leS5tcDQiLCJpYXQiOjE3NzA1NDg0NzAsImV4cCI6MTgwMjA4NDQ3MH0.rx8NRSKXaWjHiLbVZwS9BZ9YTyfvlDlc6Mac8B5amAU',
   },
   {
     id: 'ghee',
     name: 'Ghee',
     description: 'Premium clarified butter',
-    image: 'https://images.unsplash.com/photo-1631963416786-c715c7b358dd?w=600&q=80',
+    // image: 'https://images.unsplash.com/photo-1631963416786-c715c7b358dd?w=600&q=80',
+    video: 'https://zhwwybsuomutemjojcht.supabase.co/storage/v1/object/sign/cate_videos/ghee.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9lN2YwNGMxMC1mZmQyLTQ3MDgtOWMwMi1lODY4Y2VlYzY0YjEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjYXRlX3ZpZGVvcy9naGVlLm1wNCIsImlhdCI6MTc3MDU0ODQ0NiwiZXhwIjoxODAyMDg0NDQ2fQ.mSk0K8hl8ZMtbT7TzY4tg5smCDPbdWhuN7uz3RZjfTc',
   },
 ];
 
@@ -59,8 +63,8 @@ export function ShopByCategory() {
   };
 
   return (
-    <section className="py-20 bg-background">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="pt-5 pb-16 md:pt-8 md:pb-20 bg-background">
+      <div className="container mx-auto px-4 sm:px-4 lg:px-8">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-12">
           <span className="text-accent font-medium tracking-widest uppercase text-sm">
@@ -75,8 +79,8 @@ export function ShopByCategory() {
           </p>
         </div>
 
-        {/* Categories Grid - 3 main categories */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+        {/* Categories Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {categories.map((category, index) => (
             <div
               key={category.id}
@@ -89,11 +93,16 @@ export function ShopByCategory() {
                 onClick={(e) => handleCategoryClick(category, e)}
                 className="group relative overflow-hidden rounded-2xl aspect-[4/3] block"
               >
-                <img
-                  src={category.image}
-                  alt={category.name}
+                <video
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  poster={category.video}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                />
+                >
+                  <source src={category.video} type="video/mp4" />
+                </video>
                 <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/30 to-transparent" />
                 <div className="absolute inset-0 flex flex-col justify-end p-5 lg:p-6">
                   <div className="flex items-start justify-between">

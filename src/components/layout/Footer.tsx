@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Mail, Phone, MapPin, Instagram, Facebook, Twitter } from 'lucide-react';
+import { useSiteContent } from '@/hooks/useSiteContent';
+
 
 const footerLinks = {
   shop: [
@@ -24,17 +26,22 @@ const footerLinks = {
 };
 
 export function Footer() {
+  const { data: content } = useSiteContent();
   return (
     <footer className="bg-primary text-primary-foreground">
       {/* Main Footer */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
+      <div className="container mx-auto pl-[10%] pr-4 sm:px-6 lg:px-8 py-7">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
           {/* Brand Section */}
-          <div className="lg:col-span-2">
-            <Link to="/" className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-full bg-accent flex items-center justify-center">
-                <span className="text-accent-foreground font-display text-xl font-bold">9</span>
-              </div>
+          <div className="col-span-2 lg:col-span-2">
+            <Link to="/" className="flex items-center gap-3 mb-6" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+              {content?.logo?.url ? (
+                <img src={content.logo.url} alt={content?.logo?.alt || "9 Planet Impex"} className="h-10 sm:h-12 w-auto object-contain" />
+              ) : (
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+                  <span className="text-primary-foreground font-display text-lg sm:text-xl font-bold">9</span>
+                </div>
+              )}
               <div>
                 <h2 className="font-display text-xl font-semibold tracking-tight">
                   9 Planet Impex
@@ -51,28 +58,40 @@ export function Footer() {
             </p>
             <div className="flex gap-4">
               <a
-                href="https://instagram.com"
+                href="https://indiamart.in/X93gbPll"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-colors duration-300"
+                className="w-10 h-10 rounded-full bg-white-800 flex items-center justify-center hover:bg-white hover:text-white transition-colors duration-300"
               >
-                <Instagram className="h-5 w-5" />
+                <img
+                  src="https://zhwwybsuomutemjojcht.supabase.co/storage/v1/object/public/content-images/INDIAMART.NS.png"
+                  alt="IndiaMart"
+                  className="w-8 h-8 object-contain"
+                />
               </a>
               <a
-                href="https://facebook.com"
+                href="https://www.instagram.com/9planetimpex?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-colors duration-300"
+                className="w-10 h-10 rounded-full bg-white-800 flex items-center justify-center hover:bg-white hover:text-white transition-colors duration-300"
               >
-                <Facebook className="h-5 w-5" />
+                <img
+                  src="https://zhwwybsuomutemjojcht.supabase.co/storage/v1/object/public/content-images/v982-d3-04-removebg-preview.png"
+                  alt="Instagram"
+                  className="w-8 h-8 object-contain"
+                />
               </a>
               <a
-                href="https://twitter.com"
+                href="https://www.facebook.com/share/1CXdLtosMJ/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-colors duration-300"
+                className="w-10 h-10 rounded-full bg-white-800 flex items-center justify-center hover:bg-white hover:text-white transition-colors duration-300"
               >
-                <Twitter className="h-5 w-5" />
+                <img
+                  src="https://zhwwybsuomutemjojcht.supabase.co/storage/v1/object/public/content-images/fb.png"
+                  alt="Facebook"
+                  className="w-8 h-8 object-contain"
+                />
               </a>
             </div>
           </div>
@@ -112,33 +131,34 @@ export function Footer() {
           </div>
 
           {/* Contact Info */}
-          <div>
+          <div className="col-span-2 md:col-span-1 lg:col-span-1">
             <h3 className="font-display text-lg font-semibold mb-4">Contact</h3>
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
-                <MapPin className="h-5 w-5 text-accent mt-0.5 shrink-0" />
-                <span className="text-primary-foreground/70 text-sm">
-                  123 Tea Garden Road,<br />
-                  Darjeeling, West Bengal,<br />
-                  India - 734101
+                <MapPin className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                <span className="text-gray-400 text-sm">
+                  Maratha Building,<br />
+                  Mandi Prangan,<br />
+                  Pratap Chowk, Chotisadri, Pratapgarh, Rajasthan,<br />
+                  India - 312604
                 </span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="h-5 w-5 text-accent shrink-0" />
                 <a
-                  href="tel:+919876543210"
-                  className="text-primary-foreground/70 hover:text-accent transition-colors duration-200 text-sm"
+                  href="tel:+917503517503"
+                  className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
-                  +91 98765 43210
+                  +91 75035 17503
                 </a>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="h-5 w-5 text-accent shrink-0" />
                 <a
-                  href="mailto:hello@9planetimpex.com"
-                  className="text-primary-foreground/70 hover:text-accent transition-colors duration-200 text-sm"
+                  href="mailto:9planetimpax@gmail.com"
+                  className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                 >
-                  hello@9planetimpex.com
+                  9planetimpax@gmail.com
                 </a>
               </li>
             </ul>
