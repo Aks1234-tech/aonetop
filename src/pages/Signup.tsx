@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/lib/supabase';
 
 const Signup = () => {
     const navigate = useNavigate();
@@ -49,21 +50,55 @@ const Signup = () => {
 
         setIsLoading(true);
 
-        const { error } = await signUp(email, password, fullName);
+        // Call signup and get user data
+        const { error: signupError, data: signupData } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+                data: {
+                    full_name: fullName,
+                },
+            },
+        });
 
-        if (error) {
+        if (signupError) {
             toast({
                 title: 'Signup failed',
-                description: error.message,
+                description: signupError.message,
                 variant: 'destructive',
             });
             setIsLoading(false);
             return;
         }
 
+        // Get user ID from signup response
+        const userId = signupData?.user?.id;
+        console.log('✅ User created:', userId);
+
+        // Send welcome email notification via Supabase Edge Function
+        if (userId) {
+            try {
+                console.log('📧 Sending welcome email to:', email);
+                const response = await supabase.functions.invoke('send-signup-email', {
+                    body: {
+                        userId: userId,
+                        email: email,
+                        fullName: fullName,
+                    },
+                });
+                console.log('✅ Welcome email function invoked:', response);
+            } catch (emailError) {
+                console.error('⚠️ Welcome email failed:', emailError);
+                // Don't block signup if email fails - continue anyway
+                console.log('ℹ️ Signup completed despite email error. User can still login.');
+            }
+        } else {
+            console.warn('⚠️ No userId returned from signup');
+        }
+
         toast({
             title: 'Account created!',
-            description: 'Please check your email to verify your account.',
+            description: 'Please check your email to verify your account and welcome email.',
         });
 
         navigate('/login');

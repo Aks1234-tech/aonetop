@@ -85,9 +85,40 @@ const Profile = () => {
         full_name: fullName,
         phone: phone,
       });
+
+      // Send notification if changes were made
+      if (changedFields.length > 0 && user?.email) {
+        try {
+          await supabase.functions.invoke('send-profile-update-email', {
+            body: {
+              userId: user.id,
+              email: user.email,
+              fullName: fullName,
+              changedFields: changedFields,
+              ipAddress: 'localhost', // In production, get actual IP
+              timestamp: new Date().toISOString(),
+            },
+          });
+          console.log('✅ Profile update email sent');
+        } catch (emailError) {
+          console.error('⚠️ Profile update email failed:', emailError);
+          // Don't block the profile update if email fails
+        }
+      }
+
+      toast({
+        title: 'Profile updated',
+        description: 'Your profile has been updated successfully.',
+      });
+
       setIsEditing(false);
     } catch (error) {
       console.error('Error updating profile:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to update profile.',
+        variant: 'destructive',
+      });
     } finally {
       setIsSaving(false);
     }
