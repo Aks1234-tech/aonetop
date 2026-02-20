@@ -56,16 +56,16 @@ export function WhyChoose() {
           {features.map((feature, index) => (
             <div
               key={feature.title}
-              className="group p-8 rounded-2xl bg-primary-foreground/5 border border-primary-foreground/10 hover:bg-primary-foreground/10 transition-all duration-300 animate-fade-up"
+              className="group p-8 rounded-2xl bg-card border border-border hover:bg-muted transition-all duration-300 animate-fade-up"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
-              <div className="w-14 h-14 rounded-2xl bg-gold/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                <feature.icon className="h-7 w-7 text-gold" />
+              <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <feature.icon className="h-7 w-7 text-primary" />
               </div>
               <h3 className="font-display text-xl font-semibold mb-3">
                 {feature.title}
               </h3>
-              <p className="text-primary-foreground/70 leading-relaxed">
+              <p className="text-muted-foreground leading-relaxed">
                 {feature.description}
               </p>
             </div>

@@ -4,10 +4,8 @@ import { Mail, Phone, MapPin, Instagram, Facebook, Twitter } from 'lucide-react'
 const footerLinks = {
   shop: [
     { name: 'All Teas', href: '/shop' },
-    { name: 'Black Tea', href: '/shop?category=black-tea' },
-    { name: 'Green Tea', href: '/shop?category=green-tea' },
-    { name: 'Chai Blends', href: '/shop?category=chai-blends' },
-    { name: 'Gift Sets', href: '/shop?category=gifts' },
+    { name: 'Honey', href: '/shop?category=honey' },
+    { name: 'Ghee', href: '/shop?category=ghee' },
   ],
   company: [
     { name: 'Our Story', href: '/about' },
@@ -25,7 +23,7 @@ const footerLinks = {
 
 export function Footer() {
   return (
-    <footer className="bg-primary text-primary-foreground">
+    <footer className="bg-gray-900 text-white">
       {/* Main Footer */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
@@ -39,14 +37,14 @@ export function Footer() {
                 <h2 className="font-display text-xl font-semibold tracking-tight">
                   9 Planet Impex
                 </h2>
-                <p className="text-xs text-primary-foreground/70 tracking-widest uppercase">
+                <p className="text-xs text-gray-400 tracking-widest uppercase">
                   Premium Teas
                 </p>
               </div>
             </Link>
-            <p className="text-primary-foreground/80 leading-relaxed mb-6 max-w-md">
-              Sourcing the finest teas from India's legendary gardens. 
-              Each cup tells a story of tradition, craftsmanship, and 
+            <p className="text-gray-400 leading-relaxed mb-6 max-w-md">
+              Sourcing the finest teas from India's legendary gardens.
+              Each cup tells a story of tradition, craftsmanship, and
               the pure essence of nature.
             </p>
             <div className="flex gap-4">
@@ -85,7 +83,8 @@ export function Footer() {
                 <li key={link.name}>
                   <Link
                     to={link.href}
-                    className="text-primary-foreground/70 hover:text-accent transition-colors duration-200"
+                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                    className="text-gray-400 hover:text-white transition-colors duration-200"
                   >
                     {link.name}
                   </Link>
@@ -102,7 +101,8 @@ export function Footer() {
                 <li key={link.name}>
                   <Link
                     to={link.href}
-                    className="text-primary-foreground/70 hover:text-accent transition-colors duration-200"
+                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                    className="text-gray-400 hover:text-white transition-colors duration-200"
                   >
                     {link.name}
                   </Link>
@@ -124,7 +124,7 @@ export function Footer() {
                 </span>
               </li>
               <li className="flex items-center gap-3">
-                <Phone className="h-5 w-5 text-accent shrink-0" />
+                <Phone className="h-5 w-5 text-primary shrink-0" />
                 <a
                   href="tel:+919876543210"
                   className="text-primary-foreground/70 hover:text-accent transition-colors duration-200 text-sm"
@@ -133,7 +133,7 @@ export function Footer() {
                 </a>
               </li>
               <li className="flex items-center gap-3">
-                <Mail className="h-5 w-5 text-accent shrink-0" />
+                <Mail className="h-5 w-5 text-primary shrink-0" />
                 <a
                   href="mailto:hello@9planetimpex.com"
                   className="text-primary-foreground/70 hover:text-accent transition-colors duration-200 text-sm"
@@ -142,27 +142,30 @@ export function Footer() {
                 </a>
               </li>
             </ul>
+
           </div>
         </div>
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-primary-foreground/10">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="border-t border-gray-800">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-primary-foreground/60 text-sm">
+            <p className="text-gray-400 text-sm">
               © {new Date().getFullYear()} 9 Planet Impex. All rights reserved.
             </p>
             <div className="flex gap-6 text-sm">
               <Link
                 to="/privacy"
-                className="text-primary-foreground/60 hover:text-accent transition-colors duration-200"
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                className="text-gray-400 hover:text-white transition-colors duration-200"
               >
                 Privacy Policy
               </Link>
               <Link
                 to="/terms"
-                className="text-primary-foreground/60 hover:text-accent transition-colors duration-200"
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                className="text-gray-400 hover:text-white transition-colors duration-200"
               >
                 Terms of Service
               </Link>
