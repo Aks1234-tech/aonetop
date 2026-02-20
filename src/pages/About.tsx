@@ -3,8 +3,8 @@ import { Leaf, Mountain, Users, Shield, ChevronLeft, ChevronRight, Award, Heart,
 import { motion } from 'motion/react';
 import { useState } from 'react';
 import Slider from 'react-slick';
-import 'slick-carousel/slick/slick.css';
-import 'slick-carousel/slick/slick-theme.css';
+// import 'slick-carousel/slick/slick.css';
+// import 'slick-carousel/slick/slick-theme.css';
 import Autoplay from "embla-carousel-autoplay";
 import {
   Carousel,
