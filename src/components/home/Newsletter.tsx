@@ -63,7 +63,7 @@ export function Newsletter() {
             />
             <Button
               type="submit"
-              variant="default"
+              variant="gold"
               size="lg"
               disabled={isSubscribed}
               className="h-12"

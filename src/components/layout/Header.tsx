@@ -1,8 +1,7 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, ShoppingBag, Search, User, LogOut, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,20 +26,10 @@ import { useSiteContent } from '@/hooks/useSiteContent';
 export function Header() {
   const { data: content } = useSiteContent();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const searchInputRef = useRef<HTMLInputElement>(null);
   const { cartCount, toggleCart } = useCart();
   const { user, profile, isAdmin, signOut } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-
-  // Focus input when search opens
-  useEffect(() => {
-    if (searchOpen && searchInputRef.current) {
-      searchInputRef.current.focus();
-    }
-  }, [searchOpen]);
 
   const handleSignOut = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -58,17 +47,8 @@ export function Header() {
     }
   };
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/shop?search=${encodeURIComponent(searchQuery)}`);
-      setSearchOpen(false);
-      setSearchQuery('');
-    }
-  };
-
   return (
-    <header className="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-200">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-cream/95 backdrop-blur-md border-b border-border/50">
       <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 sm:h-20 items-center justify-between">
           {/* Logo */}
@@ -97,17 +77,16 @@ export function Header() {
               <Link
                 key={item.name}
                 to={item.href}
-                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                 className={cn(
-                  "text-xl font-medium transition-colors duration-200 relative py-2",
+                  "text-sm font-medium transition-colors duration-200 relative py-2",
                   location.pathname === item.href
-                    ? "text-primary font-semibold"
-                    : "text-gray-700 hover:text-primary"
+                    ? "text-primary"
+                    : "text-muted-foreground hover:text-primary"
                 )}
               >
                 {item.name}
                 {location.pathname === item.href && (
-                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />
+                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent rounded-full" />
                 )}
               </Link>
             ))}
@@ -115,44 +94,9 @@ export function Header() {
 
           {/* Actions */}
           <div className="flex items-center gap-2 sm:gap-4">
-            {/* Inline Search Bar */}
-            <div className="relative flex items-center">
-              <form onSubmit={handleSearchSubmit} className={cn(
-                "transition-all duration-300 ease-in-out overflow-hidden flex items-center",
-                searchOpen ? "w-64 opacity-100" : "w-0 opacity-0"
-              )}>
-                <Input
-                  ref={searchInputRef}
-                  type="text"
-                  placeholder="Search products..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="h-9 pr-8"
-                  onBlur={() => {
-                    // Slight delay to allow form submit if clicking search icon to submit
-                    setTimeout(() => {
-                      if (!searchQuery) setSearchOpen(false);
-                    }, 200);
-                  }}
-                />
-              </form>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="hidden sm:flex z-10"
-                onClick={() => {
-                  if (searchOpen && searchQuery) {
-                    navigate(`/shop?search=${encodeURIComponent(searchQuery)}`);
-                    setSearchQuery('');
-                    setSearchOpen(false);
-                  } else {
-                    setSearchOpen(!searchOpen);
-                  }
-                }}
-              >
-                <Search className="h-5 w-5" />
-              </Button>
-            </div>
+            <Button variant="ghost" size="icon" className="hidden sm:flex">
+              <Search className="h-5 w-5" />
+            </Button>
 
             {user ? (
               <DropdownMenu>
@@ -209,7 +153,7 @@ export function Header() {
               >
                 <ShoppingBag className="h-5 w-5" />
                 {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center animate-scale-in">
+                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-accent text-accent-foreground text-xs font-bold flex items-center justify-center animate-scale-in">
                     {cartCount}
                   </span>
                 )}
@@ -240,10 +184,7 @@ export function Header() {
                 <Link
                   key={item.name}
                   to={item.href}
-                  onClick={() => {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                    setMobileMenuOpen(false);
-                  }}
+                  onClick={() => setMobileMenuOpen(false)}
                   className={cn(
                     "px-4 py-3 rounded-lg text-base font-medium transition-colors duration-200",
                     location.pathname === item.href

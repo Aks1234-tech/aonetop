@@ -122,8 +122,7 @@ const About = () => {
   };
 
   return (
-
-    <div className="min-h-[screen] bg-background">
+    <div className="min-h-screen bg-background">
       {/* Hero */}
       <section className="relative h-[300px] overflow-hidden">
         {/* Background Image */}
@@ -136,50 +135,46 @@ const About = () => {
           {/* Dark Overlay */}
           <div className="absolute inset-0 bg-black/50" />
         </div>
-
-        {/* Content */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4">
-              About 9 Planet Impex
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="max-w-3xl mx-auto text-center">
+            <span className="inline-block px-4 py-1.5 bg-gold/20 text-gold text-sm font-medium rounded-full mb-6">
+              Our Story
+            </span>
+            <h1 className="font-display text-4xl sm:text-5xl font-semibold mb-6">
+              A Legacy of Excellence in Tea
             </h1>
-            <p className="text-xl text-white/90 max-w-2xl mx-auto">
-              Bringing nature's finest organic products to your doorstep since 2015
+            <p className="text-xl text-primary-foreground/80 leading-relaxed">
+              For over 25 years, 9 Planet Impex has been dedicated to sourcing and 
+              sharing the finest teas from India's legendary gardens.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Our Story */}
-      <section className="py-16 sm:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-start">
-            {/* Left: Story Text */}
+      {/* Story */}
+      <section className="py-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="font-display text-3xl sm:text-4xl font-semibold text-foreground mb-6">
-                Our Story
+                From Humble Beginnings to Premium Excellence
               </h2>
               <div className="space-y-4 text-muted-foreground leading-relaxed">
                 <p>
-                  9 Planet Impex was founded with a simple yet powerful mission: to make
-                  premium, organic products accessible to everyone who values health,
-                  quality, and sustainability.
+                  Founded in 1998 by Rajesh Sharma, 9 Planet Impex began as a small 
+                  family business with a simple mission: to bring the authentic taste 
+                  of Indian teas to discerning customers worldwide.
                 </p>
                 <p>
-                  Our journey began in 2015 when our founder, inspired by traditional farming
-                  practices and the purity of natural products, decided to bridge the gap
-                  between organic farmers and conscious consumers.
+                  What started as a modest operation in Darjeeling has grown into a 
+                  trusted name in premium tea sourcing. We've maintained our core values 
+                  of quality, authenticity, and sustainability throughout our journey.
                 </p>
                 <p>
-                  Today, we work directly with certified organic farms across the country,
-                  ensuring that every product that bears our name meets the highest
-                  standards of quality and purity. From the tea estates of Darjeeling to the
-                  honey farms of the Himalayas, we bring you nature's best.
-                </p>
-                <p>
-                  Our name, "9 Planet," symbolizes our commitment to harmony with nature
-                  and the universe. Just as planets orbit in perfect balance, we believe in
-                  maintaining balance between quality, sustainability, and affordability.
+                  Today, we partner directly with over 50 tea estates across Darjeeling, 
+                  Assam, Nilgiri, and other renowned tea-growing regions. Each relationship 
+                  is built on mutual respect, fair trade practices, and a shared commitment 
+                  to excellence.
                 </p>
               </div>
             </div>
@@ -254,7 +249,7 @@ const About = () => {
       </section>
 
       {/* Values */}
-      <section className="py-16 sm:py-18 bg-muted/50">
+      <section className="py-20 bg-muted/50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="font-display text-3xl sm:text-4xl font-semibold text-foreground mb-4">
@@ -274,7 +269,7 @@ const About = () => {
                 Quality First
               </h3>
               <p className="text-muted-foreground leading-relaxed">
-                We never compromise on quality. Every tea is personally selected and
+                We never compromise on quality. Every tea is personally selected and 
                 tested to ensure it meets our exacting standards.
               </p>
             </div>
@@ -287,7 +282,7 @@ const About = () => {
                 Sustainability
               </h3>
               <p className="text-muted-foreground leading-relaxed">
-                We're committed to environmental responsibility, partnering only with
+                We're committed to environmental responsibility, partnering only with 
                 estates that practice sustainable farming methods.
               </p>
             </div>
@@ -300,7 +295,7 @@ const About = () => {
                 Fair Trade
               </h3>
               <p className="text-muted-foreground leading-relaxed">
-                We ensure fair prices for tea farmers and workers, supporting the
+                We ensure fair prices for tea farmers and workers, supporting the 
                 communities that make our teas possible.
               </p>
             </div>
@@ -313,7 +308,7 @@ const About = () => {
                 Direct Sourcing
               </h3>
               <p className="text-muted-foreground leading-relaxed">
-                By working directly with tea estates, we ensure freshness and
+                By working directly with tea estates, we ensure freshness and 
                 authenticity while supporting growers.
               </p>
             </div>
@@ -326,7 +321,7 @@ const About = () => {
                 Authenticity
               </h3>
               <p className="text-muted-foreground leading-relaxed">
-                Every tea we sell is 100% authentic, traceable to its source, and
+                Every tea we sell is 100% authentic, traceable to its source, and 
                 represents the true character of its origin.
               </p>
             </div>
@@ -339,7 +334,7 @@ const About = () => {
                 Customer Love
               </h3>
               <p className="text-muted-foreground leading-relaxed">
-                Our customers are family. We're dedicated to providing exceptional
+                Our customers are family. We're dedicated to providing exceptional 
                 service and sharing our passion for tea.
               </p>
             </div>
@@ -351,11 +346,11 @@ const About = () => {
       <div className="bg-gray-50 py-16 sm:py-18">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Our Certifications
+            <h2 className="font-display text-3xl sm:text-4xl font-semibold text-foreground mb-4">
+              The People Behind the Cup
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Trusted certifications that validate our commitment to quality
+            <p className="text-muted-foreground max-w-xl mx-auto">
+              Meet the passionate team that brings you the finest teas from India.
             </p>
           </div>
 
@@ -395,7 +390,31 @@ const About = () => {
             </motion.div>
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* Stats */}
+      <section className="py-20 bg-primary text-primary-foreground">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div>
+              <p className="font-display text-4xl sm:text-5xl font-bold text-gold">25+</p>
+              <p className="text-primary-foreground/80 mt-2">Years of Excellence</p>
+            </div>
+            <div>
+              <p className="font-display text-4xl sm:text-5xl font-bold text-gold">50+</p>
+              <p className="text-primary-foreground/80 mt-2">Partner Estates</p>
+            </div>
+            <div>
+              <p className="font-display text-4xl sm:text-5xl font-bold text-gold">10K+</p>
+              <p className="text-primary-foreground/80 mt-2">Happy Customers</p>
+            </div>
+            <div>
+              <p className="font-display text-4xl sm:text-5xl font-bold text-gold">50+</p>
+              <p className="text-primary-foreground/80 mt-2">Tea Varieties</p>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };

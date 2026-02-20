@@ -4,7 +4,7 @@
  */
 
 import { useEffect, useState, useCallback } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from './useAuth'; // Assuming auth hook exists
 import { supabase } from '../lib/supabase';
 import { notificationService } from '../lib/notificationService';
 import type { NotificationType, NotificationChannel } from '../lib/notificationService';
@@ -37,10 +37,9 @@ export function useNotificationPreferences() {
         .eq('user_id', user?.id)
         .single();
 
-      if (error || !data) throw error;
+      if (error) throw error;
 
-      const prefs = ((data as any)?.notification_preferences as Record<NotificationType, NotificationChannel[]>) || ({} as Record<NotificationType, NotificationChannel[]>);
-      setPreferences(prefs);
+      setPreferences(data?.notification_preferences || {});
       setError(null);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch preferences';
@@ -67,7 +66,7 @@ export function useNotificationPreferences() {
           [notificationType]: channels,
         };
 
-        const { error } = await (supabase as any)
+        const { error } = await supabase
           .from('user_contact_info')
           .update({ notification_preferences: updatedPrefs })
           .eq('user_id', user.id);
@@ -120,16 +119,14 @@ export function useNotificationPreferences() {
           .eq('user_id', user.id)
           .single();
 
-        if (!data) throw new Error('User data not found');
-
-        const unsubscribedFrom = (((data as any)?.unsubscribed_from || []) as NotificationType[]);
+        const unsubscribedFrom = data?.unsubscribed_from || [];
 
         // Add if not already unsubscribed
         if (!unsubscribedFrom.includes(notificationType)) {
           unsubscribedFrom.push(notificationType);
         }
 
-        const { error } = await (supabase as any)
+        const { error } = await supabase
           .from('user_contact_info')
           .update({ unsubscribed_from: unsubscribedFrom })
           .eq('user_id', user.id);
@@ -294,9 +291,9 @@ export function useNotificationStatus(notificationId: string | null) {
         .eq('id', notificationId)
         .single();
 
-      if (error || !data) throw error;
+      if (error) throw error;
 
-      setStatus(((data as any)?.status as string) || null);
+      setStatus(data?.status || null);
     } catch (err) {
       console.error('Error fetching notification status:', err);
     } finally {

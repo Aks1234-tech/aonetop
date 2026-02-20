@@ -100,7 +100,7 @@ export function Bestsellers() {
             Bestselling Products
           </h2>
           <p className="text-muted-foreground leading-relaxed">
-            Discover our most loved teas, handpicked by tea enthusiasts and
+            Discover our most loved teas, handpicked by tea enthusiasts and 
             cherished for their exceptional quality and taste.
           </p>
         </div>
@@ -135,7 +135,7 @@ export function Bestsellers() {
                 </div>
                 {/* Quick Add */}
                 <Button
-                  variant="default"
+                  variant="gold"
                   size="icon"
                   className="absolute bottom-4 right-4 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300"
                   onClick={(e) => {

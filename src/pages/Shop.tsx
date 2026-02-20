@@ -14,7 +14,7 @@ const Shop = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
-  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+  const [searchQuery, setSearchQuery] = useState('');
   const [loadTimeout, setLoadTimeout] = useState(false);
   const { addToCart } = useCart();
   const { isAdmin } = useAuth();
@@ -42,14 +42,6 @@ const Shop = () => {
     }
     setLoadTimeout(false);
   }, [isLoading]);
-
-  // Sync search query from URL
-  useEffect(() => {
-    const query = searchParams.get('search');
-    if (query !== null) {
-      setSearchQuery(query);
-    }
-  }, [searchParams]);
 
   const formatPrice = (price: number) => {
     // Prices are stored in paise, convert to rupees
@@ -148,21 +140,6 @@ const Shop = () => {
               <div className="mb-6">
                 <h4 className="font-medium text-foreground mb-3">Categories</h4>
                 <div className="space-y-2">
-                  {/* All Products Button */}
-                  <button
-                    onClick={() => {
-                      searchParams.delete('category');
-                      setSearchParams(searchParams);
-                    }}
-                    className={cn(
-                      "w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors",
-                      !selectedCategory
-                        ? "bg-primary text-primary-foreground"
-                        : "hover:bg-muted text-muted-foreground hover:text-foreground"
-                    )}
-                  >
-                    <span className="font-medium">All</span>
-                  </button>
                   {/* Show only main categories: Tea, Honey, Ghee */}
                   {categories
                     .filter((cat) => !cat.parent_id)
@@ -235,7 +212,7 @@ const Shop = () => {
                 </div>
 
                 {/* View Mode */}
-                <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
+                <div className="hidden sm:flex items-center gap-1 bg-muted rounded-lg p-1">
                   <Button
                     variant={viewMode === 'grid' ? 'default' : 'ghost'}
                     size="icon"
@@ -304,7 +281,7 @@ const Shop = () => {
               <div
                 className={cn(
                   viewMode === 'grid'
-                    ? "grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 gap-6"
+                    ? "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6"
                     : "space-y-4"
                 )}
               >
