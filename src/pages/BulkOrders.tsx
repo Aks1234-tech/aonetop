@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Building2, Package, Truck, HeartHandshake, Send, CheckCircle, Loader2 } from 'lucide-react';
+import { DollarSign, Sparkles, List, Clock, Send, CheckCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,24 +9,32 @@ import { useSubmitBulkInquiry } from '@/hooks/useForms';
 
 const benefits = [
   {
-    icon: Package,
-    title: 'Competitive Bulk Pricing',
-    description: 'Get wholesale rates for large orders with volume-based discounts.',
+    icon: DollarSign,
+    title: 'Competitive Pricing',
+    description: 'Get the best rates on bulk orders with our special wholesale pricing structure.',
+    color: 'bg-green-50',
+    iconColor: 'text-green-600',
   },
   {
-    icon: Building2,
-    title: 'Private Labeling',
-    description: 'Create your own tea brand with our custom labeling services.',
+    icon: Sparkles,
+    title: 'Best Quality',
+    description: 'Premium organic products sourced directly from certified farms ensuring top quality.',
+    color: 'bg-amber-50',
+    iconColor: 'text-amber-600',
   },
   {
-    icon: Truck,
-    title: 'Reliable Supply Chain',
-    description: 'Consistent quality and timely delivery you can count on.',
+    icon: List,
+    title: 'Different Varieties',
+    description: 'Wide range of Tea, Honey, and Ghee products to meet all your business needs.',
+    color: 'bg-purple-50',
+    iconColor: 'text-purple-600',
   },
   {
-    icon: HeartHandshake,
-    title: 'Dedicated Support',
-    description: 'Personal account manager for all your business needs.',
+    icon: Clock,
+    title: 'Priority Processing',
+    description: 'Bulk orders receive priority processing and expedited handling.',
+    color: 'bg-orange-50',
+    iconColor: 'text-orange-600',
   },
 ];
 
@@ -116,36 +124,53 @@ const BulkOrders = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero */}
-      <section className="py-16 bg-primary text-primary-foreground">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto text-center">
-            <span className="inline-block px-4 py-1.5 bg-gold/20 text-gold text-sm font-medium rounded-full mb-6">
-              B2B Partnership
-            </span>
-            <h1 className="font-display text-4xl sm:text-5xl font-semibold mb-6">
-              Bulk Orders & Business Solutions
+      <section className="relative h-[300px] overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <img
+            src="https://images.unsplash.com/photo-1766040923580-16ad32fae8b4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx3YXJlaG91c2UlMjBpbnZlbnRvcnklMjBib3hlc3xlbnwxfHx8fDE3Njk4NzYwNzh8MA&ixlib=rb-4.1.0&q=80&w=1080"
+            alt="Bulk shipping boxes"
+            className="w-full h-full object-cover"
+          />
+          {/* Dark Overlay */}
+          <div className="absolute inset-0 bg-black/60" />
+        </div>
+
+        {/* Content */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-center px-4">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4">
+              Bulk Orders
             </h1>
-            <p className="text-xl text-primary-foreground/80">
-              Partner with us for premium tea supplies. Whether you're a hotel,
-              restaurant, cafe, or retailer, we have tailored solutions for you.
+            <p className="text-2xl text-white/90 max-w-2xl mx-auto">
+              Perfect for restaurants, hotels, retailers, and corporate gifting
             </p>
           </div>
         </div>
       </section>
 
       {/* Benefits */}
-      <section className="py-16">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-16 sm:py-18 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+              Why Choose Our Bulk Service?
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              We make bulk ordering simple, affordable, and hassle-free
+            </p>
+          </div>
+
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {benefits.map((benefit) => (
               <div key={benefit.title} className="text-center">
-                <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <benefit.icon className="h-8 w-8 text-primary" />
+                <div className={`w-20 h-20 rounded-full ${benefit.color} flex items-center justify-center mx-auto mb-4`}>
+                  <benefit.icon className={`h-10 w-10 ${benefit.iconColor}`} />
                 </div>
-                <h3 className="font-display text-lg font-semibold text-foreground mb-2">
+                <h3 className="font-bold text-lg text-gray-900 mb-2">
                   {benefit.title}
                 </h3>
-                <p className="text-muted-foreground text-sm">
+                <p className="text-gray-600 text-3sm leading-relaxed">
                   {benefit.description}
                 </p>
               </div>
@@ -155,21 +180,21 @@ const BulkOrders = () => {
       </section>
 
       {/* Form */}
-      <section className="py-16 bg-muted/50">
+      <section className="py-16 sm:py-18 bg-gray-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-2xl mx-auto">
+          <div className="max-w-3xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="font-display text-3xl font-semibold text-foreground mb-4">
+              <h2 className="font-display text-4xl font-semibold text-foreground mb-4">
                 Request a Quote
               </h2>
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground text-lg">
                 Fill out the form below and our B2B team will get back to you
                 with a customized quote within 24 hours.
               </p>
             </div>
 
             <div className="bg-card rounded-2xl p-8 shadow-soft">
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-6 text-sm">
                 <div className="grid sm:grid-cols-2 gap-6">
                   <div>
                     <Label htmlFor="companyName">Company Name *</Label>
@@ -337,15 +362,15 @@ const BulkOrders = () => {
       {/* CTA */}
       <section className="py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-muted rounded-2xl p-8 md:p-12 text-center">
-            <h2 className="font-display text-2xl font-semibold text-foreground mb-4">
+          <div className="bg-muted/60 rounded-2xl p-8 md:p-12 text-center">
+            <h2 className="font-display text-4xl font-semibold text-foreground mb-4">
               Prefer to Talk Directly?
             </h2>
-            <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
+            <p className="text-muted-foreground mb-6 max-w-3xl mx-auto">
               Our B2B team is available Monday to Saturday, 9 AM to 6 PM IST.
               Call us for immediate assistance with your bulk order requirements.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col md:flex-row gap-4 justify-center">
               <Button variant="default" size="lg" asChild>
                 <a href="tel:+919876543210">Call : +91 7503517503</a>
               </Button>

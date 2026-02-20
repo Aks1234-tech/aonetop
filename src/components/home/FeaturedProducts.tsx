@@ -69,7 +69,7 @@ export function FeaturedProducts() {
                     {formatPrice(featured[0].price)}
                   </span>
                   <Button
-                    variant="gold"
+                    variant="default"
                     onClick={() =>
                       addToCart({
                         id: featured[0].id,
@@ -122,6 +122,7 @@ export function FeaturedProducts() {
                     <Button
                       variant="outline"
                       size="sm"
+                      className="hover:bg-primary hover:text-primary-foreground"
                       onClick={() =>
                         addToCart({
                           id: product.id,

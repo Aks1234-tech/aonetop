@@ -19,11 +19,12 @@ interface ProductsQueryOptions {
     filters?: ProductFilters;
     sortBy?: 'featured' | 'price-asc' | 'price-desc' | 'name' | 'rating';
     limit?: number;
+    enabled?: boolean;
 }
 
 // Fetch all products with optional filters and sorting
 export function useProducts(options: ProductsQueryOptions = {}) {
-    const { filters = {}, sortBy = 'featured', limit } = options;
+    const { filters = {}, sortBy = 'featured', limit, enabled = true } = options;
 
     return useQuery<Product[]>({
         queryKey: ['products', JSON.stringify(filters), sortBy, limit],
@@ -143,6 +144,7 @@ export function useProducts(options: ProductsQueryOptions = {}) {
         retry: false,
         staleTime: 60 * 1000,
         refetchOnWindowFocus: false,
+        enabled,
     });
 }
 

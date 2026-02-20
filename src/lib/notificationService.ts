@@ -102,17 +102,22 @@ class NotificationService {
       }
 
       // Determine channels to use
+      // NOTE: Currently defaulting to ['email'] only
+      // When SMS/WhatsApp are enabled, this will use user preferences
       const channelsToUse =
         payload.channels ||
         contactInfo.notification_preferences[payload.notificationType] ||
-        ['email'];
+        ['email']; // EMAIL ONLY
+
+      // Filter out SMS and WhatsApp for now (email only)
+      const activeChannels = channelsToUse.filter(ch => ch === 'email');
 
       // Send via each channel
       const results: Record<NotificationChannel, any> = {};
       let successCount = 0;
       let failureCount = 0;
 
-      for (const channel of channelsToUse) {
+      for (const channel of activeChannels) {
         try {
           const result = await this.sendViaChannel(
             channel,
@@ -185,6 +190,10 @@ class NotificationService {
 
   /**
    * Send via specific channel
+   * 
+   * NOTE: Currently only EMAIL is enabled.
+   * SMS and WhatsApp are commented out below.
+   * To enable them, uncomment the case statements and remove the throw statements.
    */
   private async sendViaChannel(
     channel: NotificationChannel,
@@ -194,10 +203,17 @@ class NotificationService {
     switch (channel) {
       case 'email':
         return await this.sendEmail(payload, contactInfo);
+      
       case 'sms':
-        return await this.sendSMS(payload, contactInfo);
+        // ⚠️  SMS DISABLED - Uncomment to enable
+        // return await this.sendSMS(payload, contactInfo);
+        throw new Error('SMS notifications are not enabled yet. Configure when needed.');
+      
       case 'whatsapp':
-        return await this.sendWhatsApp(payload, contactInfo);
+        // ⚠️  WHATSAPP DISABLED - Uncomment to enable
+        // return await this.sendWhatsApp(payload, contactInfo);
+        throw new Error('WhatsApp notifications are not enabled yet. Configure when needed.');
+      
       default:
         throw new Error(`Unknown channel: ${channel}`);
     }
