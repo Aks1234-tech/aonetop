@@ -221,19 +221,20 @@ const About = () => {
         </div>
       </section>
 
-      {/* Team */}
+     {/* Team Section - Corrected Nesting */}
       <section className="py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Our Certifications
+              Our Team
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Trusted certifications that validate our commitment to quality
+              The passionate experts behind 9 Planet Impex
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            {/* Rajesh */}
             <div className="text-center">
               <div className="w-32 h-32 rounded-full bg-muted mx-auto mb-4 overflow-hidden">
                 <img
@@ -242,12 +243,11 @@ const About = () => {
                   className="w-full h-full object-cover"
                 />
               </div>
-              <h3 className="font-display text-lg font-semibold text-foreground">
-                Rajesh Sharma
-              </h3>
+              <h3 className="font-display text-lg font-semibold text-foreground">Rajesh Sharma</h3>
               <p className="text-muted-foreground">Founder & CEO</p>
             </div>
 
+            {/* Priya */}
             <div className="text-center">
               <div className="w-32 h-32 rounded-full bg-muted mx-auto mb-4 overflow-hidden">
                 <img
@@ -256,12 +256,11 @@ const About = () => {
                   className="w-full h-full object-cover"
                 />
               </div>
-              <h3 className="font-display text-lg font-semibold text-foreground">
-                Priya Sharma
-              </h3>
+              <h3 className="font-display text-lg font-semibold text-foreground">Priya Sharma</h3>
               <p className="text-muted-foreground">Head of Curation</p>
             </div>
 
+            {/* Amit */}
             <div className="text-center">
               <div className="w-32 h-32 rounded-full bg-muted mx-auto mb-4 overflow-hidden">
                 <img
@@ -270,14 +269,12 @@ const About = () => {
                   className="w-full h-full object-cover"
                 />
               </div>
-              <h3 className="font-display text-lg font-semibold text-foreground">
-                Amit Patel
-              </h3>
+              <h3 className="font-display text-lg font-semibold text-foreground">Amit Patel</h3>
               <p className="text-muted-foreground">Master Tea Sommelier</p>
             </div>
           </div>
-        </div>
-      </div>
+        </div> 
+      </section> {/* This replaces the incorrect </div> tag */}
     </div>
   );
 };
