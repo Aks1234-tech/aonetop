@@ -77,7 +77,7 @@ const ProductDetails = () => {
   };
 
   const formatPrice = (price: number) => {
-    // Prices are stored in paise, convert to rupees
+    // Prices are stored in rupees
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
