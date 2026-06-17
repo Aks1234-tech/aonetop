@@ -75,7 +75,7 @@ export function Bestsellers() {
       style: 'currency',
       currency: 'INR',
       minimumFractionDigits: 0,
-    }).format(price / 100);
+    }).format(price);
   };
 
   if (isLoading) {
