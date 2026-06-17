@@ -77,12 +77,12 @@ const ProductDetails = () => {
   };
 
   const formatPrice = (price: number) => {
-    // Prices are stored in paise, convert to rupees
+    // Prices are stored in rupees
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
       minimumFractionDigits: 0,
-    }).format(price / 100);
+    }).format(price);
   };
 
   const getProductImage = (p: typeof product) => {
@@ -130,7 +130,7 @@ const ProductDetails = () => {
     addToCart({
       id: product.id,
       name: product.name,
-      price: price / 100, // Convert from paise
+      price: price, // Price is in rupees
       image: getProductImage(product),
       weight: weight || undefined,
       weightVariantId: selectedVariant?.id,

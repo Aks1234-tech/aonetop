@@ -50,12 +50,12 @@ const Profile = () => {
     }
   }, [user, isLoading, navigate]);
 
-  const formatPrice = (priceInPaise: number) => {
+  const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
       minimumFractionDigits: 0,
-    }).format(priceInPaise / 100);
+    }).format(price);
   };
 
   const handleSaveProfile = async () => {
