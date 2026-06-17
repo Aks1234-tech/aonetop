@@ -13,7 +13,7 @@ const OrderHistory = () => {
             style: 'currency',
             currency: 'INR',
             minimumFractionDigits: 0,
-        }).format(price / 100); // Convert from paise
+        }).format(price);
     };
 
     const formatDate = (date: string) => {

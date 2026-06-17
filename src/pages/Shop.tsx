@@ -57,7 +57,7 @@ const Shop = () => {
       style: 'currency',
       currency: 'INR',
       minimumFractionDigits: 0,
-    }).format(price / 100);
+    }).format(price);
   };
 
   const getProductImage = (product: Product) => {
