@@ -71,11 +71,12 @@ export function Bestsellers() {
   }, []);
 
   const formatPrice = (price: number) => {
+    // Prices are stored in paise, convert to rupees
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
       minimumFractionDigits: 0,
-    }).format(price);
+    }).format(price / 100);
   };
 
   if (isLoading) {
